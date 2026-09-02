@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qcov"
+version = "0.1.0a0"
+description = "Find what your tests still don't prove."
+readme = { text = "QCov — Quality Evidence Gap Engine.", content-type = "text/markdown" }
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "AI Native QA Lab" }]
+dependencies = [
+  "pydantic>=2.8,<3",
+  "PyYAML>=6,<7",
+  "typer>=0.12,<1",
+  "rich>=13,<14",
+]
+
+[project.optional-dependencies]
+dev = ["build>=1.2,<2", "mypy>=1.11,<2", "pytest>=8,<9", "ruff>=0.6,<1"]
+
+[project.scripts]
+qcov = "qcov.cli.app:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["qcov"]
