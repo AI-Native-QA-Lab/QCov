@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "Artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "Artifact",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "properties": {
+        "deterministic": {
+          "title": "Deterministic",
+          "type": "boolean"
+        },
+        "reproducible": {
+          "title": "Reproducible",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "deterministic",
+        "reproducible"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "EvidenceDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "$ref": "#/$defs/QualityDimension"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimension",
+        "type"
+      ],
+      "title": "EvidenceDescriptor",
+      "type": "object"
+    },
+    "EvidenceMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "EvidenceMetadata",
+      "type": "object"
+    },
+    "Execution": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "skipped",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "timestamp"
+      ],
+      "title": "Execution",
+      "type": "object"
+    },
+    "ObligationRef": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "title": "ObligationRef",
+      "type": "object"
+    },
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "adapter": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Adapter"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Producer",
+      "type": "object"
+    },
+    "QualityDimension": {
+      "enum": [
+        "behavior",
+        "boundary",
+        "data",
+        "concurrency",
+        "idempotency",
+        "production",
+        "security",
+        "fault",
+        "integration"
+      ],
+      "title": "QualityDimension",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "const": "qcov.dev/v1alpha1",
+      "title": "Apiversion",
+      "type": "string"
+    },
+    "kind": {
+      "const": "QualityEvidence",
+      "title": "Kind",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/EvidenceMetadata"
+    },
+    "obligation": {
+      "$ref": "#/$defs/ObligationRef"
+    },
+    "evidence": {
+      "$ref": "#/$defs/EvidenceDescriptor"
+    },
+    "producer": {
+      "$ref": "#/$defs/Producer"
+    },
+    "execution": {
+      "$ref": "#/$defs/Execution"
+    },
+    "artifact": {
+      "$ref": "#/$defs/Artifact"
+    },
+    "confidence": {
+      "$ref": "#/$defs/Confidence"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "obligation",
+    "evidence",
+    "producer",
+    "execution",
+    "artifact",
+    "confidence"
+  ],
+  "title": "QualityEvidence",
+  "type": "object"
+}

@@ -1,0 +1,165 @@
+{
+  "$defs": {
+    "Invariant": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "expression"
+      ],
+      "title": "Invariant",
+      "type": "object"
+    },
+    "LocalizedText": {
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "title": "En",
+          "type": "string"
+        },
+        "zh-CN": {
+          "title": "Zh-Cn",
+          "type": "string"
+        }
+      },
+      "required": [
+        "en",
+        "zh-CN"
+      ],
+      "title": "LocalizedText",
+      "type": "object"
+    },
+    "ObligationMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "$ref": "#/$defs/LocalizedText"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "ObligationMetadata",
+      "type": "object"
+    },
+    "QualityDimension": {
+      "enum": [
+        "behavior",
+        "boundary",
+        "data",
+        "concurrency",
+        "idempotency",
+        "production",
+        "security",
+        "fault",
+        "integration"
+      ],
+      "title": "QualityDimension",
+      "type": "string"
+    },
+    "Risk": {
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "title": "Domain",
+          "type": "string"
+        },
+        "severity": {
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "domain",
+        "severity"
+      ],
+      "title": "Risk",
+      "type": "object"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "ref": {
+          "title": "Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "ref"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "const": "qcov.dev/v1alpha1",
+      "title": "Apiversion",
+      "type": "string"
+    },
+    "kind": {
+      "const": "TestingObligation",
+      "title": "Kind",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/ObligationMetadata"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceRef"
+    },
+    "risk": {
+      "$ref": "#/$defs/Risk"
+    },
+    "invariants": {
+      "items": {
+        "$ref": "#/$defs/Invariant"
+      },
+      "title": "Invariants",
+      "type": "array"
+    },
+    "requiredEvidence": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/QualityDimension"
+      },
+      "title": "Requiredevidence",
+      "type": "object"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "source",
+    "risk",
+    "requiredEvidence"
+  ],
+  "title": "TestingObligation",
+  "type": "object"
+}
