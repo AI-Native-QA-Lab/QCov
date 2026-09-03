@@ -7,6 +7,7 @@ from typing import Annotated
 
 import typer
 
+from qcov.adapters.pytest import PytestAdapter
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
 from qcov.engine.reports import render_json, render_markdown
 from qcov.models.io import ProtocolLoadError, load_evidence, load_obligation
@@ -124,5 +125,5 @@ def init(path: Annotated[Path, typer.Option()] = Path(".")) -> None:
 @app.command()
 def scan(path: Annotated[Path, typer.Option(exists=True, readable=True)] = Path(".")) -> None:
     """List MVP-local evidence producers detected in a project."""
-    marker = any(path.rglob("test_*.py"))
-    typer.echo(f"pytest-marker  {'detected' if marker else 'not detected'}")
+    result = PytestAdapter().detect(path)
+    typer.echo(f"{result.name}  {'detected' if result.detected else 'not detected'}")
