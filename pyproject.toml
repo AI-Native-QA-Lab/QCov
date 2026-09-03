@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "qcov"
 version = "0.1.0a0"
 description = "Find what your tests still don't prove."
-readme = { text = "QCov — Quality Evidence Gap Engine.", content-type = "text/markdown" }
+readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "AI Native QA Lab" }]
