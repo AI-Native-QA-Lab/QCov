@@ -8,7 +8,7 @@ version = "0.1.0a0"
 description = "Find what your tests still don't prove."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Apache-2.0" }
+license = { text = "PolyForm Noncommercial 1.0.0" }
 authors = [{ name = "AI Native QA Lab" }]
 dependencies = [
   "pydantic>=2.8,<3",
