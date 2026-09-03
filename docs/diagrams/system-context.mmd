@@ -1,0 +1,8 @@
+flowchart TB
+  R[Requirement / Risk / Change] --> O[Testing Obligation]
+  O --> RE[Required Evidence]
+  T[Test and engineering tools] --> A[QCov Adapters]
+  A --> OE[Observed Evidence]
+  RE --> G[QCov Gap Engine]
+  OE --> G
+  G --> S[COVERED / PARTIAL / MISSING / UNKNOWN]

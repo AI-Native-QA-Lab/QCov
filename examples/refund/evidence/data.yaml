@@ -1,0 +1,9 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityEvidence
+metadata: { id: QE-REFUND-DATA-001 }
+obligation: { ref: QO-REFUND-001 }
+evidence: { dimension: data, type: database_invariant }
+producer: { name: pytest, adapter: qcov-pytest }
+execution: { status: passed, timestamp: "2026-09-03T10:00:00+08:00" }
+artifact: { path: tests/refund/test_database.py }
+confidence: { deterministic: true, reproducible: true }

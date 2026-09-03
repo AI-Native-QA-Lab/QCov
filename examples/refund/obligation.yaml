@@ -1,0 +1,23 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata:
+  id: QO-REFUND-001
+  title:
+    en: Refund amount must not exceed paid amount
+    zh-CN: 累计退款金额不能超过支付金额
+source:
+  type: requirement
+  ref: REFUND-001
+risk:
+  domain: financial
+  severity: critical
+invariants:
+  - id: INV-REFUND-001
+    expression: total_refund <= paid_amount
+requiredEvidence:
+  behavior: [api_test]
+  boundary: [property_test]
+  data: [database_invariant]
+  concurrency: [concurrency_test]
+  idempotency: [idempotency_test]
+  production: [runtime_monitor]

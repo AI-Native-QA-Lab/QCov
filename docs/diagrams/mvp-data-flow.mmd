@@ -1,0 +1,6 @@
+flowchart LR
+  O[obligation.yaml] --> V[Protocol validation]
+  E[evidence/*.yaml] --> V
+  V --> G[Gap evaluation]
+  G --> J[JSON report]
+  G --> M[Localized Markdown]

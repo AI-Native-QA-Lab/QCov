@@ -1,0 +1,6 @@
+# Protocol
+
+`qcov.dev/v1alpha1` defines `TestingObligation`, `QualityEvidence`, and
+`QualityPolicy`. Machine keys are English; localized prose uses `en` and
+`zh-CN`. Published schemas are in `schemas/`. Stable errors such as
+`QCOV-SCHEMA-001` are never translated.
