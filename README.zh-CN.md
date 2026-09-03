@@ -28,3 +28,7 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 - [技术设计](docs/zh-CN/technical-design.md)
 - [开发指南](docs/zh-CN/development.md)
 - [过程记录](docs/zh-CN/process.md)
+
+## 许可证
+
+[PolyForm Noncommercial License 1.0.0](LICENSE)。

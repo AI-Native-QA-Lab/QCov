@@ -37,4 +37,4 @@ exist; concurrency, idempotency, and production evidence are still unproven.
 
 ## License
 
-Apache-2.0.
+[PolyForm Noncommercial License 1.0.0](LICENSE).
