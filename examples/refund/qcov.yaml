@@ -1,0 +1,4 @@
+obligations:
+  - obligation.yaml
+evidence:
+  - evidence/*.yaml

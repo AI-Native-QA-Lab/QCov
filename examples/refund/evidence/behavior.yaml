@@ -1,0 +1,9 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityEvidence
+metadata: { id: QE-REFUND-BEHAVIOR-001 }
+obligation: { ref: QO-REFUND-001 }
+evidence: { dimension: behavior, type: api_test }
+producer: { name: pytest, adapter: qcov-pytest }
+execution: { status: passed, timestamp: "2026-09-03T10:00:00+08:00" }
+artifact: { path: tests/refund/test_api.py }
+confidence: { deterministic: true, reproducible: true }

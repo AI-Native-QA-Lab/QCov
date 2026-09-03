@@ -1,0 +1,9 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityEvidence
+metadata: { id: QE-REFUND-BOUNDARY-001 }
+obligation: { ref: QO-REFUND-001 }
+evidence: { dimension: boundary, type: property_test }
+producer: { name: hypothesis, adapter: qcov-pytest }
+execution: { status: passed, timestamp: "2026-09-03T10:00:00+08:00" }
+artifact: { path: tests/refund/test_property.py }
+confidence: { deterministic: true, reproducible: true }
