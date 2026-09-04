@@ -39,3 +39,10 @@ JUnit/coverage imports are inventory only. They never infer an obligation,
 produce passed Quality Evidence, execute user tests, or calculate a quality
 score. JaCoCo, Playwright, external adapters, policy, Git delta, and AI remain
 future roadmap items.
+
+## Fixture tracking correction
+
+The repository-wide Python ignore rule initially excluded the intentional
+`examples/imported-reports/coverage.xml` fixture. A narrow negation rule now
+tracks that single documented sample while preserving normal generated coverage
+report ignores. The fixture was rechecked with `git check-ignore` before commit.
