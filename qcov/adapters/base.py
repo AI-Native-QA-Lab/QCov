@@ -16,6 +16,35 @@ class DetectionResult:
     detail: str
 
 
+@dataclass(frozen=True)
+class InventoryRecord:
+    """An imported observation with no inferred obligation relationship."""
+
+    producer: str
+    identity: str
+    status: str
+    artifact_path: str
+    metadata: dict[str, str]
+
+
+@dataclass(frozen=True)
+class ScanDiagnostic:
+    """A non-fatal local artifact inspection diagnostic."""
+
+    code: str
+    message: str
+    artifact_path: str
+
+
+@dataclass(frozen=True)
+class ScanResult:
+    """Inventory records and diagnostics from one side-effect-free scan."""
+
+    adapter: str
+    records: tuple[InventoryRecord, ...]
+    diagnostics: tuple[ScanDiagnostic, ...]
+
+
 class Adapter(Protocol):
     name: str
 

@@ -1,0 +1,63 @@
+{
+  "$defs": {
+    "ScanConfig": {
+      "additionalProperties": false,
+      "description": "Optional report paths grouped by supported local producer.",
+      "properties": {
+        "junit": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Junit",
+          "type": "array"
+        },
+        "coverage": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Coverage",
+          "type": "array"
+        }
+      },
+      "title": "ScanConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Strict, versioned configuration for one local QCov project.",
+  "properties": {
+    "apiVersion": {
+      "const": "qcov.dev/v1alpha1",
+      "title": "Apiversion",
+      "type": "string"
+    },
+    "kind": {
+      "const": "QCovConfig",
+      "title": "Kind",
+      "type": "string"
+    },
+    "obligations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Obligations",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "scan": {
+      "$ref": "#/$defs/ScanConfig"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind"
+  ],
+  "title": "ProjectConfig",
+  "type": "object"
+}

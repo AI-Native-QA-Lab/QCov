@@ -54,3 +54,29 @@ def test_inspect_and_report_emit_requested_result(tmp_path: Path) -> None:
 def test_init_refuses_to_overwrite_configuration(tmp_path: Path) -> None:
     assert runner.invoke(app, ["init", "--path", str(tmp_path)]).exit_code == 0
     assert runner.invoke(app, ["init", "--path", str(tmp_path)]).exit_code == 4
+
+
+def test_scan_json_lists_junit_file_and_record_count(tmp_path: Path) -> None:
+    (tmp_path / "junit.xml").write_text('<testsuite><testcase name="works" /></testsuite>')
+    config = tmp_path / "qcov.yaml"
+    config.write_text("apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\nscan:\n  junit: [junit.xml]\n")
+
+    result = runner.invoke(app, ["scan", "--config", str(config), "--format", "json"])
+
+    assert result.exit_code == 0
+    assert '"adapter": "junit"' in result.stdout
+    assert '"recordCount": 1' in result.stdout
+
+
+def test_gaps_loads_paths_from_config(tmp_path: Path) -> None:
+    config = tmp_path / "qcov.yaml"
+    config.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        f"obligations: [{OBLIGATION}]\n"
+        f"evidence: [{EVIDENCE}/*.yaml]\n"
+    )
+
+    result = runner.invoke(app, ["gaps", "--config", str(config)])
+
+    assert result.exit_code == 0
+    assert "QO-REFUND-001" in result.stdout

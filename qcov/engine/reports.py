@@ -6,6 +6,7 @@ import json
 from collections.abc import Sequence
 
 from qcov.engine.gaps import ObligationResult
+from qcov.engine.scan import ScanReport
 from qcov.i18n.catalog import translate
 
 
@@ -50,3 +51,38 @@ def render_markdown(results: Sequence[ObligationResult], locale: str = "en") -> 
             f"{translate('label.unproven', locale)}: {unproven}"
         )
     return "\n\n".join(blocks)
+
+
+def render_scan_json(report: ScanReport) -> str:
+    """Return stable English-keyed JSON for artifact discovery."""
+    return json.dumps(
+        {
+            "adapters": [
+                {
+                    "adapter": item.adapter,
+                    "detected": item.detected,
+                    "files": list(item.files),
+                    "recordCount": item.record_count,
+                }
+                for item in report.adapters
+            ],
+            "diagnostics": [
+                {"code": item.code, "message": item.message, "artifactPath": item.artifact_path}
+                for item in report.diagnostics
+            ],
+        },
+        indent=2,
+        sort_keys=True,
+    )
+
+
+def render_scan_markdown(report: ScanReport) -> str:
+    """Return concise human-readable artifact-discovery diagnostics."""
+    adapters = "\n".join(
+        f"- {item.adapter}: {'detected' if item.detected else 'not detected'}; {item.record_count} records"
+        for item in report.adapters
+    )
+    diagnostics = "\n".join(
+        f"- `{item.code}` {item.artifact_path}: {item.message}" for item in report.diagnostics
+    ) or "- none"
+    return f"## Scan\n\nAdapters:\n{adapters}\n\nDiagnostics:\n{diagnostics}"
