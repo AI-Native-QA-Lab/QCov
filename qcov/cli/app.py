@@ -7,10 +7,10 @@ from typing import Annotated
 
 import typer
 
-from qcov.adapters.pytest import PytestAdapter
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
-from qcov.engine.reports import render_json, render_markdown
-from qcov.models.io import ProtocolLoadError, load_evidence, load_obligation
+from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
+from qcov.engine.scan import scan_project
+from qcov.models.io import ConfigLoadError, ProtocolLoadError, load_evidence, load_obligation
 from qcov.models.protocol import CoverageStatus, QualityEvidence
 
 app = typer.Typer(no_args_is_help=True)
@@ -123,7 +123,21 @@ def init(path: Annotated[Path, typer.Option()] = Path(".")) -> None:
 
 
 @app.command()
-def scan(path: Annotated[Path, typer.Option(exists=True, readable=True)] = Path(".")) -> None:
-    """List MVP-local evidence producers detected in a project."""
-    result = PytestAdapter().detect(path)
-    typer.echo(f"{result.name}  {'detected' if result.detected else 'not detected'}")
+def scan(
+    path: Annotated[Path, typer.Option(exists=True, readable=True)] = Path("."),
+    config: Annotated[Path | None, typer.Option(exists=True, readable=True)] = None,
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Discover supported local evidence artifacts without executing tests."""
+    config_path = config or path / "qcov.yaml"
+    try:
+        report = scan_project(path, config_path)
+    except ConfigLoadError as error:
+        typer.echo(str(error), err=True)
+        raise typer.Exit(code=4) from error
+    if output_format == "json":
+        typer.echo(render_scan_json(report))
+    elif output_format == "markdown":
+        typer.echo(render_scan_markdown(report))
+    else:
+        raise typer.BadParameter("format must be markdown or json")
