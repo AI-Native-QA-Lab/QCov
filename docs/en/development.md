@@ -10,3 +10,6 @@ python3 -m venv .venv
 ```
 
 Use `pytest` before production code. Keep adapter collection side-effect free.
+
+Try local discovery with `qcov scan --config examples/imported-reports/qcov.yaml`.
+Every behavior change must preserve a recorded RED test before its GREEN result.

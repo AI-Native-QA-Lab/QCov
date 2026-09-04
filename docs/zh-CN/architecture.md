@@ -11,3 +11,5 @@ flowchart LR
 ```
 
 Core 不理解具体框架；Adapter 只标准化生产者输出，只有 Core 评估协议数据。
+
+`qcov.yaml` 相对自身解析报告路径。JUnit/coverage reader 仅解析本地文件并输出 scan diagnostics，不会直接进入 Gap Engine。

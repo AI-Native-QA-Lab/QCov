@@ -20,6 +20,10 @@ QCov 是面向 AI Native 软件交付的开源**质量证据缺口引擎**与**�
 
 Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发、幂等性和生产证据仍缺失。
 
+要发现现有本地报告而不执行测试，请运行
+`qcov scan --config examples/imported-reports/qcov.yaml`；加入 `--format json`
+可输出机器可读的 inventory 信息。参见[导入报告示例](examples/imported-reports/README.zh-CN.md)。
+
 ## 项目入口
 
 - [需求](docs/zh-CN/requirements.md)
