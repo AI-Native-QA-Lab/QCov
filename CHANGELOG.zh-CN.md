@@ -1,5 +1,15 @@
 # 更新日志
 
+## 0.3.0 - 2026-09-06
+
+### 新功能
+
+- 通过确定性的 built-in adapter registry 新增本地 Playwright JSON 与 LCOV inventory reader。
+
+### 文档
+
+- 新增 Iteration 2 的设计、实施、验证记录，以及新报告导入的可运行中英示例。
+
 ## 0.2.1 - 2026-09-06
 
 ### 修复

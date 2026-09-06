@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 - 2026-09-06
+
+### Features
+
+- Add local Playwright JSON and LCOV inventory readers through a deterministic
+  built-in adapter registry.
+
+### Documentation
+
+- Add Iteration 2 design, implementation, verification records, and runnable
+  bilingual examples for the new report imports.
+
 ## 0.2.1 - 2026-09-06
 
 ### Fixes
