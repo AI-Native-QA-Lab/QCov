@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage line-rate="0.8">
+  <packages><package name="refund" line-rate="0.8"><classes>
+    <class name="refund.service" filename="refund/service.py" line-rate="0.8" />
+  </classes></package></packages>
+</coverage>

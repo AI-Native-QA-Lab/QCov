@@ -20,6 +20,13 @@ git diff --check
 
 Use the environment's available `python3` command when `python` is absent.
 
+## Test-Driven Development
+
+For every behavior change, write one focused automated test first and run it to
+observe the expected RED failure. Only then write the smallest implementation
+needed for GREEN; re-run the scoped test and relevant regression suite. Record
+the RED and GREEN evidence in the corresponding `docs/process/` entry.
+
 ## Documentation and Process
 
 Protocol keys, CLI flags, enums, and error IDs are English. Public prose is

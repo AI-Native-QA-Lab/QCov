@@ -12,3 +12,6 @@ flowchart LR
 
 The core has no framework knowledge. Adapters normalize producer output; only
 the core evaluates explicit protocol data.
+
+`qcov.yaml` resolves report paths relative to itself. JUnit/coverage readers
+parse local files only and feed scan diagnostics, never the Gap Engine directly.

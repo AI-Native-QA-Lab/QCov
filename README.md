@@ -26,6 +26,10 @@ python3 -m venv .venv
 The Refund scenario reports `PARTIAL`: behavior, boundary, and data evidence
 exist; concurrency, idempotency, and production evidence are still unproven.
 
+To discover existing local reports without executing them, run
+`qcov scan --config examples/imported-reports/qcov.yaml`. Use `--format json`
+for machine-readable inventory facts. See the [imported-reports example](examples/imported-reports/README.md).
+
 ## Project map
 
 - [Requirements](docs/en/requirements.md)

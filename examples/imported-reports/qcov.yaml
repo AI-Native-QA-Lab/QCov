@@ -1,0 +1,11 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QCovConfig
+obligations:
+  - ../refund/obligation.yaml
+evidence:
+  - ../refund/evidence/*.yaml
+scan:
+  junit:
+    - junit.xml
+  coverage:
+    - coverage.xml

@@ -15,12 +15,20 @@ class PytestAdapter:
     name = "pytest-marker"
 
     def detect(self, project_path: Path) -> DetectionResult:
-        found = any(project_path.rglob("test_*.py"))
+        found = bool(self.test_files(project_path))
         return DetectionResult(self.name, found, "Python test files found" if found else "No Python test files")
+
+    def test_files(self, project_path: Path) -> tuple[Path, ...]:
+        """Return project test files while excluding hidden dependency trees."""
+        return tuple(
+            path
+            for path in sorted(project_path.rglob("test_*.py"))
+            if not any(part.startswith(".") for part in path.relative_to(project_path).parts)
+        )
 
     def collect(self, project_path: Path) -> list[QualityEvidence]:
         records: list[QualityEvidence] = []
-        for path in project_path.rglob("test_*.py"):
+        for path in self.test_files(project_path):
             records.extend(self._collect_file(path, project_path))
         return records
 

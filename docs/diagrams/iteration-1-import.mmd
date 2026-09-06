@@ -1,0 +1,8 @@
+flowchart LR
+  C[qcov.yaml] --> D[Local discovery]
+  P[pytest marker source] --> D
+  J[JUnit XML] --> D
+  V[coverage.py XML] --> D
+  D --> I[Inventory records + diagnostics]
+  I -. explicit mapping required .-> E[Quality Evidence]
+  E --> G[Gap Engine]

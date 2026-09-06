@@ -42,18 +42,20 @@ def _evaluate_dimension(
     required_types: list[str],
     evidence: Sequence[QualityEvidence],
 ) -> DimensionResult:
+    obligation_evidence = tuple(
+        item for item in evidence if item.obligation.ref == obligation.metadata.id
+    )
     matching = tuple(
         item
-        for item in evidence
-        if item.obligation.ref == obligation.metadata.id
-        and item.evidence.dimension is dimension
+        for item in obligation_evidence
+        if item.evidence.dimension is dimension
         and item.evidence.type in required_types
     )
     observed_ids = tuple(item.metadata.id for item in matching)
-    if any(item.execution.status == "passed" for item in matching):
-        status = CoverageStatus.COVERED
-    elif any(item.execution.status == "unknown" for item in matching):
+    if not obligation_evidence or any(item.execution.status == "unknown" for item in matching):
         status = CoverageStatus.UNKNOWN
+    elif any(item.execution.status == "passed" for item in matching):
+        status = CoverageStatus.COVERED
     else:
         status = CoverageStatus.MISSING
     return DimensionResult(dimension, tuple(required_types), status, observed_ids)

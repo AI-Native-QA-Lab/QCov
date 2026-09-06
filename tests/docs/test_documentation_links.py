@@ -22,3 +22,8 @@ def test_bilingual_docs_have_matching_stems() -> None:
         "technical-design.md",
     }
     assert english == chinese == expected
+
+
+def test_readmes_document_config_driven_scan() -> None:
+    assert "qcov scan --config" in (ROOT / "README.md").read_text()
+    assert "qcov scan --config" in (ROOT / "README.zh-CN.md").read_text()
