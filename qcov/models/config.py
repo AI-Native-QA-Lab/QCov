@@ -38,7 +38,10 @@ class ResolvedPaths:
     coverage: tuple[Path, ...]
 
 
-def _resolve(patterns: list[str], base: Path) -> tuple[Path, ...]:
+def resolve_patterns(
+    patterns: list[str], base: Path, *, include_missing: bool = False
+) -> tuple[Path, ...]:
+    """Resolve sorted, deduplicated paths, optionally retaining absent inputs."""
     paths: dict[Path, None] = {}
     for pattern in patterns:
         candidate = Path(pattern)
@@ -48,6 +51,8 @@ def _resolve(patterns: list[str], base: Path) -> tuple[Path, ...]:
             matches = sorted(base.glob(pattern))
         for path in matches:
             paths[path.resolve()] = None
+        if include_missing and not matches:
+            paths[(candidate if candidate.is_absolute() else base / candidate).resolve()] = None
     return tuple(sorted(paths))
 
 
@@ -55,8 +60,8 @@ def resolve_paths(config: ProjectConfig, config_path: Path) -> ResolvedPaths:
     """Resolve config patterns relative to the configuration file location."""
     base = config_path.resolve().parent
     return ResolvedPaths(
-        obligations=_resolve(config.obligations, base),
-        evidence=_resolve(config.evidence, base),
-        junit=_resolve(config.scan.junit, base),
-        coverage=_resolve(config.scan.coverage, base),
+        obligations=resolve_patterns(config.obligations, base),
+        evidence=resolve_patterns(config.evidence, base),
+        junit=resolve_patterns(config.scan.junit, base),
+        coverage=resolve_patterns(config.scan.coverage, base),
     )

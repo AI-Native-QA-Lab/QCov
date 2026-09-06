@@ -41,7 +41,7 @@ def passing(dimension: str) -> QualityEvidence:
     [
         ([passing("behavior"), passing("boundary")], CoverageStatus.COVERED),
         ([passing("behavior")], CoverageStatus.PARTIAL),
-        ([], CoverageStatus.MISSING),
+        ([], CoverageStatus.UNKNOWN),
     ],
 )
 def test_gap_status_is_deterministic(
@@ -55,3 +55,11 @@ def test_unknown_observation_produces_unknown_status() -> None:
     raw["execution"]["status"] = "unknown"
     unknown = QualityEvidence.model_validate(raw)
     assert evaluate_obligation(obligation(), [unknown]).status is CoverageStatus.PARTIAL
+
+
+def test_unrelated_evidence_does_not_turn_an_absent_obligation_inventory_into_missing() -> None:
+    raw = passing("behavior").model_dump(by_alias=True, mode="json")
+    raw["obligation"]["ref"] = "QO-OTHER-001"
+    unrelated = QualityEvidence.model_validate(raw)
+
+    assert evaluate_obligation(obligation(), [unrelated]).status is CoverageStatus.UNKNOWN

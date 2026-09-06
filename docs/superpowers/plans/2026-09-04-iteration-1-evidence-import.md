@@ -12,12 +12,12 @@
 
 ## Global Constraints
 
-- [ ] Parse artifacts locally and never execute/import user project code.
-- [ ] Keep generic imported test/coverage observations separate from obligation-satisfying `QualityEvidence`.
-- [ ] Retain English protocol keys and JSON output; localize Markdown only.
-- [ ] Treat malformed/missing scan artifacts as diagnostics, but invalid config as `QCOV-CONFIG-001` / exit 4.
-- [ ] Update paired English/Chinese docs and a dated process record per delivered task.
-- [ ] Follow strict TDD for every behavior: write one focused test first, run it
+- [x] Parse artifacts locally and never execute/import user project code.
+- [x] Keep generic imported test/coverage observations separate from obligation-satisfying `QualityEvidence`.
+- [x] Retain English protocol keys and JSON output; localize Markdown only.
+- [x] Treat malformed/missing scan artifacts as diagnostics, but invalid config as `QCOV-CONFIG-001` / exit 4.
+- [x] Update paired English/Chinese docs and a dated process record per delivered task.
+- [x] Follow strict TDD for every behavior: write one focused test first, run it
       and observe the expected RED failure, write only the smallest production
       implementation needed for GREEN, then run scoped and full regression.
       Process records must preserve the RED/GREEN evidence.
@@ -30,7 +30,7 @@
 
 **Interfaces:** Produces `ProjectConfig`, `load_config(path)`, and `resolve_paths(config, config_path)` returning sorted, deduplicated `Path` values.
 
-- [ ] **Step 1: Write failing config tests.**
+- [x] **Step 1: Write failing config tests.**
 
 ```python
 def test_config_resolves_relative_globs_in_sorted_order(tmp_path: Path) -> None:
@@ -38,10 +38,10 @@ def test_config_resolves_relative_globs_in_sorted_order(tmp_path: Path) -> None:
     assert [path.name for path in resolve_paths(load_config(config), config).evidence] == ["a.yaml", "b.yaml"]
 ```
 
-- [ ] **Step 2: Run `pytest tests/models/test_config.py -q`.** Expected: FAIL because the config API does not exist.
-- [ ] **Step 3: Implement strict `QCovConfig` v1alpha1 model, loader, resolution, and generated schema.** Add the strict RED/GREEN TDD requirement to `AGENTS.md`. Missing matched artifact paths remain a diagnostic candidate rather than a loader exception.
-- [ ] **Step 4: Run model tests, Ruff, mypy, and schema JSON validation.** Expected: PASS.
-- [ ] **Step 5: Add `docs/process/YYYY-MM-DD-config.md` and commit `feat: add project configuration loading`.**
+- [x] **Step 2: Run `pytest tests/models/test_config.py -q`.** Expected: FAIL because the config API does not exist.
+- [x] **Step 3: Implement strict `QCovConfig` v1alpha1 model, loader, resolution, and generated schema.** Add the strict RED/GREEN TDD requirement to `AGENTS.md`. Missing matched artifact paths remain a diagnostic candidate rather than a loader exception.
+- [x] **Step 4: Run model tests, Ruff, mypy, and schema JSON validation.** Expected: PASS.
+- [x] **Step 5: Add `docs/process/YYYY-MM-DD-config.md` and commit `feat: add project configuration loading`.**
 
 ## Task 2: Generic JUnit XML Inventory Reader
 
@@ -49,7 +49,7 @@ def test_config_resolves_relative_globs_in_sorted_order(tmp_path: Path) -> None:
 
 **Interfaces:** Produces `InventoryRecord`, `ScanDiagnostic`, and `JUnitAdapter.scan(path) -> ScanResult`.
 
-- [ ] **Step 1: Write failing tests for passed, failure, error, skipped, and malformed JUnit XML.**
+- [x] **Step 1: Write failing tests for passed, failure, error, skipped, and malformed JUnit XML.**
 
 ```python
 def test_junit_scan_maps_failure_without_creating_quality_evidence(tmp_path: Path) -> None:
@@ -58,10 +58,10 @@ def test_junit_scan_maps_failure_without_creating_quality_evidence(tmp_path: Pat
     assert not hasattr(result.records[0], "obligation")
 ```
 
-- [ ] **Step 2: Run `pytest tests/adapters/test_junit_adapter.py -q`.** Expected: FAIL because the adapter is absent.
-- [ ] **Step 3: Implement stdlib `xml.etree.ElementTree` parser and non-fatal `QCOV-SCAN-001` diagnostics.** Do not execute test commands or infer obligation IDs.
-- [ ] **Step 4: Run adapter tests, Ruff, and mypy.** Expected: PASS.
-- [ ] **Step 5: Record results and commit `feat: import JUnit XML test inventory`.**
+- [x] **Step 2: Run `pytest tests/adapters/test_junit_adapter.py -q`.** Expected: FAIL because the adapter is absent.
+- [x] **Step 3: Implement stdlib `xml.etree.ElementTree` parser and non-fatal `QCOV-SCAN-001` diagnostics.** Do not execute test commands or infer obligation IDs.
+- [x] **Step 4: Run adapter tests, Ruff, and mypy.** Expected: PASS.
+- [x] **Step 5: Record results and commit `feat: import JUnit XML test inventory`.**
 
 ## Task 3: coverage.py XML Inventory Reader
 
@@ -69,11 +69,11 @@ def test_junit_scan_maps_failure_without_creating_quality_evidence(tmp_path: Pat
 
 **Interfaces:** Produces coverage inventory records with producer `coverage.py`, structural type, file identity, and line-rate metadata.
 
-- [ ] **Step 1: Write failing tests for class/package line rates and malformed XML.**
-- [ ] **Step 2: Run `pytest tests/adapters/test_coverage_adapter.py -q`.** Expected: FAIL.
-- [ ] **Step 3: Implement the side-effect-free XML reader.** Preserve line-rate as metadata only; never represent it as a QCov score or proof.
-- [ ] **Step 4: Run adapter checks.** Expected: PASS.
-- [ ] **Step 5: Record results and commit `feat: import coverage XML inventory`.**
+- [x] **Step 1: Write failing tests for class/package line rates and malformed XML.**
+- [x] **Step 2: Run `pytest tests/adapters/test_coverage_adapter.py -q`.** Expected: FAIL.
+- [x] **Step 3: Implement the side-effect-free XML reader.** Preserve line-rate as metadata only; never represent it as a QCov score or proof.
+- [x] **Step 4: Run adapter checks.** Expected: PASS.
+- [x] **Step 5: Record results and commit `feat: import coverage XML inventory`.**
 
 ## Task 4: Discovery Service and `scan` Reports
 
@@ -81,7 +81,7 @@ def test_junit_scan_maps_failure_without_creating_quality_evidence(tmp_path: Pat
 
 **Interfaces:** Produces `scan_project(path, config_path) -> ScanReport`, `render_scan_json`, and `render_scan_markdown`.
 
-- [ ] **Step 1: Write failing CLI tests.**
+- [x] **Step 1: Write failing CLI tests.**
 
 ```python
 def test_scan_json_lists_junit_file_and_record_count() -> None:
@@ -90,10 +90,10 @@ def test_scan_json_lists_junit_file_and_record_count() -> None:
     assert '"adapter": "junit"' in result.stdout
 ```
 
-- [ ] **Step 2: Run scoped tests.** Expected: FAIL because scan has no config/report support.
-- [ ] **Step 3: Implement aggregation of pytest, JUnit, and coverage findings.** Sort adapters/files/diagnostics; return 0 for inspectable projects and 4 for invalid configs.
-- [ ] **Step 4: Run scan, CLI, Ruff, and mypy tests.** Expected: PASS.
-- [ ] **Step 5: Record results and commit `feat: add config-driven evidence scan`.**
+- [x] **Step 2: Run scoped tests.** Expected: FAIL because scan has no config/report support.
+- [x] **Step 3: Implement aggregation of pytest, JUnit, and coverage findings.** Sort adapters/files/diagnostics; return 0 for inspectable projects and 4 for invalid configs.
+- [x] **Step 4: Run scan, CLI, Ruff, and mypy tests.** Expected: PASS.
+- [x] **Step 5: Record results and commit `feat: add config-driven evidence scan`.**
 
 ## Task 5: Config Defaults for Existing Gap Commands
 
@@ -101,7 +101,7 @@ def test_scan_json_lists_junit_file_and_record_count() -> None:
 
 **Interfaces:** `gaps`, `check`, and `report` accept `--config`; explicit `--obligation`/`--evidence` override defaults.
 
-- [ ] **Step 1: Write a failing config-default command test.**
+- [x] **Step 1: Write a failing config-default command test.**
 
 ```python
 def test_gaps_loads_paths_from_config() -> None:
@@ -110,17 +110,17 @@ def test_gaps_loads_paths_from_config() -> None:
     assert "QO-REFUND-001" in result.stdout
 ```
 
-- [ ] **Step 2: Run CLI test.** Expected: FAIL because `--config` is not accepted.
-- [ ] **Step 3: Implement precedence and validated single-obligation behavior.** Empty/multiple obligation selections produce a stable configuration error rather than arbitrary aggregation.
-- [ ] **Step 4: Run all CLI tests.** Expected: PASS.
-- [ ] **Step 5: Record results and commit `feat: load gap inputs from project config`.**
+- [x] **Step 2: Run CLI test.** Expected: FAIL because `--config` is not accepted.
+- [x] **Step 3: Implement precedence and validated single-obligation behavior.** Empty/multiple obligation selections produce a stable configuration error rather than arbitrary aggregation.
+- [x] **Step 4: Run all CLI tests.** Expected: PASS.
+- [x] **Step 5: Record results and commit `feat: load gap inputs from project config`.**
 
 ## Task 6: Documentation, Example, and Release Verification
 
 **Files:** Modify paired README and `docs/en|zh-CN/{requirements,architecture,protocol,technical-design,development,roadmap}.md`; create matching import-example READMEs, diagram update, ADR, docs tests, and final verification record.
 
-- [ ] **Step 1: Write failing docs tests for `scan --format json`, config quickstart, paired references, and supported-format claims.**
-- [ ] **Step 2: Run docs tests.** Expected: FAIL before docs are updated.
-- [ ] **Step 3: Publish paired docs and runnable imported-reports fixture.** Clearly distinguish inventory imports from obligation evidence and unsupported future tools.
-- [ ] **Step 4: Run `ruff check . && mypy qcov && pytest && python -m build && qcov scan --config examples/imported-reports/qcov.yaml && qcov scan --config examples/imported-reports/qcov.yaml --format json && git diff --check`.** Expected: all checks pass.
-- [ ] **Step 5: Record executed results, commit `docs: document iteration 1 evidence import`, and inspect Git status.**
+- [x] **Step 1: Write failing docs tests for `scan --format json`, config quickstart, paired references, and supported-format claims.**
+- [x] **Step 2: Run docs tests.** Expected: FAIL before docs are updated.
+- [x] **Step 3: Publish paired docs and runnable imported-reports fixture.** Clearly distinguish inventory imports from obligation evidence and unsupported future tools.
+- [x] **Step 4: Run `ruff check . && mypy qcov && pytest && python -m build && qcov scan --config examples/imported-reports/qcov.yaml && qcov scan --config examples/imported-reports/qcov.yaml --format json && git diff --check`.** Expected: all checks pass.
+- [x] **Step 5: Record executed results, commit `docs: document iteration 1 evidence import`, and inspect Git status.**

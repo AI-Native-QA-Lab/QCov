@@ -51,3 +51,11 @@ class Adapter(Protocol):
     def detect(self, project_path: Path) -> DetectionResult: ...
 
     def collect(self, project_path: Path) -> list[QualityEvidence]: ...
+
+
+class InventoryScanner(Protocol):
+    """Protocol for adapters that inspect a persisted artifact as inventory."""
+
+    name: str
+
+    def scan(self, path: Path) -> ScanResult: ...

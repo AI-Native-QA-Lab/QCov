@@ -37,7 +37,8 @@ def render_markdown(results: Sequence[ObligationResult], locale: str = "en") -> 
     for result in results:
         dimensions = "\n".join(
             f"- {translate(f'dimension.{item.dimension.value}', locale)}: `{item.status.value}` "
-            f"({', '.join(item.required_types)})"
+            f"({', '.join(item.required_types)}); "
+            f"{translate('label.observed', locale)}: {', '.join(item.observed_evidence_ids) or '—'}"
             for item in result.dimensions
         )
         unproven = ", ".join(
