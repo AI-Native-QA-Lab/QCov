@@ -7,7 +7,10 @@ from typing import Annotated
 
 import typer
 
+from qcov.engine.delta import compare_snapshots
+from qcov.engine.delta_reports import render_delta_json, render_delta_markdown
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
+from qcov.engine.git_snapshots import DiffInputError, load_snapshot
 from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
 from qcov.engine.scan import scan_project
 from qcov.models.config import resolve_paths
@@ -192,5 +195,28 @@ def scan(
         typer.echo(render_scan_json(report))
     elif output_format == "markdown":
         typer.echo(render_scan_markdown(report))
+    else:
+        raise typer.BadParameter("format must be markdown or json")
+
+
+@app.command()
+def diff(
+    base: Annotated[str, typer.Option()],
+    head: Annotated[str, typer.Option()] = "HEAD",
+    config: Annotated[str, typer.Option()] = "qcov.yaml",
+    repo: Annotated[Path, typer.Option(exists=True, file_okay=False, readable=True)] = Path("."),
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Compare explicit quality coverage in two local committed Git trees."""
+    try:
+        report = compare_snapshots(load_snapshot(repo, base, config), load_snapshot(repo, head, config))
+    except DiffInputError as error:
+        typer.echo(str(error), err=True)
+        raise typer.Exit(code=4) from error
+    if output_format == "json":
+        typer.echo(render_delta_json(report))
+    elif output_format == "markdown":
+        typer.echo(render_delta_markdown(report, locale))
     else:
         raise typer.BadParameter("format must be markdown or json")

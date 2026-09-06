@@ -9,7 +9,7 @@ QCov 是面向 AI Native 软件交付的开源**质量证据缺口引擎**与**�
 ## MVP
 
 本地确定性 MVP 校验 Testing Obligation 与 Quality Evidence，并输出
-`COVERED`、`PARTIAL`、`MISSING` 或 `UNKNOWN`。AI、数据库、仪表盘、Git Delta 和策略门禁均不在当前范围内。
+`COVERED`、`PARTIAL`、`MISSING` 或 `UNKNOWN`。AI、数据库、仪表盘、远程 Git 和策略门禁均不在当前范围内。
 
 ```bash
 .venv/bin/python -m qcov gaps \
@@ -25,6 +25,9 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 可输出机器可读的 inventory 信息。参见[导入报告示例](examples/imported-reports/README.zh-CN.md)。
 迭代 2 还支持在 `scan.playwright` 与 `scan.lcov` 下配置 Playwright JSON 和 LCOV；这些仍然只是 inventory observation。
 
+使用 `qcov diff --base origin/main --head HEAD --config qcov.yaml` 比较已提交的
+版本。它不会切换提交，也不会读取脏工作区。参见[PR 质量覆盖增量](docs/zh-CN/pr-delta.md)。
+
 ## 项目入口
 
 - [需求](docs/zh-CN/requirements.md)
@@ -32,6 +35,7 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 - [协议](docs/zh-CN/protocol.md)
 - [技术设计](docs/zh-CN/technical-design.md)
 - [开发指南](docs/zh-CN/development.md)
+- [PR 质量覆盖增量](docs/zh-CN/pr-delta.md)
 - [过程记录](docs/zh-CN/process.md)
 
 ## 许可证
