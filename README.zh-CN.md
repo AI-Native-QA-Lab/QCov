@@ -23,6 +23,7 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 要发现现有本地报告而不执行测试，请运行
 `qcov scan --config examples/imported-reports/qcov.yaml`；加入 `--format json`
 可输出机器可读的 inventory 信息。参见[导入报告示例](examples/imported-reports/README.zh-CN.md)。
+迭代 2 还支持在 `scan.playwright` 与 `scan.lcov` 下配置 Playwright JSON 和 LCOV；这些仍然只是 inventory observation。
 
 ## 项目入口
 

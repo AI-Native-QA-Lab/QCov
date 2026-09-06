@@ -42,3 +42,19 @@ def test_invalid_config_uses_stable_error_code(tmp_path: Path) -> None:
 def test_config_requires_qcov_config_kind() -> None:
     with pytest.raises(ValueError):
         ProjectConfig.model_validate({"apiVersion": "qcov.dev/v1alpha1", "kind": "wrong"})
+
+
+def test_config_resolves_playwright_and_lcov_scan_paths(tmp_path: Path) -> None:
+    config_path = tmp_path / "qcov.yaml"
+    config_path.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "scan:\n  playwright: [reports/playwright.json]\n  lcov: [reports/lcov.info]\n"
+    )
+    (tmp_path / "reports").mkdir()
+    (tmp_path / "reports/playwright.json").write_text("{}")
+    (tmp_path / "reports/lcov.info").write_text("")
+
+    paths = resolve_paths(load_config(config_path), config_path)
+
+    assert paths.playwright == ((tmp_path / "reports/playwright.json").resolve(),)
+    assert paths.lcov == ((tmp_path / "reports/lcov.info").resolve(),)
