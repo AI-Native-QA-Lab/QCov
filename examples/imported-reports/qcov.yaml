@@ -9,3 +9,7 @@ scan:
     - junit.xml
   coverage:
     - coverage.xml
+  playwright:
+    - playwright.json
+  lcov:
+    - lcov.info

@@ -27,3 +27,10 @@ def test_bilingual_docs_have_matching_stems() -> None:
 def test_readmes_document_config_driven_scan() -> None:
     assert "qcov scan --config" in (ROOT / "README.md").read_text()
     assert "qcov scan --config" in (ROOT / "README.zh-CN.md").read_text()
+
+
+def test_docs_name_iteration_two_inventory_adapters() -> None:
+    for path in (ROOT / "README.md", ROOT / "README.zh-CN.md"):
+        text = path.read_text()
+        assert "scan.playwright" in text
+        assert "scan.lcov" in text

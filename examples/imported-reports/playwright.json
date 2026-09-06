@@ -1,0 +1,1 @@
+{"suites":[{"title":"refund","file":"tests/refund.spec.ts","specs":[{"title":"shows confirmation","tests":[{"projectName":"chromium","status":"expected"}]}]}]}

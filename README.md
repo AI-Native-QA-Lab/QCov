@@ -29,6 +29,8 @@ exist; concurrency, idempotency, and production evidence are still unproven.
 To discover existing local reports without executing them, run
 `qcov scan --config examples/imported-reports/qcov.yaml`. Use `--format json`
 for machine-readable inventory facts. See the [imported-reports example](examples/imported-reports/README.md).
+Iteration 2 also reads Playwright JSON and LCOV files configured under
+`scan.playwright` and `scan.lcov`; these remain inventory observations.
 
 ## Project map
 

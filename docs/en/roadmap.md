@@ -8,3 +8,6 @@ value beyond ordinary reports, and AI proposal acceptance before expanding.
 
 Iteration 1 is now the local first-value import milestone: config, pytest
 marker detection, JUnit XML, and coverage.py XML inventory.
+
+Iteration 2 adds local Playwright JSON and LCOV inventory readers through an
+explicit built-in registry. External adapter plugins remain out of scope.

@@ -17,7 +17,9 @@
           },
           "title": "Coverage",
           "type": "array"
-        }
+        },
+        "playwright": {"items": {"type": "string"}, "title": "Playwright", "type": "array"},
+        "lcov": {"items": {"type": "string"}, "title": "Lcov", "type": "array"}
       },
       "title": "ScanConfig",
       "type": "object"

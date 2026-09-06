@@ -11,6 +11,9 @@ calculated.
 JUnit XML and coverage.py XML report only test/structural inventory. QCov does
 not infer a requirement relationship from a test name, class name, or line rate.
 
+Playwright JSON and LCOV imports follow the same inventory-only rule. They preserve
+test outcomes or source line counts and never create Quality Evidence.
+
 `gaps`, `check`, and `report` accept `--obligation` (with the backward-compatible
 `--obligations` alias) and `--evidence`. With `--config`, either explicit input
 overrides only its corresponding configured default.
