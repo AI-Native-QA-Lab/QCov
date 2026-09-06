@@ -16,6 +16,13 @@ MESSAGES: dict[str, dict[str, str]] = {
     "label.observed": {"en": "Observed evidence", "zh-CN": "已观测证据"},
     "label.unproven": {"en": "Unproven dimensions", "zh-CN": "未证实维度"},
     "label.status": {"en": "Status", "zh-CN": "状态"},
+    "delta.title": {"en": "PR Quality Coverage Delta", "zh-CN": "PR 质量覆盖增量"},
+    "delta.base": {"en": "Base commit", "zh-CN": "基线提交"},
+    "delta.head": {"en": "Head commit", "zh-CN": "目标提交"},
+    "delta.change": {"en": "Change", "zh-CN": "变更"},
+    "delta.before": {"en": "Before status", "zh-CN": "变更前状态"},
+    "delta.after": {"en": "After status", "zh-CN": "变更后状态"},
+    "delta.evidence": {"en": "Changed evidence", "zh-CN": "变更的证据"},
 }
 
 
