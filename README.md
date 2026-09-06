@@ -13,7 +13,7 @@ the evidence from those tools proves a requirement, risk, or change.
 
 The local deterministic MVP validates Testing Obligations and Quality Evidence,
 then reports `COVERED`, `PARTIAL`, `MISSING`, or `UNKNOWN`. It intentionally
-does not include AI, a database, a dashboard, Git delta, or policy gates.
+does not include AI, a database, a dashboard, remote Git access, or policy gates.
 
 ```bash
 python3 -m venv .venv
@@ -32,6 +32,10 @@ for machine-readable inventory facts. See the [imported-reports example](example
 Iteration 2 also reads Playwright JSON and LCOV files configured under
 `scan.playwright` and `scan.lcov`; these remain inventory observations.
 
+Compare committed trees with `qcov diff --base origin/main --head HEAD --config
+qcov.yaml`. It does not check out revisions or inspect dirty work. See
+[PR Quality Coverage Delta](docs/en/pr-delta.md).
+
 ## Project map
 
 - [Requirements](docs/en/requirements.md)
@@ -39,6 +43,7 @@ Iteration 2 also reads Playwright JSON and LCOV files configured under
 - [Protocol](docs/en/protocol.md)
 - [Technical design](docs/en/technical-design.md)
 - [Development guide](docs/en/development.md)
+- [PR Quality Coverage Delta](docs/en/pr-delta.md)
 - [Process records](docs/en/process.md)
 
 ## License
