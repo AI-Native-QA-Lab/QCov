@@ -6,9 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from qcov.adapters.base import InventoryScanner, ScanDiagnostic
-from qcov.adapters.coverage import CoverageAdapter
-from qcov.adapters.junit import JUnitAdapter
 from qcov.adapters.pytest import PytestAdapter
+from qcov.adapters.registry import inventory_adapters
 from qcov.models.config import resolve_patterns
 from qcov.models.io import load_config
 
@@ -55,13 +54,21 @@ def scan_project(project_path: Path, config_path: Path) -> ScanReport:
     pytest_summary = AdapterScanSummary(
         pytest.name, pytest.detected, pytest_files, len(pytest_adapter.collect(project_path))
     )
-    junit_summary, junit_diagnostics = _scan_files(
-        JUnitAdapter(), resolve_patterns(config.scan.junit, config_path.resolve().parent, include_missing=True)
-    )
-    coverage_summary, coverage_diagnostics = _scan_files(
-        CoverageAdapter(), resolve_patterns(config.scan.coverage, config_path.resolve().parent, include_missing=True)
-    )
+    configured = {
+        "junit": config.scan.junit,
+        "coverage.py": config.scan.coverage,
+        "lcov": config.scan.lcov,
+        "playwright": config.scan.playwright,
+    }
+    summaries: list[AdapterScanSummary] = [pytest_summary]
+    diagnostics: list[ScanDiagnostic] = []
+    for adapter in inventory_adapters():
+        summary, adapter_diagnostics = _scan_files(
+            adapter, resolve_patterns(configured[adapter.name], config_path.resolve().parent, include_missing=True)
+        )
+        summaries.append(summary)
+        diagnostics.extend(adapter_diagnostics)
     return ScanReport(
-        adapters=tuple(sorted((pytest_summary, junit_summary, coverage_summary), key=lambda item: item.adapter)),
-        diagnostics=tuple(sorted((*junit_diagnostics, *coverage_diagnostics), key=lambda item: item.artifact_path)),
+        adapters=tuple(sorted(summaries, key=lambda item: item.adapter)),
+        diagnostics=tuple(sorted(diagnostics, key=lambda item: item.artifact_path)),
     )

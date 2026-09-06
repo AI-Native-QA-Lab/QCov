@@ -4,4 +4,6 @@
 
 JUnit XML 与 coverage.py XML 只产生测试/结构 inventory；QCov 不会从测试名、类名或 line rate 推断需求关联。
 
+Playwright JSON 与 LCOV 导入遵循相同的 inventory-only 规则，保留测试结果或源代码行计数，不会创建 Quality Evidence。
+
 `gaps`、`check` 和 `report` 接受 `--obligation`（兼容旧的 `--obligations` 别名）与 `--evidence`。使用 `--config` 时，显式参数只覆盖其对应的配置默认值。

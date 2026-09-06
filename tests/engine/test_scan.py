@@ -20,6 +20,8 @@ def test_scan_project_collects_configured_junit_and_coverage_inventory(tmp_path:
     assert [(item.adapter, item.record_count) for item in report.adapters] == [
         ("coverage.py", 1),
         ("junit", 1),
+        ("lcov", 0),
+        ("playwright", 0),
         ("pytest-marker", 0),
     ]
 
@@ -45,3 +47,14 @@ def test_scan_project_reports_pytest_marker_files_and_records(tmp_path: Path) ->
     pytest = next(item for item in report.adapters if item.adapter == "pytest-marker")
     assert pytest.files == (str(tmp_path / "test_refund.py"),)
     assert pytest.record_count == 1
+
+
+def test_scan_project_uses_deterministic_cross_language_adapter_order(tmp_path: Path) -> None:
+    config = tmp_path / "qcov.yaml"
+    config.write_text("apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n")
+
+    report = scan_project(tmp_path, config)
+
+    assert [item.adapter for item in report.adapters] == [
+        "coverage.py", "junit", "lcov", "playwright", "pytest-marker"
+    ]

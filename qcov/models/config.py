@@ -16,6 +16,8 @@ class ScanConfig(ProtocolModel):
 
     junit: list[str] = Field(default_factory=list)
     coverage: list[str] = Field(default_factory=list)
+    playwright: list[str] = Field(default_factory=list)
+    lcov: list[str] = Field(default_factory=list)
 
 
 class ProjectConfig(ProtocolModel):
@@ -36,6 +38,8 @@ class ResolvedPaths:
     evidence: tuple[Path, ...]
     junit: tuple[Path, ...]
     coverage: tuple[Path, ...]
+    playwright: tuple[Path, ...]
+    lcov: tuple[Path, ...]
 
 
 def resolve_patterns(
@@ -64,4 +68,6 @@ def resolve_paths(config: ProjectConfig, config_path: Path) -> ResolvedPaths:
         evidence=resolve_patterns(config.evidence, base),
         junit=resolve_patterns(config.scan.junit, base),
         coverage=resolve_patterns(config.scan.coverage, base),
+        playwright=resolve_patterns(config.scan.playwright, base),
+        lcov=resolve_patterns(config.scan.lcov, base),
     )

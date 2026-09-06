@@ -1,6 +1,6 @@
 # 导入报告示例
 
-该项目配置发现 JUnit XML 和 coverage.py XML，而不执行测试：
+该项目配置发现 JUnit XML、coverage.py XML、Playwright JSON 和 LCOV，而不执行测试：
 
 ```bash
 qcov scan --config examples/imported-reports/qcov.yaml

@@ -1,6 +1,6 @@
 # Imported Reports Example
 
-This project config discovers a JUnit XML file and a coverage.py XML file
+This project config discovers JUnit XML, coverage.py XML, Playwright JSON, and LCOV
 without running tests.
 
 ```bash
