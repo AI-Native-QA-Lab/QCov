@@ -22,11 +22,14 @@ from qcov.models.protocol import CoverageStatus, QualityEvidence
 
 app = typer.Typer(no_args_is_help=True)
 
-ObligationPath = Annotated[Path, typer.Option(exists=True, readable=True)]
+ObligationPath = Annotated[Path, typer.Option("--obligation", "--obligations", exists=True, readable=True)]
 EvidencePath = Annotated[Path, typer.Option(exists=True, readable=True)]
 Locale = Annotated[str, typer.Option("--locale", case_sensitive=False)]
 OutputFormat = Annotated[str, typer.Option("--format", case_sensitive=False)]
-OptionalPath = Annotated[Path | None, typer.Option(exists=True, readable=True)]
+OptionalObligationPath = Annotated[
+    Path | None, typer.Option("--obligation", "--obligations", exists=True, readable=True)
+]
+OptionalEvidencePath = Annotated[Path | None, typer.Option(exists=True, readable=True)]
 
 
 def _evidence_files(path: Path) -> list[Path]:
@@ -47,23 +50,29 @@ def _evaluate_files(obligation_path: Path, evidence_paths: list[Path]) -> Obliga
     return evaluate_obligation(obligation, evidence)
 
 
-def _config_inputs(config_path: Path) -> tuple[Path, list[Path]]:
+def _config_inputs(
+    config_path: Path, obligation: Path | None, evidence: Path | None
+) -> tuple[Path, list[Path]]:
     resolved = resolve_paths(load_config(config_path), config_path)
-    if len(resolved.obligations) != 1 or not resolved.evidence:
+    selected_obligation = obligation
+    selected_evidence = _evidence_files(evidence) if evidence is not None else list(resolved.evidence)
+    if selected_obligation is None and len(resolved.obligations) == 1:
+        selected_obligation = resolved.obligations[0]
+    if selected_obligation is None or not selected_evidence:
         raise ConfigLoadError(
             f"{ConfigLoadError.code}: config must resolve exactly one obligation and at least one evidence file"
         )
-    return resolved.obligations[0], list(resolved.evidence)
+    return selected_obligation, selected_evidence
 
 
 def _result_from_inputs(
     obligation: Path | None, evidence: Path | None, config: Path | None
 ) -> ObligationResult:
-    if obligation is not None and evidence is not None:
-        return _evaluate(obligation, evidence)
     if config is None:
+        if obligation is not None and evidence is not None:
+            return _evaluate(obligation, evidence)
         raise ConfigLoadError(f"{ConfigLoadError.code}: provide --obligation/--evidence or --config")
-    config_obligation, config_evidence = _config_inputs(config)
+    config_obligation, config_evidence = _config_inputs(config, obligation, evidence)
     return _evaluate_files(config_obligation, config_evidence)
 
 
@@ -82,9 +91,9 @@ def _handle_input_error(error: ConfigLoadError | ProtocolLoadError) -> None:
 
 @app.command()
 def gaps(
-    obligation: OptionalPath = None,
-    evidence: OptionalPath = None,
-    config: OptionalPath = None,
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
     locale: Locale = "en",
     output_format: OutputFormat = "markdown",
 ) -> None:
@@ -97,9 +106,9 @@ def gaps(
 
 @app.command()
 def check(
-    obligation: OptionalPath = None,
-    evidence: OptionalPath = None,
-    config: OptionalPath = None,
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
     locale: Locale = "en",
     output_format: OutputFormat = "markdown",
 ) -> None:
@@ -136,9 +145,9 @@ def inspect(
 @app.command()
 def report(
     output: Annotated[Path, typer.Option()],
-    obligation: OptionalPath = None,
-    evidence: OptionalPath = None,
-    config: OptionalPath = None,
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
     locale: Locale = "en",
     output_format: OutputFormat = "markdown",
 ) -> None:
@@ -160,7 +169,9 @@ def init(path: Annotated[Path, typer.Option()] = Path(".")) -> None:
     if config.exists():
         typer.echo(f"QCOV-CLI-002: configuration already exists: {config}", err=True)
         raise typer.Exit(code=4)
-    config.write_text("obligations: []\nevidence: []\n")
+    config.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\nobligations: []\nevidence: []\n"
+    )
     typer.echo(str(config))
 
 

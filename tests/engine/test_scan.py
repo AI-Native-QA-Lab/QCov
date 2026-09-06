@@ -31,3 +31,17 @@ def test_scan_project_retains_missing_configured_artifact_as_diagnostic(tmp_path
     report = scan_project(tmp_path, config)
 
     assert report.diagnostics[0].code == "QCOV-SCAN-001"
+
+
+def test_scan_project_reports_pytest_marker_files_and_records(tmp_path: Path) -> None:
+    (tmp_path / "test_refund.py").write_text(
+        'import pytest\n\n@pytest.mark.qcov("QO-REFUND-001")\ndef test_refund():\n    pass\n'
+    )
+    config = tmp_path / "qcov.yaml"
+    config.write_text("apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n")
+
+    report = scan_project(tmp_path, config)
+
+    pytest = next(item for item in report.adapters if item.adapter == "pytest-marker")
+    assert pytest.files == (str(tmp_path / "test_refund.py"),)
+    assert pytest.record_count == 1
