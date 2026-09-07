@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -11,6 +12,8 @@ from qcov.engine.delta import compare_snapshots
 from qcov.engine.delta_reports import render_delta_json, render_delta_markdown
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
 from qcov.engine.git_snapshots import DiffInputError, load_snapshot
+from qcov.engine.policy import PolicyDecision, evaluate_policy
+from qcov.engine.policy_reports import render_policy_json, render_policy_markdown
 from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
 from qcov.engine.scan import scan_project
 from qcov.models.config import resolve_paths
@@ -20,10 +23,13 @@ from qcov.models.io import (
     load_config,
     load_evidence,
     load_obligation,
+    load_policy,
 )
 from qcov.models.protocol import CoverageStatus, QualityEvidence
 
 app = typer.Typer(no_args_is_help=True)
+policy_app = typer.Typer(no_args_is_help=True)
+app.add_typer(policy_app, name="policy")
 
 ObligationPath = Annotated[Path, typer.Option("--obligation", "--obligations", exists=True, readable=True)]
 EvidencePath = Annotated[Path, typer.Option(exists=True, readable=True)]
@@ -90,6 +96,22 @@ def _render(result: ObligationResult, locale: str, output_format: str) -> str:
 def _handle_input_error(error: ConfigLoadError | ProtocolLoadError) -> None:
     typer.echo(str(error), err=True)
     raise typer.Exit(code=4) from error
+
+
+def _policy_results(
+    obligation: Path | None, evidence: Path | None, config: Path | None
+) -> tuple[ObligationResult, ...]:
+    if config is None:
+        if obligation is not None and evidence is not None:
+            return (_evaluate(obligation, evidence),)
+        raise ConfigLoadError(f"{ConfigLoadError.code}: provide --obligation/--evidence or --config")
+    if obligation is not None or evidence is not None:
+        raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
+    resolved = resolve_paths(load_config(config), config)
+    if not resolved.obligations or not resolved.evidence:
+        raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations and evidence files")
+    observed = [load_evidence(path) for path in resolved.evidence]
+    return tuple(evaluate_obligation(load_obligation(path), observed) for path in resolved.obligations)
 
 
 @app.command()
@@ -220,3 +242,32 @@ def diff(
         typer.echo(render_delta_markdown(report, locale))
     else:
         raise typer.BadParameter("format must be markdown or json")
+
+
+@policy_app.command("check")
+def policy_check(
+    policy: Annotated[Path, typer.Option(exists=True, readable=True)],
+    as_of: Annotated[str, typer.Option("--as-of")],
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Evaluate a local quality policy without changing coverage facts."""
+    try:
+        evaluated_at = datetime.fromisoformat(as_of)
+        if evaluated_at.tzinfo is None or evaluated_at.utcoffset() is None:
+            raise ValueError("--as-of must be timezone-aware")
+        report = evaluate_policy(_policy_results(obligation, evidence, config), load_policy(policy), evaluated_at)
+    except (ConfigLoadError, ProtocolLoadError, ValueError) as error:
+        _handle_input_error(error if isinstance(error, (ConfigLoadError, ProtocolLoadError)) else ConfigLoadError(str(error)))
+        return
+    if output_format == "json":
+        typer.echo(render_policy_json(report))
+    elif output_format == "markdown":
+        typer.echo(render_policy_markdown(report, locale))
+    else:
+        raise typer.BadParameter("format must be markdown or json")
+    if any(item.decision is PolicyDecision.BLOCK for item in report.results):
+        raise typer.Exit(code=2)
