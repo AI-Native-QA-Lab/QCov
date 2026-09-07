@@ -5,3 +5,5 @@ Iteration 0 验证 Obligation → Evidence → Gap；Iteration 1 扩展 CLI 导�
 Iteration 1 现为本地首次价值里程碑：配置、pytest marker detection、JUnit XML 与 coverage.py XML inventory。
 
 Iteration 2 通过明确的 built-in registry 增加本地 Playwright JSON 与 LCOV inventory reader；external adapter plugin 仍不在范围内。
+
+Iteration 4 已提供独立的 `qcov policy check`：默认状态规则、带时区且可审计的精确豁免、显式 `--as-of` 与 PASS/WARN/BLOCK 门禁均保持本地确定性。

@@ -14,3 +14,6 @@ explicit built-in registry. External adapter plugins remain out of scope.
 
 Iteration 3 adds read-only committed-tree comparison through `qcov diff`.
 Policy gates, remote Git operations, and source-line impact inference remain deferred.
+
+Iteration 4 now provides local `qcov policy check` with default status rules,
+auditable exact waivers, explicit `--as-of`, and PASS/WARN/BLOCK decisions.
