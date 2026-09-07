@@ -48,3 +48,28 @@ waivers: []
 
     assert runner.invoke(app, [*base, "--format", "nope"]).exit_code == 4
     assert runner.invoke(app, [*base, "--locale", "fr"]).exit_code == 4
+
+
+def test_policy_check_config_renders_json_and_rejects_mixed_inputs(tmp_path: Path) -> None:
+    policy = tmp_path / "policy.yaml"
+    config = tmp_path / "qcov.yaml"
+    policy.write_text("""apiVersion: qcov.dev/v1alpha1
+kind: QualityPolicy
+metadata: {id: release}
+rules: {default: {allowedStatuses: [COVERED]}}
+waivers: []
+""")
+    config.write_text(f"""apiVersion: qcov.dev/v1alpha1
+kind: QCovConfig
+obligations: [{OBLIGATION}]
+evidence: [{EVIDENCE}/*.yaml]
+""")
+    base = ["policy", "check", "--config", str(config), "--policy", str(policy),
+            "--as-of", "2026-09-07T00:00:00+08:00"]
+
+    blocked = runner.invoke(app, [*base, "--format", "json"])
+    mixed = runner.invoke(app, [*base, "--obligation", str(OBLIGATION)])
+
+    assert blocked.exit_code == 2
+    assert '"coverageStatus": "PARTIAL"' in blocked.stdout
+    assert mixed.exit_code == 4
