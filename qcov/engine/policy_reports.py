@@ -24,6 +24,7 @@ def _result_dict(result: PolicyResult) -> dict[str, object]:
         "decision": result.decision.value,
         "violations": [violation.code for violation in result.violations],
         "waiver": waiver,
+        "waiverExpired": result.waiver_expired,
     }
 
 
@@ -64,5 +65,7 @@ def render_policy_markdown(report: PolicyReport, locale: str = "en") -> str:
                 f"{waiver.reason}; {translate('policy.expires_at', locale)}: "
                 f"{waiver.expires_at.isoformat()}{approver}"
             )
+            if result.waiver_expired:
+                block += f"\n\n{translate('policy.expired_waiver_cleanup', locale)}"
         blocks.append(block)
     return "\n\n".join(blocks)

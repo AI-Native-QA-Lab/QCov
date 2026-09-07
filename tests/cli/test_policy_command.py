@@ -33,3 +33,18 @@ waivers:
     )
     assert result.exit_code == 0
     assert "策略决定" in result.stdout
+
+
+def test_policy_check_rejects_invalid_format_and_locale(tmp_path: Path) -> None:
+    policy = tmp_path / "policy.yaml"
+    policy.write_text("""apiVersion: qcov.dev/v1alpha1
+kind: QualityPolicy
+metadata: {id: release}
+rules: {default: {allowedStatuses: [COVERED]}}
+waivers: []
+""")
+    base = ["policy", "check", "--obligation", str(OBLIGATION), "--evidence", str(EVIDENCE),
+            "--policy", str(policy), "--as-of", "2026-09-07T00:00:00+08:00"]
+
+    assert runner.invoke(app, [*base, "--format", "nope"]).exit_code == 4
+    assert runner.invoke(app, [*base, "--locale", "fr"]).exit_code == 4

@@ -29,6 +29,7 @@ class PolicyResult:
     decision: PolicyDecision
     violations: tuple[PolicyViolation, ...]
     waiver: PolicyWaiver | None
+    waiver_expired: bool = False
 
 
 @dataclass(frozen=True)
@@ -47,11 +48,12 @@ def evaluate_policy(
     evaluated: list[PolicyResult] = []
     for result in sorted(results, key=lambda item: item.obligation_id):
         waiver = waivers.get(result.obligation_id)
+        waiver_expired = waiver is not None and waiver.expires_at <= as_of
         if result.status in allowed:
-            decision = PolicyDecision.WARN if waiver is not None and waiver.expires_at <= as_of else PolicyDecision.PASS
-            evaluated.append(PolicyResult(result.obligation_id, result.status, decision, (), waiver))
+            decision = PolicyDecision.WARN if waiver_expired else PolicyDecision.PASS
+            evaluated.append(PolicyResult(result.obligation_id, result.status, decision, (), waiver, waiver_expired))
         elif waiver is not None and waiver.expires_at > as_of:
-            evaluated.append(PolicyResult(result.obligation_id, result.status, PolicyDecision.WARN, (), waiver))
+            evaluated.append(PolicyResult(result.obligation_id, result.status, PolicyDecision.WARN, (), waiver, False))
         else:
             code = "QCOV-POLICY-002" if waiver is not None else "QCOV-POLICY-001"
             evaluated.append(
@@ -61,6 +63,7 @@ def evaluate_policy(
                     PolicyDecision.BLOCK,
                     (PolicyViolation(code),),
                     waiver,
+                    waiver_expired,
                 )
             )
     return PolicyReport(policy.metadata.id, as_of, tuple(evaluated))

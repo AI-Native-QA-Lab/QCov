@@ -255,6 +255,10 @@ def policy_check(
     output_format: OutputFormat = "markdown",
 ) -> None:
     """Evaluate a local quality policy without changing coverage facts."""
+    if output_format not in {"json", "markdown"}:
+        _handle_input_error(ConfigLoadError("QCOV-CLI-004: format must be markdown or json"))
+    if locale not in {"en", "zh-CN"}:
+        _handle_input_error(ConfigLoadError("QCOV-CLI-005: locale must be en or zh-CN"))
     try:
         evaluated_at = datetime.fromisoformat(as_of)
         if evaluated_at.tzinfo is None or evaluated_at.utcoffset() is None:

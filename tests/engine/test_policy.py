@@ -74,3 +74,14 @@ def test_policy_results_are_sorted_by_obligation_id() -> None:
     )
 
     assert [item.obligation_id for item in report.results] == ["QO-002", "QO-010"]
+
+
+def test_expired_waiver_on_allowed_status_is_marked_for_cleanup() -> None:
+    report = evaluate_policy(
+        [result("QO-002", CoverageStatus.COVERED)],
+        policy([{"obligationRef": "QO-002", "reason": "expired", "expiresAt": "2026-09-07T00:00:00+08:00"}]),
+        AS_OF,
+    )
+
+    assert report.results[0].decision is PolicyDecision.WARN
+    assert report.results[0].waiver_expired is True

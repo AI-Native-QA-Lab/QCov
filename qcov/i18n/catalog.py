@@ -32,6 +32,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     "policy.reason": {"en": "Reason", "zh-CN": "理由"},
     "policy.expires_at": {"en": "Expires at", "zh-CN": "到期时间"},
     "policy.approved_by": {"en": "Approved by", "zh-CN": "批准人"},
+    "policy.expired_waiver_cleanup": {"en": "Expired waiver: remove or renew it.", "zh-CN": "豁免已过期：请删除或续期。"},
 }
 
 
