@@ -1,0 +1,12 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityPolicy
+metadata:
+  id: refund-local-gate
+rules:
+  default:
+    allowedStatuses: [COVERED]
+waivers:
+  - obligationRef: QO-REFUND-001
+    reason: The local reference fixture intentionally lacks production evidence.
+    expiresAt: 2026-10-01T00:00:00+08:00
+    approvedBy: qa-owner
