@@ -35,6 +35,7 @@ from qcov.engine.mapping import (
     apply_mappings,
 )
 from qcov.engine.mapping_reports import render_map_preview_json, render_map_preview_markdown
+from qcov.engine.planner import build_quality_plan
 from qcov.engine.policy import PolicyDecision, evaluate_policy
 from qcov.engine.policy_reports import render_policy_json, render_policy_markdown
 from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
@@ -467,6 +468,49 @@ def map_preview(
         typer.echo(render_map_preview_json(materialization))
     else:
         typer.echo(render_map_preview_markdown(materialization, locale))
+
+
+@app.command("plan")
+def plan(
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
+    output: Annotated[Path | None, typer.Option()] = None,
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Rank next-best verification steps from gaps (proposal only)."""
+    try:
+        if config is not None and (obligation is not None or evidence is not None):
+            raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
+        if config is not None:
+            bundle = _policy_bundle(None, None, config)
+            loaded = load_config(config)
+            resolved = resolve_paths(loaded, config)
+            obligations = tuple(load_obligation(path) for path in resolved.obligations)
+            refs = [str(config)]
+        elif obligation is not None and evidence is not None:
+            bundle = EvaluationBundle((_evaluate(obligation, evidence),), None)
+            obligations = (load_obligation(obligation),)
+            refs = [str(obligation), str(evidence)]
+        else:
+            raise ConfigLoadError(
+                f"{ConfigLoadError.code}: provide --obligation/--evidence or --config"
+            )
+        proposal = build_quality_plan(bundle.results, obligations, refs=refs)
+    except (
+        ConfigLoadError,
+        ProtocolLoadError,
+        MappingConflictError,
+        MappingDocumentError,
+        ProposalInputError,
+    ) as error:
+        _handle_input_error(error)
+        return
+    if output is not None:
+        _write_proposal_yaml(output, proposal)
+    _ = locale
+    typer.echo(_render_proposal(proposal, output_format))
 
 
 def _render_proposal(proposal: QualityProposal, output_format: str) -> str:
