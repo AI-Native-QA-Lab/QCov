@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.5.0 - 2026-09-08
+
+### Features
+
+- Add deterministic local `qcov policy check` with explicit evaluation time,
+  default coverage-status rules, expiring exact waivers, and PASS/WARN/BLOCK
+  decisions.
+- Add stable JSON and localized Markdown policy reports plus a runnable Refund
+  policy fixture.
+
+### Fixes
+
+- Reject invalid policy format and locale values with stable input exit code 4,
+  and identify expired waivers that require cleanup.
+
+### Documentation
+
+- Add Chinese-first policy reference, English README entry, process evidence,
+  and Iteration 4 roadmap completion.
+
 ## 0.3.0 - 2026-09-06
 
 ### Features

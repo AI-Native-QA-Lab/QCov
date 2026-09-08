@@ -1,19 +1,45 @@
 # Roadmap
 
-Iteration 0 proves Obligation → Evidence → Gap. Iteration 1 expands CLI imports;
-Iteration 2 adds language/tool adapters; Iteration 3 introduces local PR delta;
-Iteration 4 policies/waivers; Iterations 5–7 AI proposals and planning; and
-Iteration 8 production evidence. Validate integration time, explainability, gap
-value beyond ordinary reports, and AI proposal acceptance before expanding.
+QCov remains a local, deterministic Quality Evidence Gap Engine. It reports
+what remains unproven for an obligation; it is not a line-coverage detector or
+test runner.
 
-Iteration 1 is now the local first-value import milestone: config, pytest
-marker detection, JUnit XML, and coverage.py XML inventory.
+## Delivered through Iteration 4
 
-Iteration 2 adds local Playwright JSON and LCOV inventory readers through an
-explicit built-in registry. External adapter plugins remain out of scope.
+Iteration 0 proves Obligation → Evidence → Gap. Iteration 1 adds config-driven
+local discovery for pytest markers, JUnit XML, and coverage.py XML inventory.
+Iteration 2 adds Playwright JSON and LCOV inventory readers through an explicit
+built-in registry; external adapter plugins remain out of scope. Iteration 3
+adds read-only committed-tree comparison through `qcov diff`. Iteration 4 adds
+local `qcov policy check` with default status rules, auditable exact waivers,
+explicit `--as-of`, and PASS/WARN/BLOCK decisions.
 
-Iteration 3 adds read-only committed-tree comparison through `qcov diff`.
-Policy gates, remote Git operations, and source-line impact inference remain deferred.
+Remote Git operations, source-line impact inference, policy DSL, dimension
+thresholds, wildcard waivers, and inventory-to-evidence inference remain
+deferred.
 
-Iteration 4 now provides local `qcov policy check` with default status rules,
-auditable exact waivers, explicit `--as-of`, and PASS/WARN/BLOCK decisions.
+## Next: Iteration 4.5 mapping and validation
+
+Before AI work, close the first-value loop that ADR 0003 deferred: an **explicit
+obligation mapping** from inventory observations (and related adapter output) to
+`QualityEvidence`, plus real-project checks of integration time, explainability,
+and gap value beyond ordinary reports.
+
+Mapping must stay declarative and local. Adapters still must not infer that a
+passing test or coverage rate proves a business obligation.
+
+Design:
+`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`.
+
+## Later iterations
+
+Iterations 5–7 may introduce AI only as a proposal and planning layer under
+deterministic policy checks. AI must never become evidence or gate authority.
+Iteration 8 integrates production evidence.
+
+## Validation gates before expansion
+
+Validate these assumptions before accelerating into AI or production adapters:
+Testing Obligations add value beyond requirement-to-test links; initial
+integration is fast; gaps remain explainable; the tool finds omissions that
+ordinary reports hide; and AI proposals never override deterministic decisions.

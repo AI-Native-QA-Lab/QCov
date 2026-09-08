@@ -1,5 +1,17 @@
 # 需求
 
-MVP 接收版本化的 Obligation/Evidence 文件，进行校验、计算四种义务状态，并输出 JSON 或 Markdown。通过的证据必须精确匹配义务 ID、维度和所需类型。AI、UI、存储、Git diff、外部插件加载和策略执行不在范围内。
+## Core engine
 
-Iteration 1 增加配置驱动的 pytest marker、JUnit XML 和 coverage.py XML 本地发现。通用导入仅是 inventory observation，只有显式映射后才能关联 Obligation。
+产品接收版本化的 Obligation 与 Evidence 文件，进行校验，按义务计算四种状态（`COVERED`、`PARTIAL`、`MISSING`、`UNKNOWN`），并输出 JSON 或 Markdown。通过的证据必须精确匹配义务 ID、维度和所需类型。不计算聚合质量分数。`UNKNOWN` 不得伪装成通过。
+
+## Delivered local capabilities
+
+配置驱动的 `scan` 发现 pytest marker，并将 JUnit XML、coverage.py XML、Playwright JSON 与 LCOV 导入为 **inventory observation**，在出现显式义务映射之前不会变成可满足证据。`qcov diff` 比较本地已提交版本上的显式义务与证据快照。`qcov policy check` 提供本地确定性门禁、精确且带时限的豁免，以及显式 `--as-of` 时间戳。
+
+## Still excluded without a new approved design
+
+在无新的已批准设计前，AI 提供方、Web UI、数据库持久化、远程 Git、外部插件加载、inventory 到证据的自动推断、策略 DSL、维度阈值，以及通配符或路径豁免仍不在范围内。
+
+## Pending requirement: explicit mapping
+
+声明式映射层须能将选定的 inventory observation 转为 `QualityEvidence`，且不得削弱显式证据模型。在此落地前，通用导入仅作诊断与 inventory。
