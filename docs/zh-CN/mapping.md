@@ -1,7 +1,9 @@
 # 显式证据映射
 
-`EvidenceMapping` 用声明式规则，把 inventory 中的精确 `identity` 提升为
-`QualityEvidence`。QCov **不会**根据测试名或覆盖率推断义务。
+`EvidenceMapping` 用声明式规则，把 inventory 中的 `identity` 提升为
+`QualityEvidence`。QCov **不会**根据测试名或覆盖率推断义务。`identity` 支持精确匹配，
+或仅一个尾缀 `*` 的后缀通配（例如 `refund.api::*`）。多条匹配仍报 `QCOV-MAP-005`，
+不会静默取第一条。
 
 ```bash
 qcov map preview --config examples/imported-reports/qcov.yaml --format json
@@ -17,8 +19,10 @@ coverage.py 与 LCOV 仍仅为 inventory，不能映射为可满足义务的证�
 ## 命令
 
 - `qcov map preview --config …`：只读预览将生成的证据与 `QCOV-MAP-*` 诊断。
-- `gaps` / `check` / `report` / `policy check` 在使用 `--config` 且含 mapping
-  时，合并手写证据与映射产物；JSON 增加 `mappingDiagnostics`。
+- `gaps` / `check` / `report` / `policy check` 在使用 `--config` 时，合并手写证据、
+  映射产物，以及配置目录下显式 `@pytest.mark.qcov` marker 证据；配置了 mapping 时
+  JSON 增加 `mappingDiagnostics`。status 为 `unknown` 的 marker 证据永不满足 required
+  evidence。
 
 ## 诊断码
 

@@ -34,3 +34,15 @@ line-length = 100
 python_version = "3.11"
 strict = true
 packages = ["qcov"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.venv",
+  "/.venv312",
+  "/.worktrees",
+  "/dist",
+  "/build",
+  "/.pytest_cache",
+  "/.ruff_cache",
+  "/.mypy_cache",
+]

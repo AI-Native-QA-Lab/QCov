@@ -5,15 +5,20 @@
 QCov is a local, deterministic Quality Evidence Gap Engine. Iterations 0–4.5
 deliver gap evaluation, inventory scan adapters (with retained records), local
 `qcov diff`, local `qcov policy check`, and declarative junit/playwright evidence
-mapping.
+mapping. Iteration 5 adds pytest-marker evaluation merge, limited identity suffix
+wildcards, and proposal-only AI (`obligation suggest` / `risk analyze`) with a
+default offline provider. Planned Iterations 6–8 cover a pure Quality Planner,
+an Agentic Quality Loop, and production evidence; Iteration 8 completes that
+core roadmap arc, not the whole product (see Post-8 backlog in the roadmap).
 
-Do not add AI providers, a web UI, persistence, remote Git operations, external
-plugins, automatic inventory-to-evidence inference, coverage/LCOV promotion to
-passed evidence, or policy DSL / wildcard waivers without an approved design and
-plan update.
+Do not add remote LLM providers beyond the approved Iteration 5 provider
+abstraction, a web UI, persistence, remote Git host APIs, external plugins,
+automatic inventory-to-obligation inference, coverage/LCOV promotion to passed
+evidence, or policy DSL / path-based waivers without an approved design and plan
+update. AI must never become evidence or gate authority.
 
-Prefer real-project validation of mapping before AI proposal work. Do not
-describe QCov as a line-coverage detector.
+Prefer real-project validation of mapping before expanding AI proposal work. Do
+not describe QCov as a line-coverage detector.
 
 ## Commands
 
@@ -38,8 +43,17 @@ the RED and GREEN evidence in the corresponding `docs/process/` entry.
 
 ## Documentation and Process
 
-Protocol keys, CLI flags, enums, and error IDs are English. Public prose is
-maintained in paired `docs/en/` and `docs/zh-CN/` pages with matching stems and
-heading structures. Update the relevant process record in `docs/process/` when
-closing a planned implementation task; record executed verification commands
-and results, not expectations presented as results.
+Protocol keys, CLI flags, enums, and error IDs are English.
+
+**Project-facing docs (bilingual as today):** README, CONTRIBUTING, and public
+product pages under paired `docs/en/` and `docs/zh-CN/` (matching stems and
+heading structures).
+
+**Development process docs (Chinese-only going forward):** design specs and
+implementation plans under `docs/superpowers/`, process records under
+`docs/process/`, and similar engineering working notes (including ADRs written
+after this rule). Do not maintain paired English copies of these process docs.
+
+Update the relevant `docs/process/` entry when closing a planned implementation
+task; record executed verification commands and results, not expectations
+presented as results.

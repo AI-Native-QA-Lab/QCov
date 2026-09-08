@@ -15,10 +15,12 @@ Playwright、覆盖率工具、安全扫描或可观测性平台，而是判断�
 - 显式 `EvidenceMapping`：将 junit/playwright inventory 提升为 `QualityEvidence`
 - 本地 `qcov diff`：比较已提交 Git 树上的义务/证据快照
 - 本地 `qcov policy check`：精确且带时限的豁免
+- 仅提案的 AI 助手：`qcov obligation suggest` 与 `qcov risk analyze`
+  （产出 draft `QualityProposal`；不是证据，也不是门禁权威）
 - Markdown / JSON 报告，支持 `en` / `zh-CN` 展示
 
-不在范围内：AI 决策、Web UI、数据库、远程 Git、外部插件，以及把 coverage/LCOV
-行覆盖率提升为可满足义务的证据。
+不在范围内：AI 门禁裁决、Web UI、数据库、远程 Git Host API、外部插件，以及把
+coverage/LCOV 行覆盖率提升为可满足义务的证据。
 
 ## 安装
 
@@ -60,6 +62,12 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 .venv/bin/python -m qcov policy check \
   --config qcov.yaml --policy policy.yaml \
   --as-of 2026-09-07T00:00:00+08:00
+
+# 义务 / 变更风险草案（默认 offline；不是证据）
+.venv/bin/python -m qcov obligation suggest \
+  --config qcov.yaml --requirements requirements.md --format json
+.venv/bin/python -m qcov risk analyze \
+  --config qcov.yaml --base HEAD~1 --head HEAD --format json
 ```
 
 参见[导入报告示例](examples/imported-reports/README.zh-CN.md)、

@@ -10,7 +10,14 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from .config import ProjectConfig
-from .protocol import EvidenceMapping, QualityEvidence, QualityPolicy, TestingObligation
+from .errors import ProposalInputError
+from .protocol import (
+    EvidenceMapping,
+    QualityEvidence,
+    QualityPolicy,
+    QualityProposal,
+    TestingObligation,
+)
 
 Model = TypeVar("Model", bound=BaseModel)
 
@@ -49,6 +56,14 @@ def load_policy(path: Path) -> QualityPolicy:
 
 def load_mapping(path: Path) -> EvidenceMapping:
     return _load(path, EvidenceMapping)
+
+
+def load_proposal(path: Path) -> QualityProposal:
+    try:
+        raw: Any = json.loads(path.read_text()) if path.suffix == ".json" else yaml.safe_load(path.read_text())
+        return QualityProposal.model_validate(raw)
+    except (OSError, json.JSONDecodeError, yaml.YAMLError, ValidationError) as error:
+        raise ProposalInputError(f"QCOV-PROPOSAL-001: {path}: {error}") from error
 
 
 def load_config(path: Path) -> ProjectConfig:

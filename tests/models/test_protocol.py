@@ -129,3 +129,45 @@ def test_evidence_mapping_rejects_duplicate_quintuples() -> None:
     payload = {**VALID_MAPPING, "mappings": [entry, entry]}
     with pytest.raises(ValidationError, match="duplicate mapping quintuple"):
         EvidenceMapping.model_validate(payload)
+
+
+VALID_PROPOSAL = {
+    "apiVersion": "qcov.dev/v1alpha1",
+    "kind": "QualityProposal",
+    "metadata": {"id": "QP-20260908-001", "createdAt": "2026-09-08T12:00:00+08:00"},
+    "proposal": {"type": "obligation_suggest", "status": "draft"},
+    "source": {"kind": "requirements", "refs": ["requirements.md"]},
+    "provider": {"name": "offline", "model": None},
+    "items": [
+        {
+            "id": "item-1",
+            "kind": "proposed_obligation",
+            "obligationRef": "QO-REFUND-003",
+            "summary": {
+                "en": "Concurrent refund",
+                "zh-CN": "并发退款",
+            },
+            "detail": {"suggestedEvidence": ["concurrency_test"]},
+        }
+    ],
+}
+
+
+def test_quality_proposal_accepts_draft_obligation_suggest() -> None:
+    from qcov.models.protocol import QualityProposal
+
+    proposal = QualityProposal.model_validate(VALID_PROPOSAL)
+    assert proposal.proposal.type == "obligation_suggest"
+    assert proposal.proposal.status == "draft"
+    assert proposal.items[0].obligation_ref == "QO-REFUND-003"
+
+
+def test_quality_proposal_rejects_non_draft_status() -> None:
+    from qcov.models.protocol import QualityProposal
+
+    payload = {
+        **VALID_PROPOSAL,
+        "proposal": {"type": "obligation_suggest", "status": "approved"},
+    }
+    with pytest.raises(ValidationError):
+        QualityProposal.model_validate(payload)
