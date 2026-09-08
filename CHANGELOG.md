@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0 - 2026-09-08
+
+### Features
+
+- Merge pytest-marker observations into deterministic evaluation and support
+  limited identity suffix wildcards in declarative mappings.
+- Add offline, proposal-only `qcov obligation suggest` and `qcov risk analyze`;
+  proposals are not evidence and cannot become gate authority.
+
+### Documentation
+
+- Document the Iteration 5 local/offline boundaries and proposal workflow.
+
 ## 0.5.0 - 2026-09-08
 
 ### Features

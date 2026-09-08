@@ -1,5 +1,16 @@
 # 更新日志
 
+## 0.6.0 - 2026-09-08
+
+### 新功能
+
+- 将 pytest-marker observation 合并入确定性评估，并在声明式 mapping 中支持受限的 identity 后缀通配符。
+- 新增离线、仅提议的 `qcov obligation suggest` 与 `qcov risk analyze`；提议不是证据，也不能成为门禁权威。
+
+### 文档
+
+- 记录 Iteration 5 的本地/离线边界和提议工作流。
+
 ## 0.5.0 - 2026-09-08
 
 ### 新功能
