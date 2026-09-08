@@ -131,3 +131,122 @@ def test_planner_is_deterministic() -> None:
     a = build_quality_plan([result], [obl], refs=["r"])
     b = build_quality_plan([result], [obl], refs=["r"])
     assert a.model_dump(by_alias=True, mode="json") == b.model_dump(by_alias=True, mode="json")
+
+
+def test_planner_tie_break_by_obligation_id() -> None:
+    """Equal priorityScore: lower obligation_id ranks first."""
+    low = {"domain": "x", "severity": "low"}
+    obl_a = _obligation(
+        metadata={"id": "QO-A", "title": {"en": "A", "zh-CN": "甲"}},
+        requiredEvidence={"behavior": ["api_test"]},
+        risk=low,
+    )
+    obl_b = _obligation(
+        metadata={"id": "QO-B", "title": {"en": "B", "zh-CN": "乙"}},
+        requiredEvidence={"behavior": ["api_test"]},
+        risk=low,
+        source={"type": "requirement", "ref": "B"},
+    )
+    missing_a = ObligationResult(
+        "QO-A",
+        CoverageStatus.MISSING,
+        (
+            DimensionResult(
+                QualityDimension.BEHAVIOR,
+                ("api_test",),
+                CoverageStatus.MISSING,
+                (),
+            ),
+        ),
+    )
+    missing_b = ObligationResult(
+        "QO-B",
+        CoverageStatus.MISSING,
+        (
+            DimensionResult(
+                QualityDimension.BEHAVIOR,
+                ("api_test",),
+                CoverageStatus.MISSING,
+                (),
+            ),
+        ),
+    )
+    proposal = build_quality_plan(
+        [missing_b, missing_a], [obl_a, obl_b], refs=["fixture"]
+    )
+    assert len(proposal.items) == 2
+    assert proposal.items[0].detail["priorityScore"] == -60
+    assert proposal.items[1].detail["priorityScore"] == -60
+    assert proposal.items[0].obligation_ref == "QO-A"
+    assert proposal.items[1].obligation_ref == "QO-B"
+    assert proposal.items[0].detail["rank"] == 1
+    assert proposal.items[1].detail["rank"] == 2
+
+
+def test_planner_tie_break_by_dimension() -> None:
+    """Equal priorityScore and obligation_id: dimension value breaks tie."""
+    obl = _obligation(
+        requiredEvidence={"boundary": ["api_test"], "integration": ["api_test"]},
+        risk={"domain": "x", "severity": "low"},
+    )
+    result = ObligationResult(
+        "QO-A",
+        CoverageStatus.MISSING,
+        (
+            DimensionResult(
+                QualityDimension.INTEGRATION,
+                ("api_test",),
+                CoverageStatus.MISSING,
+                (),
+            ),
+            DimensionResult(
+                QualityDimension.BOUNDARY,
+                ("api_test",),
+                CoverageStatus.MISSING,
+                (),
+            ),
+        ),
+    )
+    proposal = build_quality_plan([result], [obl], refs=["fixture"])
+    assert proposal.items[0].detail["priorityScore"] == -65
+    assert proposal.items[1].detail["priorityScore"] == -65
+    assert proposal.items[0].detail["dimension"] == "boundary"
+    assert proposal.items[1].detail["dimension"] == "integration"
+
+
+def test_planner_tie_break_by_first_missing_evidence_type() -> None:
+    """Equal priorityScore, obligation_id, and dimension: missing type breaks tie."""
+    obl = _obligation(
+        requiredEvidence={"behavior": ["api_test"]},
+        risk={"domain": "x", "severity": "low"},
+    )
+    junit_row = ObligationResult(
+        "QO-A",
+        CoverageStatus.MISSING,
+        (
+            DimensionResult(
+                QualityDimension.BEHAVIOR,
+                ("junit_test",),
+                CoverageStatus.MISSING,
+                (),
+            ),
+        ),
+    )
+    api_row = ObligationResult(
+        "QO-A",
+        CoverageStatus.MISSING,
+        (
+            DimensionResult(
+                QualityDimension.BEHAVIOR,
+                ("api_test",),
+                CoverageStatus.MISSING,
+                (),
+            ),
+        ),
+    )
+    proposal = build_quality_plan([junit_row, api_row], [obl], refs=["fixture"])
+    assert len(proposal.items) == 2
+    assert proposal.items[0].detail["missingEvidenceTypes"] == ["api_test"]
+    assert proposal.items[1].detail["missingEvidenceTypes"] == ["junit_test"]
+    assert proposal.items[0].detail["rank"] == 1
+    assert proposal.items[1].detail["rank"] == 2
