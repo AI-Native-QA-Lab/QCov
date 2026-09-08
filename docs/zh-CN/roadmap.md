@@ -14,6 +14,9 @@ Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱
 
 映射必须保持声明式与本地。适配器仍不得推断「通过的测试」或「覆盖率」足以证明业务义务。
 
+设计见：
+`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`。
+
 ## Later iterations
 
 Iteration 5–7 仅可将 AI 作为确定性策略门禁之下的建议与规划层；AI 不得成为证据或门禁权威。Iteration 8 接入生产证据。

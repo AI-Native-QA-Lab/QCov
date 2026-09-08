@@ -28,6 +28,9 @@ and gap value beyond ordinary reports.
 Mapping must stay declarative and local. Adapters still must not infer that a
 passing test or coverage rate proves a business obligation.
 
+Design:
+`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`.
+
 ## Later iterations
 
 Iterations 5–7 may introduce AI only as a proposal and planning layer under
