@@ -10,7 +10,7 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from .config import ProjectConfig
-from .protocol import QualityEvidence, QualityPolicy, TestingObligation
+from .protocol import EvidenceMapping, QualityEvidence, QualityPolicy, TestingObligation
 
 Model = TypeVar("Model", bound=BaseModel)
 
@@ -45,6 +45,10 @@ def load_evidence(path: Path) -> QualityEvidence:
 
 def load_policy(path: Path) -> QualityPolicy:
     return _load(path, QualityPolicy)
+
+
+def load_mapping(path: Path) -> EvidenceMapping:
+    return _load(path, EvidenceMapping)
 
 
 def load_config(path: Path) -> ProjectConfig:

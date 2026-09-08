@@ -6,6 +6,11 @@ import json
 from collections.abc import Sequence
 
 from qcov.engine.gaps import ObligationResult
+from qcov.engine.mapping import MappingDiagnostic
+from qcov.engine.mapping_reports import (
+    append_mapping_diagnostics_json,
+    render_mapping_diagnostics_markdown,
+)
 from qcov.engine.scan import ScanReport
 from qcov.i18n.catalog import translate
 
@@ -26,12 +31,24 @@ def _as_dict(result: ObligationResult) -> dict[str, object]:
     }
 
 
-def render_json(results: Sequence[ObligationResult]) -> str:
+def render_json(
+    results: Sequence[ObligationResult],
+    *,
+    mapping_diagnostics: Sequence[MappingDiagnostic] | None = None,
+) -> str:
     """Return stable, language-neutral JSON output."""
-    return json.dumps({"results": [_as_dict(result) for result in results]}, indent=2, sort_keys=True)
+    payload: dict[str, object] = {"results": [_as_dict(result) for result in results]}
+    if mapping_diagnostics is not None:
+        payload = append_mapping_diagnostics_json(payload, mapping_diagnostics)
+    return json.dumps(payload, indent=2, sort_keys=True)
 
 
-def render_markdown(results: Sequence[ObligationResult], locale: str = "en") -> str:
+def render_markdown(
+    results: Sequence[ObligationResult],
+    locale: str = "en",
+    *,
+    mapping_diagnostics: Sequence[MappingDiagnostic] | None = None,
+) -> str:
     """Render an explainable localized Markdown summary."""
     blocks: list[str] = []
     for result in results:
@@ -51,7 +68,12 @@ def render_markdown(results: Sequence[ObligationResult], locale: str = "en") -> 
             f"{translate('label.required', locale)}:\n{dimensions}\n\n"
             f"{translate('label.unproven', locale)}: {unproven}"
         )
-    return "\n\n".join(blocks)
+    body = "\n\n".join(blocks)
+    if mapping_diagnostics is not None:
+        extra = render_mapping_diagnostics_markdown(mapping_diagnostics, locale)
+        if extra:
+            body = f"{body}\n\n{extra}" if body else extra
+    return body
 
 
 def render_scan_json(report: ScanReport) -> str:

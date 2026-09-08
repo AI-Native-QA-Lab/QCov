@@ -2,16 +2,18 @@
 
 ## Scope
 
-QCov is a local, deterministic Quality Evidence Gap Engine. Iterations 0–4 are
-already delivered: gap evaluation, inventory scan adapters, local `qcov diff`,
-and local `qcov policy check`.
+QCov is a local, deterministic Quality Evidence Gap Engine. Iterations 0–4.5
+deliver gap evaluation, inventory scan adapters (with retained records), local
+`qcov diff`, local `qcov policy check`, and declarative junit/playwright evidence
+mapping.
 
 Do not add AI providers, a web UI, persistence, remote Git operations, external
-plugins, inventory-to-evidence inference, or policy DSL / wildcard waivers
-without an approved design and plan update.
+plugins, automatic inventory-to-evidence inference, coverage/LCOV promotion to
+passed evidence, or policy DSL / wildcard waivers without an approved design and
+plan update.
 
-Prefer closing the explicit obligation-mapping loop and real-project validation
-before AI proposal work. Do not describe QCov as a line-coverage detector.
+Prefer real-project validation of mapping before AI proposal work. Do not
+describe QCov as a line-coverage detector.
 
 ## Commands
 

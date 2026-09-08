@@ -2,20 +2,18 @@
 
 QCov 仍是本地、确定性的质量证据缺口引擎：报告某项义务还有什么未被证明。它不是行覆盖率检测器，也不是测试执行器。
 
-## Delivered through Iteration 4
+## Delivered through Iteration 4.5
 
-Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱动的 pytest marker、JUnit XML 与 coverage.py XML inventory 本地发现。Iteration 2 通过明确的 built-in registry 增加 Playwright JSON 与 LCOV inventory reader；external adapter plugin 仍不在范围内。Iteration 3 通过 `qcov diff` 提供只读的已提交树比较。Iteration 4 提供本地 `qcov policy check`：默认状态规则、可审计的精确豁免、显式 `--as-of` 与 PASS/WARN/BLOCK 判定。
+Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱动的 pytest marker、JUnit XML 与 coverage.py XML inventory 本地发现。Iteration 2 通过明确的 built-in registry 增加 Playwright JSON 与 LCOV inventory reader；external adapter plugin 仍不在范围内。Iteration 3 通过 `qcov diff` 提供只读的已提交树比较。Iteration 4 提供本地 `qcov policy check`：默认状态规则、可审计的精确豁免、显式 `--as-of` 与 PASS/WARN/BLOCK 判定。Iteration 4.5 提供声明式 `EvidenceMapping`（junit/playwright）、`qcov map preview`，以及 `--config` 评估合并。
 
-远程 Git、源码行级影响推断、策略 DSL、维度阈值、通配符豁免，以及 inventory 到证据的自动推断仍延后。
+远程 Git、源码行级影响推断、策略 DSL、维度阈值、通配符豁免、coverage/LCOV 提升为 passed 证据，以及 inventory 自动推断仍延后。
 
-## Next: Iteration 4.5 mapping and validation
+## Next after 4.5
 
-在进入 AI 工作前，先补上 ADR 0003 延后的首次价值闭环：**显式义务映射**（将 inventory observation 及相关 adapter 输出映射为 `QualityEvidence`），并用真实项目验证接入时间、可解释性，以及相对普通报告的缺口价值。
+在进入 AI 之前，继续用真实项目验证接入时间、可解释性与相对普通报告的缺口价值。设计见：
+`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`。说明见 [显式证据映射](mapping.md)。
 
 映射必须保持声明式与本地。适配器仍不得推断「通过的测试」或「覆盖率」足以证明业务义务。
-
-设计见：
-`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`。
 
 ## Later iterations
 

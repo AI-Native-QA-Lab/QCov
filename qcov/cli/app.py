@@ -2,34 +2,48 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
+from qcov.adapters.base import ScanDiagnostic
 from qcov.engine.delta import compare_snapshots
 from qcov.engine.delta_reports import render_delta_json, render_delta_markdown
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
 from qcov.engine.git_snapshots import DiffInputError, load_snapshot
+from qcov.engine.inventory import collect_mappable_inventory, config_dir_for
+from qcov.engine.mapping import (
+    MappingConflictError,
+    MappingDiagnostic,
+    MappingDocumentError,
+    MappingMaterialization,
+    apply_mappings,
+)
+from qcov.engine.mapping_reports import render_map_preview_json, render_map_preview_markdown
 from qcov.engine.policy import PolicyDecision, evaluate_policy
 from qcov.engine.policy_reports import render_policy_json, render_policy_markdown
 from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
 from qcov.engine.scan import scan_project
-from qcov.models.config import resolve_paths
+from qcov.models.config import ProjectConfig, ResolvedPaths, resolve_paths
 from qcov.models.io import (
     ConfigLoadError,
     ProtocolLoadError,
     load_config,
     load_evidence,
+    load_mapping,
     load_obligation,
     load_policy,
 )
-from qcov.models.protocol import CoverageStatus, QualityEvidence
+from qcov.models.protocol import CoverageStatus, EvidenceMapping, QualityEvidence
 
 app = typer.Typer(no_args_is_help=True)
 policy_app = typer.Typer(no_args_is_help=True)
+map_app = typer.Typer(no_args_is_help=True)
 app.add_typer(policy_app, name="policy")
+app.add_typer(map_app, name="map")
 
 ObligationPath = Annotated[Path, typer.Option("--obligation", "--obligations", exists=True, readable=True)]
 EvidencePath = Annotated[Path, typer.Option(exists=True, readable=True)]
@@ -39,6 +53,12 @@ OptionalObligationPath = Annotated[
     Path | None, typer.Option("--obligation", "--obligations", exists=True, readable=True)
 ]
 OptionalEvidencePath = Annotated[Path | None, typer.Option(exists=True, readable=True)]
+
+
+@dataclass(frozen=True)
+class EvaluationBundle:
+    results: tuple[ObligationResult, ...]
+    mapping_diagnostics: tuple[MappingDiagnostic, ...] | None
 
 
 def _evidence_files(path: Path) -> list[Path]:
@@ -53,65 +73,161 @@ def _evaluate(obligation_path: Path, evidence_path: Path) -> ObligationResult:
     return evaluate_obligation(obligation, evidence)
 
 
-def _evaluate_files(obligation_path: Path, evidence_paths: list[Path]) -> ObligationResult:
-    obligation = load_obligation(obligation_path)
-    evidence = [load_evidence(path) for path in evidence_paths]
-    return evaluate_obligation(obligation, evidence)
+def _require_mapping_files(config: ProjectConfig, resolved: ResolvedPaths) -> None:
+    if config.mapping and not resolved.mapping:
+        raise ConfigLoadError(
+            f"{ConfigLoadError.code}: configured mapping patterns resolved to no files"
+        )
 
 
-def _config_inputs(
+def _scan_diagnostics_as_mapping(
+    diagnostics: tuple[ScanDiagnostic, ...],
+) -> tuple[MappingDiagnostic, ...]:
+    return tuple(
+        MappingDiagnostic(item.code, item.message, artifact_path=item.artifact_path)
+        for item in diagnostics
+    )
+
+
+def _combine_mapping_diagnostics(
+    materialization: MappingMaterialization,
+    scan_diagnostics: tuple[ScanDiagnostic, ...],
+) -> tuple[MappingDiagnostic, ...]:
+    return tuple(
+        sorted(
+            (*materialization.diagnostics, *_scan_diagnostics_as_mapping(scan_diagnostics)),
+            key=lambda item: (
+                item.code,
+                item.message,
+                item.mapping_id or "",
+                item.identity or "",
+                item.artifact_path or "",
+            ),
+        )
+    )
+
+
+def _load_mappings(resolved: ResolvedPaths, config: ProjectConfig) -> list[EvidenceMapping]:
+    _require_mapping_files(config, resolved)
+    return [load_mapping(path) for path in resolved.mapping]
+
+
+def _merge_evidence(
+    config_path: Path,
+    config: ProjectConfig,
+    resolved: ResolvedPaths,
+    authored: list[QualityEvidence],
+) -> tuple[list[QualityEvidence], tuple[MappingDiagnostic, ...] | None]:
+    if not config.mapping:
+        return authored, None
+    mappings = _load_mappings(resolved, config)
+    inventory = collect_mappable_inventory(resolved)
+    materialization = apply_mappings(
+        inventory.records,
+        mappings,
+        config_dir_for(config_path),
+        authored_ids={item.metadata.id for item in authored},
+    )
+    return (
+        [*authored, *materialization.evidence],
+        _combine_mapping_diagnostics(materialization, inventory.diagnostics),
+    )
+
+
+def _config_evaluation(
     config_path: Path, obligation: Path | None, evidence: Path | None
-) -> tuple[Path, list[Path]]:
-    resolved = resolve_paths(load_config(config_path), config_path)
+) -> EvaluationBundle:
+    config = load_config(config_path)
+    resolved = resolve_paths(config, config_path)
     selected_obligation = obligation
-    selected_evidence = _evidence_files(evidence) if evidence is not None else list(resolved.evidence)
     if selected_obligation is None and len(resolved.obligations) == 1:
         selected_obligation = resolved.obligations[0]
-    if selected_obligation is None or not selected_evidence:
+    selected_evidence_paths = (
+        _evidence_files(evidence) if evidence is not None else list(resolved.evidence)
+    )
+    if selected_obligation is None:
+        raise ConfigLoadError(
+            f"{ConfigLoadError.code}: config must resolve exactly one obligation"
+        )
+    if not selected_evidence_paths and not config.mapping:
         raise ConfigLoadError(
             f"{ConfigLoadError.code}: config must resolve exactly one obligation and at least one evidence file"
         )
-    return selected_obligation, selected_evidence
+    _require_mapping_files(config, resolved)
+    authored = [load_evidence(path) for path in selected_evidence_paths]
+    merged, diagnostics = _merge_evidence(config_path, config, resolved, authored)
+    result = evaluate_obligation(load_obligation(selected_obligation), merged)
+    return EvaluationBundle((result,), diagnostics)
 
 
 def _result_from_inputs(
     obligation: Path | None, evidence: Path | None, config: Path | None
-) -> ObligationResult:
+) -> EvaluationBundle:
     if config is None:
         if obligation is not None and evidence is not None:
-            return _evaluate(obligation, evidence)
+            return EvaluationBundle((_evaluate(obligation, evidence),), None)
         raise ConfigLoadError(f"{ConfigLoadError.code}: provide --obligation/--evidence or --config")
-    config_obligation, config_evidence = _config_inputs(config, obligation, evidence)
-    return _evaluate_files(config_obligation, config_evidence)
+    return _config_evaluation(config, obligation, evidence)
 
 
-def _render(result: ObligationResult, locale: str, output_format: str) -> str:
+def _render(
+    result: ObligationResult,
+    locale: str,
+    output_format: str,
+    mapping_diagnostics: tuple[MappingDiagnostic, ...] | None = None,
+) -> str:
     if output_format == "json":
-        return render_json([result])
+        return render_json([result], mapping_diagnostics=mapping_diagnostics)
     if output_format != "markdown":
         raise typer.BadParameter("format must be markdown or json")
-    return render_markdown([result], locale=locale)
+    return render_markdown([result], locale=locale, mapping_diagnostics=mapping_diagnostics)
 
 
-def _handle_input_error(error: ConfigLoadError | ProtocolLoadError) -> None:
+_InputError = ConfigLoadError | ProtocolLoadError | MappingConflictError | MappingDocumentError
+
+
+def _handle_input_error(error: _InputError) -> None:
     typer.echo(str(error), err=True)
     raise typer.Exit(code=4) from error
 
 
-def _policy_results(
+def _policy_bundle(
     obligation: Path | None, evidence: Path | None, config: Path | None
-) -> tuple[ObligationResult, ...]:
+) -> EvaluationBundle:
     if config is None:
         if obligation is not None and evidence is not None:
-            return (_evaluate(obligation, evidence),)
+            return EvaluationBundle((_evaluate(obligation, evidence),), None)
         raise ConfigLoadError(f"{ConfigLoadError.code}: provide --obligation/--evidence or --config")
     if obligation is not None or evidence is not None:
         raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
-    resolved = resolve_paths(load_config(config), config)
-    if not resolved.obligations or not resolved.evidence:
-        raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations and evidence files")
-    observed = [load_evidence(path) for path in resolved.evidence]
-    return tuple(evaluate_obligation(load_obligation(path), observed) for path in resolved.obligations)
+    loaded = load_config(config)
+    resolved = resolve_paths(loaded, config)
+    if not resolved.obligations:
+        raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations")
+    if not resolved.evidence and not loaded.mapping:
+        raise ConfigLoadError(
+            f"{ConfigLoadError.code}: config must resolve obligations and evidence files"
+        )
+    _require_mapping_files(loaded, resolved)
+    authored = [load_evidence(path) for path in resolved.evidence]
+    merged, diagnostics = _merge_evidence(config, loaded, resolved, authored)
+    results = tuple(evaluate_obligation(load_obligation(path), merged) for path in resolved.obligations)
+    return EvaluationBundle(results, diagnostics)
+
+
+def _map_preview(config_path: Path) -> MappingMaterialization:
+    config = load_config(config_path)
+    if not config.mapping:
+        raise ConfigLoadError(f"{ConfigLoadError.code}: map preview requires mapping entries")
+    resolved = resolve_paths(config, config_path)
+    mappings = _load_mappings(resolved, config)
+    inventory = collect_mappable_inventory(resolved)
+    materialization = apply_mappings(inventory.records, mappings, config_dir_for(config_path))
+    return MappingMaterialization(
+        materialization.evidence,
+        _combine_mapping_diagnostics(materialization, inventory.diagnostics),
+        materialization.mapping_ids,
+    )
 
 
 @app.command()
@@ -124,8 +240,9 @@ def gaps(
 ) -> None:
     """Show explainable gaps for one Testing Obligation."""
     try:
-        typer.echo(_render(_result_from_inputs(obligation, evidence, config), locale, output_format))
-    except (ConfigLoadError, ProtocolLoadError) as error:
+        bundle = _result_from_inputs(obligation, evidence, config)
+        typer.echo(_render(bundle.results[0], locale, output_format, bundle.mapping_diagnostics))
+    except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
         _handle_input_error(error)
 
 
@@ -139,9 +256,10 @@ def check(
 ) -> None:
     """Evaluate an obligation and return a gate-compatible status code."""
     try:
-        result = _result_from_inputs(obligation, evidence, config)
-        typer.echo(_render(result, locale, output_format))
-    except (ConfigLoadError, ProtocolLoadError) as error:
+        bundle = _result_from_inputs(obligation, evidence, config)
+        result = bundle.results[0]
+        typer.echo(_render(result, locale, output_format, bundle.mapping_diagnostics))
+    except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
         _handle_input_error(error)
         return
     if result.status is CoverageStatus.COVERED:
@@ -178,11 +296,11 @@ def report(
 ) -> None:
     """Write a report file without overwriting protocol data."""
     try:
-        result = _result_from_inputs(obligation, evidence, config)
-    except (ConfigLoadError, ProtocolLoadError) as error:
+        bundle = _result_from_inputs(obligation, evidence, config)
+    except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
         _handle_input_error(error)
         return
-    output.write_text(_render(result, locale, output_format))
+    output.write_text(_render(bundle.results[0], locale, output_format, bundle.mapping_diagnostics))
     typer.echo(str(output))
 
 
@@ -263,15 +381,47 @@ def policy_check(
         evaluated_at = datetime.fromisoformat(as_of)
         if evaluated_at.tzinfo is None or evaluated_at.utcoffset() is None:
             raise ValueError("--as-of must be timezone-aware")
-        report = evaluate_policy(_policy_results(obligation, evidence, config), load_policy(policy), evaluated_at)
-    except (ConfigLoadError, ProtocolLoadError, ValueError) as error:
-        _handle_input_error(error if isinstance(error, (ConfigLoadError, ProtocolLoadError)) else ConfigLoadError(str(error)))
+        bundle = _policy_bundle(obligation, evidence, config)
+        report = evaluate_policy(bundle.results, load_policy(policy), evaluated_at)
+    except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError, ValueError) as error:
+        _handle_input_error(
+            error
+            if isinstance(
+                error,
+                (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError),
+            )
+            else ConfigLoadError(str(error))
+        )
         return
     if output_format == "json":
-        typer.echo(render_policy_json(report))
+        typer.echo(render_policy_json(report, mapping_diagnostics=bundle.mapping_diagnostics))
     elif output_format == "markdown":
-        typer.echo(render_policy_markdown(report, locale))
+        typer.echo(
+            render_policy_markdown(report, locale, mapping_diagnostics=bundle.mapping_diagnostics)
+        )
     else:
         raise typer.BadParameter("format must be markdown or json")
     if any(item.decision is PolicyDecision.BLOCK for item in report.results):
         raise typer.Exit(code=2)
+
+
+@map_app.command("preview")
+def map_preview(
+    config: Annotated[Path, typer.Option(exists=True, readable=True)],
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Preview QualityEvidence that would be produced by configured mappings."""
+    if output_format not in {"json", "markdown"}:
+        _handle_input_error(ConfigLoadError("QCOV-CLI-004: format must be markdown or json"))
+    if locale not in {"en", "zh-CN"}:
+        _handle_input_error(ConfigLoadError("QCOV-CLI-005: locale must be en or zh-CN"))
+    try:
+        materialization = _map_preview(config)
+    except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
+        _handle_input_error(error)
+        return
+    if output_format == "json":
+        typer.echo(render_map_preview_json(materialization))
+    else:
+        typer.echo(render_map_preview_markdown(materialization, locale))
