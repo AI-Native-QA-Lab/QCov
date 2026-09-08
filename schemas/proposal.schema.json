@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QualityProposal",
+  "$defs": {
+    "LocalizedText": {
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "title": "En",
+          "type": "string"
+        },
+        "zh-CN": {
+          "title": "Zh-Cn",
+          "type": "string"
+        }
+      },
+      "required": [
+        "en",
+        "zh-CN"
+      ],
+      "title": "LocalizedText",
+      "type": "object"
+    },
+    "ProposalDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "obligation_suggest",
+            "change_risk"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "status": {
+          "const": "draft",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "status"
+      ],
+      "title": "ProposalDescriptor",
+      "type": "object"
+    },
+    "ProposalItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "proposed_obligation",
+            "affected_obligation",
+            "suggested_evidence"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "obligationRef": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Obligationref"
+        },
+        "summary": {
+          "$ref": "#/$defs/LocalizedText"
+        },
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "summary"
+      ],
+      "title": "ProposalItem",
+      "type": "object"
+    },
+    "ProposalMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "title": "Createdat",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "createdAt"
+      ],
+      "title": "ProposalMetadata",
+      "type": "object"
+    },
+    "ProposalProvider": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ProposalProvider",
+      "type": "object"
+    },
+    "ProposalSource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "requirements",
+            "local_diff"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ProposalSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "const": "qcov.dev/v1alpha1",
+      "title": "Apiversion",
+      "type": "string"
+    },
+    "kind": {
+      "const": "QualityProposal",
+      "title": "Kind",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/ProposalMetadata"
+    },
+    "proposal": {
+      "$ref": "#/$defs/ProposalDescriptor"
+    },
+    "source": {
+      "$ref": "#/$defs/ProposalSource"
+    },
+    "provider": {
+      "$ref": "#/$defs/ProposalProvider"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ProposalItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "proposal",
+    "source",
+    "provider"
+  ],
+  "type": "object"
+}

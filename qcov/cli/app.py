@@ -2,14 +2,26 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
 import typer
+import yaml
 
 from qcov.adapters.base import ScanDiagnostic
+from qcov.adapters.pytest import PytestAdapter
+from qcov.ai import (
+    ChangeRiskContext,
+    ObligationSuggestContext,
+    analyze_change,
+    propose_obligations,
+    resolve_provider,
+)
 from qcov.engine.delta import compare_snapshots
 from qcov.engine.delta_reports import render_delta_json, render_delta_markdown
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
@@ -28,6 +40,7 @@ from qcov.engine.policy_reports import render_policy_json, render_policy_markdow
 from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
 from qcov.engine.scan import scan_project
 from qcov.models.config import ProjectConfig, ResolvedPaths, resolve_paths
+from qcov.models.errors import ProposalInputError
 from qcov.models.io import (
     ConfigLoadError,
     ProtocolLoadError,
@@ -37,13 +50,23 @@ from qcov.models.io import (
     load_obligation,
     load_policy,
 )
-from qcov.models.protocol import CoverageStatus, EvidenceMapping, QualityEvidence
+from qcov.models.protocol import (
+    CoverageStatus,
+    EvidenceMapping,
+    QualityEvidence,
+    QualityProposal,
+    TestingObligation,
+)
 
 app = typer.Typer(no_args_is_help=True)
 policy_app = typer.Typer(no_args_is_help=True)
 map_app = typer.Typer(no_args_is_help=True)
+obligation_app = typer.Typer(no_args_is_help=True)
+risk_app = typer.Typer(no_args_is_help=True)
 app.add_typer(policy_app, name="policy")
 app.add_typer(map_app, name="map")
+app.add_typer(obligation_app, name="obligation")
+app.add_typer(risk_app, name="risk")
 
 ObligationPath = Annotated[Path, typer.Option("--obligation", "--obligations", exists=True, readable=True)]
 EvidencePath = Annotated[Path, typer.Option(exists=True, readable=True)]
@@ -117,19 +140,28 @@ def _merge_evidence(
     config: ProjectConfig,
     resolved: ResolvedPaths,
     authored: list[QualityEvidence],
+    markers: list[QualityEvidence],
 ) -> tuple[list[QualityEvidence], tuple[MappingDiagnostic, ...] | None]:
+    seen_ids = {item.metadata.id for item in authored}
+    for item in markers:
+        if item.metadata.id in seen_ids:
+            raise MappingConflictError(
+                f"{MappingConflictError.code}: evidence id conflict: {item.metadata.id}"
+            )
+        seen_ids.add(item.metadata.id)
+    combined = [*authored, *markers]
     if not config.mapping:
-        return authored, None
+        return combined, None
     mappings = _load_mappings(resolved, config)
     inventory = collect_mappable_inventory(resolved)
     materialization = apply_mappings(
         inventory.records,
         mappings,
         config_dir_for(config_path),
-        authored_ids={item.metadata.id for item in authored},
+        authored_ids=seen_ids,
     )
     return (
-        [*authored, *materialization.evidence],
+        [*combined, *materialization.evidence],
         _combine_mapping_diagnostics(materialization, inventory.diagnostics),
     )
 
@@ -149,13 +181,16 @@ def _config_evaluation(
         raise ConfigLoadError(
             f"{ConfigLoadError.code}: config must resolve exactly one obligation"
         )
-    if not selected_evidence_paths and not config.mapping:
+    markers = PytestAdapter().collect(config_dir_for(config_path))
+    if not selected_evidence_paths and not config.mapping and not markers:
         raise ConfigLoadError(
             f"{ConfigLoadError.code}: config must resolve exactly one obligation and at least one evidence file"
         )
     _require_mapping_files(config, resolved)
     authored = [load_evidence(path) for path in selected_evidence_paths]
-    merged, diagnostics = _merge_evidence(config_path, config, resolved, authored)
+    merged, diagnostics = _merge_evidence(
+        config_path, config, resolved, authored, markers
+    )
     result = evaluate_obligation(load_obligation(selected_obligation), merged)
     return EvaluationBundle((result,), diagnostics)
 
@@ -183,7 +218,13 @@ def _render(
     return render_markdown([result], locale=locale, mapping_diagnostics=mapping_diagnostics)
 
 
-_InputError = ConfigLoadError | ProtocolLoadError | MappingConflictError | MappingDocumentError
+_InputError = (
+    ConfigLoadError
+    | ProtocolLoadError
+    | MappingConflictError
+    | MappingDocumentError
+    | ProposalInputError
+)
 
 
 def _handle_input_error(error: _InputError) -> None:
@@ -204,13 +245,14 @@ def _policy_bundle(
     resolved = resolve_paths(loaded, config)
     if not resolved.obligations:
         raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations")
-    if not resolved.evidence and not loaded.mapping:
+    markers = PytestAdapter().collect(config_dir_for(config))
+    if not resolved.evidence and not loaded.mapping and not markers:
         raise ConfigLoadError(
             f"{ConfigLoadError.code}: config must resolve obligations and evidence files"
         )
     _require_mapping_files(loaded, resolved)
     authored = [load_evidence(path) for path in resolved.evidence]
-    merged, diagnostics = _merge_evidence(config, loaded, resolved, authored)
+    merged, diagnostics = _merge_evidence(config, loaded, resolved, authored, markers)
     results = tuple(evaluate_obligation(load_obligation(path), merged) for path in resolved.obligations)
     return EvaluationBundle(results, diagnostics)
 
@@ -425,3 +467,140 @@ def map_preview(
         typer.echo(render_map_preview_json(materialization))
     else:
         typer.echo(render_map_preview_markdown(materialization, locale))
+
+
+def _render_proposal(proposal: QualityProposal, output_format: str) -> str:
+    payload = proposal.model_dump(by_alias=True, mode="json")
+    if output_format == "json":
+        return json.dumps(payload, indent=2, ensure_ascii=False)
+    if output_format == "markdown":
+        lines = [
+            f"# QualityProposal `{proposal.metadata.id}`",
+            "",
+            f"- type: `{proposal.proposal.type}`",
+            f"- status: `{proposal.proposal.status}`",
+            f"- provider: `{proposal.provider.name}`",
+            "",
+            "## Items",
+        ]
+        for item in proposal.items:
+            lines.append(f"- `{item.id}` ({item.kind}) {item.summary.en}")
+        return "\n".join(lines) + "\n"
+    raise typer.BadParameter("format must be markdown or json")
+
+
+def _write_proposal_yaml(path: Path, proposal: QualityProposal) -> None:
+    payload = proposal.model_dump(by_alias=True, mode="json")
+    path.write_text(yaml.safe_dump(payload, sort_keys=False, allow_unicode=True))
+
+
+def _load_config_obligations(
+    config_path: Path,
+) -> tuple[ProjectConfig, list[TestingObligation]]:
+    config = load_config(config_path)
+    resolved = resolve_paths(config, config_path)
+    if not resolved.obligations:
+        raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations")
+    return config, [load_obligation(path) for path in resolved.obligations]
+
+
+def _resolve_obligations(
+    config: Path | None, obligation: Path | None
+) -> tuple[str, tuple[TestingObligation, ...]]:
+    """Return provider default name and obligations from --config or --obligation."""
+    if config is not None and obligation is not None:
+        raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with --obligation")
+    if config is not None:
+        loaded, obligations = _load_config_obligations(config)
+        return loaded.ai.provider, tuple(obligations)
+    if obligation is not None:
+        return "offline", (load_obligation(obligation),)
+    raise ConfigLoadError(f"{ConfigLoadError.code}: provide --config or --obligation")
+
+
+def _requirements_text(
+    requirements: Path | None, *, allow_stdin: bool
+) -> tuple[str, tuple[str, ...]]:
+    if requirements is not None:
+        return requirements.read_text(), (str(requirements),)
+    if allow_stdin and not sys.stdin.isatty():
+        text = sys.stdin.read()
+        if text.strip():
+            return text, ("stdin",)
+    raise ProposalInputError("QCOV-PROPOSAL-002: requirements input is required")
+
+
+def _local_diff_text(repo: Path, base: str, head: str) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repo), "diff", f"{base}...{head}"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ProposalInputError(f"QCOV-PROPOSAL-002: unable to read local diff: {error}") from error
+    return completed.stdout
+
+
+@obligation_app.command("suggest")
+def obligation_suggest(
+    config: Annotated[Path | None, typer.Option(exists=True, readable=True)] = None,
+    obligation: OptionalObligationPath = None,
+    requirements: Annotated[Path | None, typer.Option(exists=True, readable=True)] = None,
+    output: Annotated[Path | None, typer.Option()] = None,
+    provider: Annotated[str | None, typer.Option()] = None,
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Propose draft obligations/evidence from requirements (proposal only)."""
+    try:
+        default_provider, obligations = _resolve_obligations(config, obligation)
+        text, refs = _requirements_text(requirements, allow_stdin=True)
+        proposal = propose_obligations(
+            ObligationSuggestContext(
+                requirements_text=text,
+                requirements_refs=refs,
+                obligations=obligations,
+            ),
+            resolve_provider(provider or default_provider),
+        )
+    except (ConfigLoadError, ProtocolLoadError, ProposalInputError) as error:
+        _handle_input_error(error)
+        return
+    if output is not None:
+        _write_proposal_yaml(output, proposal)
+    typer.echo(_render_proposal(proposal, output_format))
+
+
+@risk_app.command("analyze")
+def risk_analyze(
+    config: Annotated[Path | None, typer.Option(exists=True, readable=True)] = None,
+    obligation: OptionalObligationPath = None,
+    base: Annotated[str, typer.Option()] = "HEAD~1",
+    head: Annotated[str, typer.Option()] = "HEAD",
+    output: Annotated[Path | None, typer.Option()] = None,
+    provider: Annotated[str | None, typer.Option()] = None,
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Propose change-risk draft from a local git diff (proposal only)."""
+    try:
+        default_provider, obligations = _resolve_obligations(config, obligation)
+        repo = config_dir_for(config) if config is not None else Path.cwd()
+        if obligation is not None:
+            repo = obligation.resolve().parent
+        diff_text = _local_diff_text(repo, base, head)
+        proposal = analyze_change(
+            ChangeRiskContext(
+                diff_text=diff_text,
+                base_ref=base,
+                head_ref=head,
+                obligations=obligations,
+            ),
+            resolve_provider(provider or default_provider),
+        )
+    except (ConfigLoadError, ProtocolLoadError, ProposalInputError) as error:
+        _handle_input_error(error)
+        return
+    if output is not None:
+        _write_proposal_yaml(output, proposal)
+    typer.echo(_render_proposal(proposal, output_format))

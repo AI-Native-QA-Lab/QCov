@@ -18,22 +18,41 @@ explicit `--as-of`, and PASS/WARN/BLOCK decisions. Iteration 4.5 adds declarativ
 
 Remote Git operations, source-line impact inference, policy DSL, dimension
 thresholds, wildcard waivers, coverage/LCOV promotion to passed evidence, and
-automatic inventory-to-evidence inference remain deferred.
+automatic inventory-to-evidence inference remain deferred unless a later design
+approves them.
 
-## Next after 4.5
+## Gate after 4.5
 
 Validate real-project integration time, explainability, and gap value beyond
-ordinary reports before AI work. Design reference:
-`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`.
+ordinary reports before accelerating AI. Mapping must stay declarative and local.
+Adapters still must not infer that a passing test or coverage rate proves a
+business obligation. Design reference:
+`docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`.
 See also [explicit evidence mapping](mapping.md).
 
-Mapping must stay declarative and local. Adapters still must not infer that a
-passing test or coverage rate proves a business obligation.
-## Later iterations
+## Planned Iterations 5–8
 
-Iterations 5–7 may introduce AI only as a proposal and planning layer under
-deterministic policy checks. AI must never become evidence or gate authority.
-Iteration 8 integrates production evidence.
+Principle: AI proposes; policy approves; the deterministic engine verifies. AI
+must never become evidence or gate authority.
+
+| Iteration | Focus |
+| --- | --- |
+| **5** | Mapping hardening (pytest-marker evaluation wiring and limited identity DX as needed) plus AI Obligation Assistant and Change Risk Analyzer (`obligation suggest`, `risk analyze`) |
+| **6** | AI Quality Planner only (`plan` / next-best verification) |
+| **7** | Agentic Quality Loop only (stable agent contracts; optional `explain`) |
+| **8** | Production evidence only (runtime / incident / observability-style producers under protocol rules) |
+
+**Roadmap Complete through Iteration 8** closes this core arc (gap → change →
+policy → mapping → AI propose/plan/agent feedback → production feedback). It is
+a milestone, not the end of the product.
+
+## Post-8 backlog
+
+Separate approved designs are required for QA-for-AI dimensions, Quality BOM,
+Adapter SDK / broader ecosystems, remote Git and deeper CI automation, policy
+DSL and dimension thresholds, coverage/LCOV promotion to covering evidence,
+automatic inventory-to-obligation inference, web UI, persistence, and a packaged
+Continuous Quality Control Plane.
 
 ## Validation gates before expansion
 

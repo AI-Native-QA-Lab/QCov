@@ -20,6 +20,12 @@ class ScanConfig(ProtocolModel):
     lcov: list[str] = Field(default_factory=list)
 
 
+class AIConfig(ProtocolModel):
+    """Optional AI proposal provider selection (proposals only; never gate authority)."""
+
+    provider: str = "offline"
+
+
 class ProjectConfig(ProtocolModel):
     """Strict, versioned configuration for one local QCov project."""
 
@@ -29,6 +35,7 @@ class ProjectConfig(ProtocolModel):
     evidence: list[str] = Field(default_factory=list)
     mapping: list[str] = Field(default_factory=list)
     scan: ScanConfig = Field(default_factory=ScanConfig)
+    ai: AIConfig = Field(default_factory=AIConfig)
 
 
 @dataclass(frozen=True)
