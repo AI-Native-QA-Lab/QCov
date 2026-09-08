@@ -2,9 +2,16 @@
 
 ## Scope
 
-QCov's MVP is a local, deterministic Quality Evidence Gap Engine. Do not add
-AI, a web UI, persistence, Git delta analysis, external plugins, or policy
-enforcement without an approved design and plan update.
+QCov is a local, deterministic Quality Evidence Gap Engine. Iterations 0–4 are
+already delivered: gap evaluation, inventory scan adapters, local `qcov diff`,
+and local `qcov policy check`.
+
+Do not add AI providers, a web UI, persistence, remote Git operations, external
+plugins, inventory-to-evidence inference, or policy DSL / wildcard waivers
+without an approved design and plan update.
+
+Prefer closing the explicit obligation-mapping loop and real-project validation
+before AI proposal work. Do not describe QCov as a line-coverage detector.
 
 ## Commands
 
