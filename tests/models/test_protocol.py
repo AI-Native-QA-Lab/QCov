@@ -66,3 +66,66 @@ def test_policy_rejects_duplicate_waiver_obligation_refs() -> None:
                 ],
             }
         )
+
+
+VALID_MAPPING = {
+    "apiVersion": "qcov.dev/v1alpha1",
+    "kind": "EvidenceMapping",
+    "metadata": {"id": "refund-import-mapping"},
+    "defaultTimestamp": "2026-09-08T00:00:00+08:00",
+    "mappings": [
+        {
+            "from": {"producer": "junit", "identity": "refund.api::refund_is_accepted"},
+            "to": {
+                "obligationRef": "QO-REFUND-001",
+                "dimension": "behavior",
+                "type": "api_test",
+            },
+        }
+    ],
+}
+
+
+def test_evidence_mapping_accepts_junit_and_playwright_producers() -> None:
+    from qcov.models.protocol import EvidenceMapping
+
+    mapping = EvidenceMapping.model_validate(VALID_MAPPING)
+    assert mapping.metadata.id == "refund-import-mapping"
+    assert mapping.mappings[0].from_.producer == "junit"
+
+
+def test_evidence_mapping_rejects_coverage_producer() -> None:
+    from qcov.models.protocol import EvidenceMapping
+
+    payload = {
+        **VALID_MAPPING,
+        "mappings": [
+            {
+                "from": {"producer": "coverage.py", "identity": "src/app.py"},
+                "to": {
+                    "obligationRef": "QO-REFUND-001",
+                    "dimension": "behavior",
+                    "type": "line_coverage",
+                },
+            }
+        ],
+    }
+    with pytest.raises(ValidationError):
+        EvidenceMapping.model_validate(payload)
+
+
+def test_evidence_mapping_rejects_naive_default_timestamp() -> None:
+    from qcov.models.protocol import EvidenceMapping
+
+    payload = {**VALID_MAPPING, "defaultTimestamp": "2026-09-08T00:00:00"}
+    with pytest.raises(ValidationError, match="timezone-aware"):
+        EvidenceMapping.model_validate(payload)
+
+
+def test_evidence_mapping_rejects_duplicate_quintuples() -> None:
+    from qcov.models.protocol import EvidenceMapping
+
+    entry = VALID_MAPPING["mappings"][0]
+    payload = {**VALID_MAPPING, "mappings": [entry, entry]}
+    with pytest.raises(ValidationError, match="duplicate mapping quintuple"):
+        EvidenceMapping.model_validate(payload)

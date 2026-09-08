@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from qcov.adapters.base import InventoryScanner, ScanDiagnostic
+from qcov.adapters.base import InventoryRecord, InventoryScanner, ScanDiagnostic
 from qcov.adapters.pytest import PytestAdapter
 from qcov.adapters.registry import inventory_adapters
 from qcov.models.config import resolve_patterns
@@ -28,21 +28,28 @@ class ScanReport:
 
     adapters: tuple[AdapterScanSummary, ...]
     diagnostics: tuple[ScanDiagnostic, ...]
+    records: tuple[InventoryRecord, ...] = ()
 
 
-def _scan_files(adapter: InventoryScanner, paths: tuple[Path, ...]) -> tuple[AdapterScanSummary, tuple[ScanDiagnostic, ...]]:
-    records = 0
+def scan_adapter_files(
+    adapter: InventoryScanner, paths: tuple[Path, ...]
+) -> tuple[AdapterScanSummary, tuple[InventoryRecord, ...], tuple[ScanDiagnostic, ...]]:
+    """Scan configured files and retain inventory records alongside the summary."""
+    records: list[InventoryRecord] = []
     diagnostics: list[ScanDiagnostic] = []
     files: list[str] = []
     for path in paths:
         if not path.exists():
-            diagnostics.append(ScanDiagnostic("QCOV-SCAN-001", "Configured artifact does not exist", str(path)))
+            diagnostics.append(
+                ScanDiagnostic("QCOV-SCAN-001", "Configured artifact does not exist", str(path))
+            )
             continue
         result = adapter.scan(path)
         files.append(str(path))
-        records += len(result.records)
+        records.extend(result.records)
         diagnostics.extend(result.diagnostics)
-    return AdapterScanSummary(adapter.name, bool(files), tuple(files), records), tuple(diagnostics)
+    summary = AdapterScanSummary(adapter.name, bool(files), tuple(files), len(records))
+    return summary, tuple(records), tuple(diagnostics)
 
 
 def scan_project(project_path: Path, config_path: Path) -> ScanReport:
@@ -62,13 +69,19 @@ def scan_project(project_path: Path, config_path: Path) -> ScanReport:
     }
     summaries: list[AdapterScanSummary] = [pytest_summary]
     diagnostics: list[ScanDiagnostic] = []
+    records: list[InventoryRecord] = []
     for adapter in inventory_adapters():
-        summary, adapter_diagnostics = _scan_files(
-            adapter, resolve_patterns(configured[adapter.name], config_path.resolve().parent, include_missing=True)
+        summary, adapter_records, adapter_diagnostics = scan_adapter_files(
+            adapter,
+            resolve_patterns(
+                configured[adapter.name], config_path.resolve().parent, include_missing=True
+            ),
         )
         summaries.append(summary)
+        records.extend(adapter_records)
         diagnostics.extend(adapter_diagnostics)
     return ScanReport(
         adapters=tuple(sorted(summaries, key=lambda item: item.adapter)),
         diagnostics=tuple(sorted(diagnostics, key=lambda item: item.artifact_path)),
+        records=tuple(records),
     )

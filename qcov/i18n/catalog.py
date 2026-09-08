@@ -33,6 +33,10 @@ MESSAGES: dict[str, dict[str, str]] = {
     "policy.expires_at": {"en": "Expires at", "zh-CN": "到期时间"},
     "policy.approved_by": {"en": "Approved by", "zh-CN": "批准人"},
     "policy.expired_waiver_cleanup": {"en": "Expired waiver: remove or renew it.", "zh-CN": "豁免已过期：请删除或续期。"},
+    "mapping.preview_title": {"en": "Evidence mapping preview", "zh-CN": "证据映射预览"},
+    "mapping.ids": {"en": "Mapping ids", "zh-CN": "映射 ID"},
+    "mapping.evidence": {"en": "Mapped evidence", "zh-CN": "映射证据"},
+    "mapping.diagnostics": {"en": "Mapping diagnostics", "zh-CN": "映射诊断"},
 }
 
 

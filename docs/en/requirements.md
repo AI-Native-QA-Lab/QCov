@@ -12,8 +12,10 @@ calculated. `UNKNOWN` must never masquerade as a pass.
 
 Config-driven `scan` discovers pytest markers and imports JUnit XML,
 coverage.py XML, Playwright JSON, and LCOV as **inventory observations** until
-an explicit obligation mapping exists. `qcov diff` compares explicit obligation
-and evidence snapshots across local committed revisions. `qcov policy check`
+an explicit obligation mapping exists. Iteration 4.5 provides declarative
+`EvidenceMapping` for junit/playwright identities, `qcov map preview`, and
+`--config` evaluation merge. `qcov diff` compares explicit obligation and
+evidence snapshots across local committed revisions. `qcov policy check`
 applies local deterministic gates with exact, expiring waivers and an explicit
 `--as-of` timestamp.
 
@@ -23,8 +25,8 @@ AI providers, web UI, database persistence, remote Git operations, external
 plugin loading, inventory-to-evidence inference, policy DSL, dimension
 thresholds, and wildcard or path-based waivers remain out of scope.
 
-## Pending requirement: explicit mapping
+## Pending requirement: broader mapping
 
-A declared mapping layer must be able to turn selected inventory observations
-into `QualityEvidence` without weakening the explicit-evidence model. Until that
-lands, generic imports stay diagnostics and inventory only.
+Wildcard identity matching, coverage/LCOV promotion to covering evidence, and
+pytest-marker evaluation wiring remain future work. Until then, unmapped
+generic imports stay diagnostics and inventory only.

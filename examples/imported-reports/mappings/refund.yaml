@@ -1,0 +1,21 @@
+apiVersion: qcov.dev/v1alpha1
+kind: EvidenceMapping
+metadata:
+  id: refund-import-mapping
+defaultTimestamp: "2026-09-08T00:00:00+08:00"
+mappings:
+  - from:
+      producer: junit
+      identity: "refund.api::refund_is_accepted"
+    to:
+      obligationRef: QO-REFUND-001
+      dimension: behavior
+      type: api_test
+  - from:
+      producer: playwright
+      identity: "tests/refund.spec.ts::refund > shows confirmation [chromium]"
+    to:
+      obligationRef: QO-REFUND-001
+      dimension: behavior
+      type: e2e_test
+      evidenceId: QE-MAP-REFUND-E2E-001

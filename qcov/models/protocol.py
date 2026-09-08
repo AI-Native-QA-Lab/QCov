@@ -148,3 +148,61 @@ class QualityPolicy(ProtocolModel):
         if len(refs) != len(set(refs)):
             raise ValueError("duplicate waiver obligation reference")
         return self
+
+
+class MappingSource(ProtocolModel):
+    producer: Literal["junit", "playwright"]
+    identity: str = Field(min_length=1)
+
+
+class MappingTarget(ProtocolModel):
+    obligation_ref: str = Field(alias="obligationRef", min_length=1)
+    dimension: QualityDimension
+    type: str = Field(min_length=1)
+    evidence_id: str | None = Field(default=None, alias="evidenceId", min_length=1)
+
+
+class MappingEntry(ProtocolModel):
+    from_: MappingSource = Field(alias="from")
+    to: MappingTarget
+    timestamp: datetime | None = None
+
+    @field_validator("timestamp")
+    @classmethod
+    def entry_timestamp_must_be_timezone_aware(cls, value: datetime | None) -> datetime | None:
+        if value is None:
+            return value
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("timestamp must be timezone-aware")
+        return value
+
+
+class EvidenceMapping(ProtocolModel):
+    api_version: Literal["qcov.dev/v1alpha1"] = Field(alias="apiVersion")
+    kind: Literal["EvidenceMapping"]
+    metadata: EvidenceMetadata
+    default_timestamp: datetime = Field(alias="defaultTimestamp")
+    mappings: list[MappingEntry] = Field(min_length=1)
+
+    @field_validator("default_timestamp")
+    @classmethod
+    def default_timestamp_must_be_timezone_aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("defaultTimestamp must be timezone-aware")
+        return value
+
+    @model_validator(mode="after")
+    def mapping_quintuples_must_be_unique(self) -> EvidenceMapping:
+        keys = [
+            (
+                entry.from_.producer,
+                entry.from_.identity,
+                entry.to.obligation_ref,
+                entry.to.dimension,
+                entry.to.type,
+            )
+            for entry in self.mappings
+        ]
+        if len(keys) != len(set(keys)):
+            raise ValueError("duplicate mapping quintuple")
+        return self
