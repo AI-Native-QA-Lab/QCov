@@ -16,6 +16,7 @@ def test_bilingual_docs_have_matching_stems() -> None:
         "concepts.md",
         "development.md",
             "process.md",
+            "policy.md",
             "pr-delta.md",
             "protocol.md",
         "requirements.md",

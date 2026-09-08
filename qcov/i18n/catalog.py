@@ -23,6 +23,16 @@ MESSAGES: dict[str, dict[str, str]] = {
     "delta.before": {"en": "Before status", "zh-CN": "变更前状态"},
     "delta.after": {"en": "After status", "zh-CN": "变更后状态"},
     "delta.evidence": {"en": "Changed evidence", "zh-CN": "变更的证据"},
+    "policy.id": {"en": "Policy", "zh-CN": "策略"},
+    "policy.evaluated_at": {"en": "Evaluated at", "zh-CN": "评估时间"},
+    "policy.coverage_status": {"en": "Coverage status", "zh-CN": "覆盖状态"},
+    "policy.decision": {"en": "Policy decision", "zh-CN": "策略决定"},
+    "policy.violations": {"en": "Violations", "zh-CN": "违规"},
+    "policy.waiver": {"en": "Waiver", "zh-CN": "豁免"},
+    "policy.reason": {"en": "Reason", "zh-CN": "理由"},
+    "policy.expires_at": {"en": "Expires at", "zh-CN": "到期时间"},
+    "policy.approved_by": {"en": "Approved by", "zh-CN": "批准人"},
+    "policy.expired_waiver_cleanup": {"en": "Expired waiver: remove or renew it.", "zh-CN": "豁免已过期：请删除或续期。"},
 }
 
 

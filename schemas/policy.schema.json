@@ -1,5 +1,33 @@
 {
   "$defs": {
+    "CoverageStatus": {
+      "enum": [
+        "COVERED",
+        "PARTIAL",
+        "MISSING",
+        "UNKNOWN"
+      ],
+      "title": "CoverageStatus",
+      "type": "string"
+    },
+    "DefaultPolicyRule": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedStatuses": {
+          "items": {
+            "$ref": "#/$defs/CoverageStatus"
+          },
+          "minItems": 1,
+          "title": "Allowedstatuses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "allowedStatuses"
+      ],
+      "title": "DefaultPolicyRule",
+      "type": "object"
+    },
     "EvidenceMetadata": {
       "additionalProperties": false,
       "properties": {
@@ -12,6 +40,58 @@
         "id"
       ],
       "title": "EvidenceMetadata",
+      "type": "object"
+    },
+    "PolicyRules": {
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/DefaultPolicyRule"
+        }
+      },
+      "required": [
+        "default"
+      ],
+      "title": "PolicyRules",
+      "type": "object"
+    },
+    "PolicyWaiver": {
+      "additionalProperties": false,
+      "properties": {
+        "obligationRef": {
+          "minLength": 1,
+          "title": "Obligationref",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "title": "Expiresat",
+          "type": "string"
+        },
+        "approvedBy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approvedby"
+        }
+      },
+      "required": [
+        "obligationRef",
+        "reason",
+        "expiresAt"
+      ],
+      "title": "PolicyWaiver",
       "type": "object"
     }
   },
@@ -30,20 +110,22 @@
     "metadata": {
       "$ref": "#/$defs/EvidenceMetadata"
     },
-    "policies": {
-      "additionalProperties": {
-        "additionalProperties": true,
-        "type": "object"
+    "rules": {
+      "$ref": "#/$defs/PolicyRules"
+    },
+    "waivers": {
+      "items": {
+        "$ref": "#/$defs/PolicyWaiver"
       },
-      "title": "Policies",
-      "type": "object"
+      "title": "Waivers",
+      "type": "array"
     }
   },
   "required": [
     "apiVersion",
     "kind",
     "metadata",
-    "policies"
+    "rules"
   ],
   "title": "QualityPolicy",
   "type": "object"

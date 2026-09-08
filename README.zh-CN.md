@@ -9,7 +9,7 @@ QCov 是面向 AI Native 软件交付的开源**质量证据缺口引擎**与**�
 ## MVP
 
 本地确定性 MVP 校验 Testing Obligation 与 Quality Evidence，并输出
-`COVERED`、`PARTIAL`、`MISSING` 或 `UNKNOWN`。AI、数据库、仪表盘、远程 Git 和策略门禁均不在当前范围内。
+`COVERED`、`PARTIAL`、`MISSING` 或 `UNKNOWN`。现已支持带时限豁免的本地策略门禁；AI、数据库、仪表盘和远程 Git 仍不在当前范围内。
 
 ```bash
 .venv/bin/python -m qcov gaps \
@@ -27,6 +27,9 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 
 使用 `qcov diff --base origin/main --head HEAD --config qcov.yaml` 比较已提交的
 版本。它不会切换提交，也不会读取脏工作区。参见[PR 质量覆盖增量](docs/zh-CN/pr-delta.md)。
+
+使用 `qcov policy check --config qcov.yaml --policy policy.yaml --as-of 2026-09-07T00:00:00+08:00`
+执行可复现的本地策略门禁。参见[策略门禁与豁免](docs/zh-CN/policy.md)。
 
 ## 项目入口
 

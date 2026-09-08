@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class ProtocolModel(BaseModel):
@@ -113,8 +113,38 @@ class QualityEvidence(ProtocolModel):
     confidence: Confidence
 
 
+class DefaultPolicyRule(ProtocolModel):
+    allowed_statuses: list[CoverageStatus] = Field(alias="allowedStatuses", min_length=1)
+
+
+class PolicyRules(ProtocolModel):
+    default: DefaultPolicyRule
+
+
+class PolicyWaiver(ProtocolModel):
+    obligation_ref: str = Field(alias="obligationRef", min_length=1)
+    reason: str = Field(min_length=1)
+    expires_at: datetime = Field(alias="expiresAt")
+    approved_by: str | None = Field(default=None, alias="approvedBy")
+
+    @field_validator("expires_at")
+    @classmethod
+    def expiry_must_be_timezone_aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("expiresAt must be timezone-aware")
+        return value
+
+
 class QualityPolicy(ProtocolModel):
     api_version: Literal["qcov.dev/v1alpha1"] = Field(alias="apiVersion")
     kind: Literal["QualityPolicy"]
     metadata: EvidenceMetadata
-    policies: dict[str, dict[str, object]]
+    rules: PolicyRules
+    waivers: list[PolicyWaiver] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def waiver_obligation_refs_must_be_unique(self) -> QualityPolicy:
+        refs = [waiver.obligation_ref for waiver in self.waivers]
+        if len(refs) != len(set(refs)):
+            raise ValueError("duplicate waiver obligation reference")
+        return self
