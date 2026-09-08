@@ -179,3 +179,99 @@ def test_playwright_flaky_becomes_failed(tmp_path: Path) -> None:
         tmp_path,
     )
     assert result.evidence[0].execution.status == "failed"
+
+
+def test_apply_mappings_suffix_wildcard_matches_unique_identity(tmp_path: Path) -> None:
+    artifact = tmp_path / "junit.xml"
+    artifact.write_text("<ok/>")
+    mapping = EvidenceMapping.model_validate(
+        {
+            "apiVersion": "qcov.dev/v1alpha1",
+            "kind": "EvidenceMapping",
+            "metadata": {"id": "wildcard-mapping"},
+            "defaultTimestamp": "2026-09-08T00:00:00+08:00",
+            "mappings": [
+                {
+                    "from": {"producer": "junit", "identity": "refund.api::*"},
+                    "to": {
+                        "obligationRef": "QO-REFUND-001",
+                        "dimension": "behavior",
+                        "type": "api_test",
+                    },
+                }
+            ],
+        }
+    )
+    result = apply_mappings(
+        [
+            InventoryRecord(
+                "junit", "refund.api::refund_is_accepted", "passed", str(artifact), {}
+            )
+        ],
+        [mapping],
+        tmp_path,
+    )
+    assert len(result.evidence) == 1
+    assert result.evidence[0].execution.status == "passed"
+    assert result.diagnostics == ()
+
+
+def test_apply_mappings_suffix_wildcard_missing_is_map_001(tmp_path: Path) -> None:
+    mapping = EvidenceMapping.model_validate(
+        {
+            "apiVersion": "qcov.dev/v1alpha1",
+            "kind": "EvidenceMapping",
+            "metadata": {"id": "wildcard-mapping"},
+            "defaultTimestamp": "2026-09-08T00:00:00+08:00",
+            "mappings": [
+                {
+                    "from": {"producer": "junit", "identity": "refund.api::*"},
+                    "to": {
+                        "obligationRef": "QO-REFUND-001",
+                        "dimension": "behavior",
+                        "type": "api_test",
+                    },
+                }
+            ],
+        }
+    )
+    result = apply_mappings([], [mapping], tmp_path)
+    assert result.evidence == ()
+    assert result.diagnostics[0].code == "QCOV-MAP-001"
+
+
+def test_apply_mappings_suffix_wildcard_ambiguous_is_map_005(tmp_path: Path) -> None:
+    artifact = tmp_path / "junit.xml"
+    artifact.write_text("<ok/>")
+    mapping = EvidenceMapping.model_validate(
+        {
+            "apiVersion": "qcov.dev/v1alpha1",
+            "kind": "EvidenceMapping",
+            "metadata": {"id": "wildcard-mapping"},
+            "defaultTimestamp": "2026-09-08T00:00:00+08:00",
+            "mappings": [
+                {
+                    "from": {"producer": "junit", "identity": "refund.api::*"},
+                    "to": {
+                        "obligationRef": "QO-REFUND-001",
+                        "dimension": "behavior",
+                        "type": "api_test",
+                    },
+                }
+            ],
+        }
+    )
+    result = apply_mappings(
+        [
+            InventoryRecord(
+                "junit", "refund.api::refund_is_accepted", "passed", str(artifact), {}
+            ),
+            InventoryRecord(
+                "junit", "refund.api::refund_is_rejected", "passed", str(artifact), {}
+            ),
+        ],
+        [mapping],
+        tmp_path,
+    )
+    assert result.evidence == ()
+    assert result.diagnostics[0].code == "QCOV-MAP-005"

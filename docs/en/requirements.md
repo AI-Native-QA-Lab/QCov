@@ -19,14 +19,26 @@ evidence snapshots across local committed revisions. `qcov policy check`
 applies local deterministic gates with exact, expiring waivers and an explicit
 `--as-of` timestamp.
 
+## Planned through Iteration 8
+
+After the post-4.5 validation gate, Iteration 5 may add mapping hardening
+(pytest-marker evaluation wiring and limited identity DX), plus proposal-only
+AI surfaces for obligation suggestion and change-risk analysis. Iterations 6–7
+add a pure Quality Planner and Agentic Quality Loop. Iteration 8 adds production
+evidence producers under the same protocol rules. AI proposals never become
+evidence or gate authority. See [roadmap](roadmap.md).
+
 ## Still excluded without a new approved design
 
-AI providers, web UI, database persistence, remote Git operations, external
-plugin loading, inventory-to-evidence inference, policy DSL, dimension
-thresholds, and wildcard or path-based waivers remain out of scope.
+Web UI, database persistence, remote Git operations, external plugin loading,
+inventory-to-obligation inference, policy DSL, dimension thresholds,
+wildcard or path-based waivers, and coverage/LCOV promotion to covering passed
+evidence remain out of scope until separately approved. Post-8 topics (QA for
+AI, Quality BOM, Adapter SDK, Continuous Quality Control Plane packaging) also
+require new designs.
 
 ## Pending requirement: broader mapping
 
-Wildcard identity matching, coverage/LCOV promotion to covering evidence, and
-pytest-marker evaluation wiring remain future work. Until then, unmapped
-generic imports stay diagnostics and inventory only.
+Limited trailing `*` identity wildcards and pytest-marker evaluation merge are
+part of Iteration 5. Coverage/LCOV still must not auto-promote to covering
+evidence. Unmapped generic imports stay diagnostics and inventory only.

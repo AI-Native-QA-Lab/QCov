@@ -71,3 +71,20 @@ def test_config_resolves_mapping_paths(tmp_path: Path) -> None:
     )
     paths = resolve_paths(load_config(config_path), config_path)
     assert paths.mapping == ((mapping / "a.yaml").resolve(),)
+
+
+def test_config_defaults_ai_provider_to_offline(tmp_path: Path) -> None:
+    config_path = tmp_path / "qcov.yaml"
+    config_path.write_text("apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n")
+    config = load_config(config_path)
+    assert config.ai.provider == "offline"
+
+
+def test_config_accepts_ai_provider(tmp_path: Path) -> None:
+    config_path = tmp_path / "qcov.yaml"
+    config_path.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "ai:\n  provider: offline\n"
+    )
+    config = load_config(config_path)
+    assert config.ai.provider == "offline"

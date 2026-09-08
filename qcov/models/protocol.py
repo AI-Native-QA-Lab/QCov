@@ -206,3 +206,48 @@ class EvidenceMapping(ProtocolModel):
         if len(keys) != len(set(keys)):
             raise ValueError("duplicate mapping quintuple")
         return self
+
+
+class ProposalMetadata(ProtocolModel):
+    id: str = Field(min_length=1)
+    created_at: datetime = Field(alias="createdAt")
+
+    @field_validator("created_at")
+    @classmethod
+    def created_at_must_be_timezone_aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("createdAt must be timezone-aware")
+        return value
+
+
+class ProposalDescriptor(ProtocolModel):
+    type: Literal["obligation_suggest", "change_risk"]
+    status: Literal["draft"]
+
+
+class ProposalSource(ProtocolModel):
+    kind: Literal["requirements", "local_diff"]
+    refs: list[str] = Field(default_factory=list)
+
+
+class ProposalProvider(ProtocolModel):
+    name: str = Field(min_length=1)
+    model: str | None = None
+
+
+class ProposalItem(ProtocolModel):
+    id: str = Field(min_length=1)
+    kind: Literal["proposed_obligation", "affected_obligation", "suggested_evidence"]
+    obligation_ref: str | None = Field(default=None, alias="obligationRef", min_length=1)
+    summary: LocalizedText
+    detail: dict[str, object] = Field(default_factory=dict)
+
+
+class QualityProposal(ProtocolModel):
+    api_version: Literal["qcov.dev/v1alpha1"] = Field(alias="apiVersion")
+    kind: Literal["QualityProposal"]
+    metadata: ProposalMetadata
+    proposal: ProposalDescriptor
+    source: ProposalSource
+    provider: ProposalProvider
+    items: list[ProposalItem] = Field(default_factory=list)

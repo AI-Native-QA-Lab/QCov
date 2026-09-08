@@ -6,18 +6,29 @@ QCov 仍是本地、确定性的质量证据缺口引擎：报告某项义务还
 
 Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱动的 pytest marker、JUnit XML 与 coverage.py XML inventory 本地发现。Iteration 2 通过明确的 built-in registry 增加 Playwright JSON 与 LCOV inventory reader；external adapter plugin 仍不在范围内。Iteration 3 通过 `qcov diff` 提供只读的已提交树比较。Iteration 4 提供本地 `qcov policy check`：默认状态规则、可审计的精确豁免、显式 `--as-of` 与 PASS/WARN/BLOCK 判定。Iteration 4.5 提供声明式 `EvidenceMapping`（junit/playwright）、`qcov map preview`，以及 `--config` 评估合并。
 
-远程 Git、源码行级影响推断、策略 DSL、维度阈值、通配符豁免、coverage/LCOV 提升为 passed 证据，以及 inventory 自动推断仍延后。
+远程 Git、源码行级影响推断、策略 DSL、维度阈值、通配符豁免、coverage/LCOV 提升为 passed 证据，以及 inventory 自动推断在无后续设计批准前仍延后。
 
-## Next after 4.5
+## Gate after 4.5
 
-在进入 AI 之前，继续用真实项目验证接入时间、可解释性与相对普通报告的缺口价值。设计见：
-`docs/superpowers/specs/2026-09-08-iteration-4.5-obligation-mapping-design.md`。说明见 [显式证据映射](mapping.md)。
+在加速 AI 之前，先用真实项目验证接入时间、可解释性与相对普通报告的缺口价值。映射必须保持声明式与本地。适配器仍不得推断「通过的测试」或「覆盖率」足以证明业务义务。设计见：
+`docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`。说明见 [显式证据映射](mapping.md)。
 
-映射必须保持声明式与本地。适配器仍不得推断「通过的测试」或「覆盖率」足以证明业务义务。
+## Planned Iterations 5–8
 
-## Later iterations
+原则：AI 提出建议；策略批准；确定性引擎核验。AI 不得成为证据或门禁权威。
 
-Iteration 5–7 仅可将 AI 作为确定性策略门禁之下的建议与规划层；AI 不得成为证据或门禁权威。Iteration 8 接入生产证据。
+| 迭代 | 焦点 |
+| --- | --- |
+| **5** | 映射加固（pytest marker 评估接线，以及按需的有限 identity DX）+ AI Obligation Assistant + Change Risk Analyzer（`obligation suggest`、`risk analyze`） |
+| **6** | 仅 AI Quality Planner（`plan` / 下一步最值得验证什么） |
+| **7** | 仅 Agentic Quality Loop（稳定 Agent 契约；可选 `explain`） |
+| **8** | 仅生产证据（runtime / incident / observability 类生产者，仍受协议规则约束） |
+
+**Roadmap Complete through Iteration 8** 表示这条核心弧（缺口 → 变更 → 策略 → 映射 → AI 建议/规划/Agent 反馈 → 生产回流）收官。这是里程碑，不是产品终点。
+
+## Post-8 backlog
+
+以下方向需单独批准设计后再做：QA for AI 维度、Quality BOM、Adapter SDK / 更广生态、远程 Git 与更深 CI 自动化、策略 DSL 与维度阈值、coverage/LCOV 提升为可满足证据、inventory 自动推断义务、Web UI、持久化，以及打包的 Continuous Quality Control Plane。
 
 ## Validation gates before expansion
 

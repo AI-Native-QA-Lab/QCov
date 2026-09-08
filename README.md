@@ -16,10 +16,13 @@ those tools proves a requirement, risk, or change.
 - Explicit `EvidenceMapping` from junit/playwright inventory to `QualityEvidence`
 - Local `qcov diff` across committed Git trees
 - Local `qcov policy check` with exact, expiring waivers
+- Proposal-only AI assistants: `qcov obligation suggest` and `qcov risk analyze`
+  (draft `QualityProposal`; never evidence or gate authority)
 - Markdown and JSON reports with `en` / `zh-CN` presentation
 
-Not included: AI decisions, web UI, database persistence, remote Git, external
-plugins, or promoting coverage/LCOV line rates to covering evidence.
+Not included: AI gate decisions, web UI, database persistence, remote Git host
+APIs, external plugins, or promoting coverage/LCOV line rates to covering
+evidence.
 
 ## Installation
 
@@ -61,6 +64,12 @@ exist; concurrency, idempotency, and production evidence remain unproven.
 .venv/bin/python -m qcov policy check \
   --config qcov.yaml --policy policy.yaml \
   --as-of 2026-09-07T00:00:00+08:00
+
+# Draft obligation / change-risk proposals (offline by default; not evidence)
+.venv/bin/python -m qcov obligation suggest \
+  --config qcov.yaml --requirements requirements.md --format json
+.venv/bin/python -m qcov risk analyze \
+  --config qcov.yaml --base HEAD~1 --head HEAD --format json
 ```
 
 See the [imported-reports example](examples/imported-reports/README.md),

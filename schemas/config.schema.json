@@ -1,5 +1,20 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectConfig",
   "$defs": {
+    "AIConfig": {
+      "additionalProperties": false,
+      "description": "Optional AI proposal provider selection (proposals only; never gate authority).",
+      "properties": {
+        "provider": {
+          "default": "offline",
+          "title": "Provider",
+          "type": "string"
+        }
+      },
+      "title": "AIConfig",
+      "type": "object"
+    },
     "ScanConfig": {
       "additionalProperties": false,
       "description": "Optional report paths grouped by supported local producer.",
@@ -73,12 +88,14 @@
     },
     "scan": {
       "$ref": "#/$defs/ScanConfig"
+    },
+    "ai": {
+      "$ref": "#/$defs/AIConfig"
     }
   },
   "required": [
     "apiVersion",
     "kind"
   ],
-  "title": "ProjectConfig",
   "type": "object"
 }

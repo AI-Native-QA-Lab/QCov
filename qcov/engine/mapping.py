@@ -81,12 +81,23 @@ def _translate_status(producer: str, status: str) -> tuple[str, bool]:
     return "unknown", True
 
 
-def _entry_evidence_id(entry: MappingEntry) -> str:
+def identity_matches(pattern: str, identity: str) -> bool:
+    """Exact match, or single trailing ``*`` suffix wildcard (one star only)."""
+    if "*" not in pattern:
+        return identity == pattern
+    if not pattern.endswith("*") or pattern.count("*") != 1:
+        return identity == pattern
+    prefix = pattern[:-1]
+    return identity.startswith(prefix)
+
+
+def _entry_evidence_id(entry: MappingEntry, matched_identity: str | None = None) -> str:
     if entry.to.evidence_id is not None:
         return entry.to.evidence_id
+    identity = matched_identity if matched_identity is not None else entry.from_.identity
     return stable_evidence_id(
         entry.from_.producer,
-        entry.from_.identity,
+        identity,
         entry.to.obligation_ref,
         entry.to.dimension.value,
         entry.to.type,
@@ -123,7 +134,8 @@ def apply_mappings(
             matches = [
                 record
                 for record in records
-                if record.producer == entry.from_.producer and record.identity == entry.from_.identity
+                if record.producer == entry.from_.producer
+                and identity_matches(entry.from_.identity, record.identity)
             ]
             if not matches:
                 diagnostics.append(
@@ -149,7 +161,7 @@ def apply_mappings(
                 continue
 
             record = matches[0]
-            evidence_id = _entry_evidence_id(entry)
+            evidence_id = _entry_evidence_id(entry, matched_identity=record.identity)
             if evidence_id in seen_ids:
                 raise MappingConflictError(
                     f"{MappingConflictError.code}: duplicate evidence id: {evidence_id}"
