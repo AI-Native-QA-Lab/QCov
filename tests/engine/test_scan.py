@@ -24,6 +24,8 @@ def test_scan_project_collects_configured_junit_and_coverage_inventory(tmp_path:
         ("playwright", 0),
         ("pytest-marker", 0),
     ]
+    assert len(report.records) == 2
+    assert {record.producer for record in report.records} == {"junit", "coverage.py"}
 
 
 def test_scan_project_retains_missing_configured_artifact_as_diagnostic(tmp_path: Path) -> None:

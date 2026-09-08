@@ -4,6 +4,8 @@ obligations:
   - ../refund/obligation.yaml
 evidence:
   - ../refund/evidence/*.yaml
+mapping:
+  - mappings/*.yaml
 scan:
   junit:
     - junit.xml

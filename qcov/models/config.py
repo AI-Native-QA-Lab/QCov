@@ -27,6 +27,7 @@ class ProjectConfig(ProtocolModel):
     kind: Literal["QCovConfig"]
     obligations: list[str] = Field(default_factory=list)
     evidence: list[str] = Field(default_factory=list)
+    mapping: list[str] = Field(default_factory=list)
     scan: ScanConfig = Field(default_factory=ScanConfig)
 
 
@@ -36,6 +37,7 @@ class ResolvedPaths:
 
     obligations: tuple[Path, ...]
     evidence: tuple[Path, ...]
+    mapping: tuple[Path, ...]
     junit: tuple[Path, ...]
     coverage: tuple[Path, ...]
     playwright: tuple[Path, ...]
@@ -66,6 +68,7 @@ def resolve_paths(config: ProjectConfig, config_path: Path) -> ResolvedPaths:
     return ResolvedPaths(
         obligations=resolve_patterns(config.obligations, base),
         evidence=resolve_patterns(config.evidence, base),
+        mapping=resolve_patterns(config.mapping, base),
         junit=resolve_patterns(config.scan.junit, base),
         coverage=resolve_patterns(config.scan.coverage, base),
         playwright=resolve_patterns(config.scan.playwright, base),

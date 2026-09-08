@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "EvidenceMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "EvidenceMetadata",
+      "type": "object"
+    },
+    "MappingEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/MappingSource"
+        },
+        "to": {
+          "$ref": "#/$defs/MappingTarget"
+        },
+        "timestamp": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timestamp"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "title": "MappingEntry",
+      "type": "object"
+    },
+    "MappingSource": {
+      "additionalProperties": false,
+      "properties": {
+        "producer": {
+          "enum": [
+            "junit",
+            "playwright"
+          ],
+          "title": "Producer",
+          "type": "string"
+        },
+        "identity": {
+          "minLength": 1,
+          "title": "Identity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producer",
+        "identity"
+      ],
+      "title": "MappingSource",
+      "type": "object"
+    },
+    "MappingTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "obligationRef": {
+          "minLength": 1,
+          "title": "Obligationref",
+          "type": "string"
+        },
+        "dimension": {
+          "$ref": "#/$defs/QualityDimension"
+        },
+        "type": {
+          "minLength": 1,
+          "title": "Type",
+          "type": "string"
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidenceid"
+        }
+      },
+      "required": [
+        "obligationRef",
+        "dimension",
+        "type"
+      ],
+      "title": "MappingTarget",
+      "type": "object"
+    },
+    "QualityDimension": {
+      "enum": [
+        "behavior",
+        "boundary",
+        "data",
+        "concurrency",
+        "idempotency",
+        "production",
+        "security",
+        "fault",
+        "integration"
+      ],
+      "title": "QualityDimension",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "const": "qcov.dev/v1alpha1",
+      "title": "Apiversion",
+      "type": "string"
+    },
+    "kind": {
+      "const": "EvidenceMapping",
+      "title": "Kind",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/EvidenceMetadata"
+    },
+    "defaultTimestamp": {
+      "format": "date-time",
+      "title": "Defaulttimestamp",
+      "type": "string"
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/MappingEntry"
+      },
+      "minItems": 1,
+      "title": "Mappings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "defaultTimestamp",
+    "mappings"
+  ],
+  "title": "EvidenceMapping",
+  "type": "object"
+}

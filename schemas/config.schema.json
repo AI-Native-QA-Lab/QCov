@@ -18,8 +18,20 @@
           "title": "Coverage",
           "type": "array"
         },
-        "playwright": {"items": {"type": "string"}, "title": "Playwright", "type": "array"},
-        "lcov": {"items": {"type": "string"}, "title": "Lcov", "type": "array"}
+        "playwright": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Playwright",
+          "type": "array"
+        },
+        "lcov": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Lcov",
+          "type": "array"
+        }
       },
       "title": "ScanConfig",
       "type": "object"
@@ -50,6 +62,13 @@
         "type": "string"
       },
       "title": "Evidence",
+      "type": "array"
+    },
+    "mapping": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Mapping",
       "type": "array"
     },
     "scan": {

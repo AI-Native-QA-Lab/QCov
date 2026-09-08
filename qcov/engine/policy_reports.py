@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 
+from qcov.engine.mapping import MappingDiagnostic
+from qcov.engine.mapping_reports import (
+    append_mapping_diagnostics_json,
+    render_mapping_diagnostics_markdown,
+)
 from qcov.engine.policy import PolicyReport, PolicyResult
 from qcov.i18n.catalog import translate
 
@@ -28,20 +34,28 @@ def _result_dict(result: PolicyResult) -> dict[str, object]:
     }
 
 
-def render_policy_json(report: PolicyReport) -> str:
+def render_policy_json(
+    report: PolicyReport,
+    *,
+    mapping_diagnostics: Sequence[MappingDiagnostic] | None = None,
+) -> str:
     """Render a language-neutral policy report."""
-    return json.dumps(
-        {
-            "policyId": report.policy_id,
-            "evaluatedAt": report.evaluated_at.isoformat(),
-            "results": [_result_dict(result) for result in report.results],
-        },
-        indent=2,
-        sort_keys=True,
-    )
+    payload: dict[str, object] = {
+        "evaluatedAt": report.evaluated_at.isoformat(),
+        "policyId": report.policy_id,
+        "results": [_result_dict(result) for result in report.results],
+    }
+    if mapping_diagnostics is not None:
+        payload = append_mapping_diagnostics_json(payload, mapping_diagnostics)
+    return json.dumps(payload, indent=2, sort_keys=True)
 
 
-def render_policy_markdown(report: PolicyReport, locale: str = "en") -> str:
+def render_policy_markdown(
+    report: PolicyReport,
+    locale: str = "en",
+    *,
+    mapping_diagnostics: Sequence[MappingDiagnostic] | None = None,
+) -> str:
     """Render a localized explainable policy report."""
     blocks = [
         (
@@ -68,4 +82,9 @@ def render_policy_markdown(report: PolicyReport, locale: str = "en") -> str:
             if result.waiver_expired:
                 block += f"\n\n{translate('policy.expired_waiver_cleanup', locale)}"
         blocks.append(block)
-    return "\n\n".join(blocks)
+    body = "\n\n".join(blocks)
+    if mapping_diagnostics is not None:
+        extra = render_mapping_diagnostics_markdown(mapping_diagnostics, locale)
+        if extra:
+            body = f"{body}\n\n{extra}"
+    return body

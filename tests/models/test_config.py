@@ -58,3 +58,16 @@ def test_config_resolves_playwright_and_lcov_scan_paths(tmp_path: Path) -> None:
 
     assert paths.playwright == ((tmp_path / "reports/playwright.json").resolve(),)
     assert paths.lcov == ((tmp_path / "reports/lcov.info").resolve(),)
+
+
+def test_config_resolves_mapping_paths(tmp_path: Path) -> None:
+    mapping = tmp_path / "mappings"
+    mapping.mkdir()
+    (mapping / "a.yaml").write_text("x")
+    config_path = tmp_path / "qcov.yaml"
+    config_path.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "mapping: [mappings/*.yaml]\n"
+    )
+    paths = resolve_paths(load_config(config_path), config_path)
+    assert paths.mapping == ((mapping / "a.yaml").resolve(),)
