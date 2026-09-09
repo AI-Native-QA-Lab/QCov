@@ -4,7 +4,7 @@ QCov remains a local, deterministic Quality Evidence Gap Engine. It reports
 what remains unproven for an obligation; it is not a line-coverage detector or
 test runner.
 
-## Delivered through Iteration 6
+## Delivered through Iteration 7
 
 Iteration 0 proves Obligation → Evidence → Gap. Iteration 1 adds config-driven
 local discovery for pytest markers, JUnit XML, and coverage.py XML inventory.
@@ -19,7 +19,10 @@ limited identity suffix wildcards, and proposal-only AI (`obligation suggest` /
 `risk analyze`) with a default offline provider. Iteration 6 adds deterministic
 `qcov plan`: fixed benefit/cost heuristics over unproven gaps emit a draft
 `QualityProposal` (`type: quality_plan`) for next-best verification—never
-evidence or gate authority.
+evidence or gate authority. Iteration 7 adds the Agentic Quality Loop helpers:
+required `qcov explain` and `qcov agent next` (stable `qcov.agent/v1` JSON),
+plus optional `qcov agent validate-evidence` for load checks only. QCov still
+does not run tests or write authoritative evidence. See [agent playbook](agent.md).
 
 Remote Git operations, source-line impact inference, policy DSL, dimension
 thresholds, wildcard waivers, coverage/LCOV promotion to passed evidence, and
@@ -35,14 +38,13 @@ business obligation. Design reference:
 `docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`.
 See also [explicit evidence mapping](mapping.md).
 
-## Planned Iterations 7–8
+## Planned Iteration 8
 
 Principle: AI proposes; policy approves; the deterministic engine verifies. AI
 must never become evidence or gate authority.
 
 | Iteration | Focus |
 | --- | --- |
-| **7** | Agentic Quality Loop only (stable agent contracts; optional `explain`) |
 | **8** | Production evidence only (runtime / incident / observability-style producers under protocol rules) |
 
 **Roadmap Complete through Iteration 8** closes this core arc (gap → change →

@@ -12,6 +12,7 @@ def test_bilingual_docs_have_matching_stems() -> None:
     english = {path.name for path in (ROOT / "docs/en").glob("*.md")}
     chinese = {path.name for path in (ROOT / "docs/zh-CN").glob("*.md")}
     expected = {
+        "agent.md",
         "architecture.md",
         "concepts.md",
         "development.md",
