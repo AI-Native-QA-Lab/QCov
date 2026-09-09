@@ -130,23 +130,16 @@ def explain_evidence(
     for item in evidence:
         if item.obligation.ref != obligation.metadata.id:
             codes.add("OBLIGATION_REF_MISMATCH")
+            continue
         if item.evidence.dimension is not dim:
             codes.add("DIMENSION_MISMATCH")
+            continue
         if item.evidence.type not in required:
             codes.add("TYPE_NOT_REQUIRED")
-        if (
-            item.obligation.ref == obligation.metadata.id
-            and item.evidence.dimension is dim
-            and item.evidence.type in required
-            and item.execution.status == "unknown"
-        ):
+            continue
+        if item.execution.status == "unknown":
             codes.add("STATUS_UNKNOWN")
-        if (
-            item.obligation.ref == obligation.metadata.id
-            and item.evidence.dimension is dim
-            and item.evidence.type in required
-            and item.execution.status not in {"passed", "unknown"}
-        ):
+        elif item.execution.status != "passed":
             codes.add("STATUS_NOT_PASSED")
 
     result = evaluate_obligation(obligation, evidence)

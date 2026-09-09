@@ -54,6 +54,15 @@ def test_agent_next_from_plan_file(tmp_path: Path) -> None:
     assert json.loads(nxt.output)["payload"]["source"] == "plan_file"
 
 
+def test_agent_next_rejects_invalid_limit(tmp_path: Path) -> None:
+    config = _write_project(tmp_path)
+    result = runner.invoke(
+        app, ["agent", "next", "--config", str(config), "--limit", "0"]
+    )
+    assert result.exit_code == 4
+    assert "QCOV-CLI-007" in result.output
+
+
 def test_agent_next_rejects_plan_with_config(tmp_path: Path) -> None:
     config = _write_project(tmp_path)
     plan_path = tmp_path / "plan.yaml"

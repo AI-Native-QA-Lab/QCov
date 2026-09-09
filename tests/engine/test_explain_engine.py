@@ -65,9 +65,17 @@ def test_explain_evidence_emits_mismatch_codes() -> None:
         "behavior",
     )
     codes = {item.code for item in payload.reasons}
-    assert "OBLIGATION_REF_MISMATCH" in codes
-    assert "DIMENSION_MISMATCH" in codes
-    assert "TYPE_NOT_REQUIRED" in codes
+    assert codes == {"NO_EVIDENCE_FOR_OBLIGATION", "OBLIGATION_REF_MISMATCH"}
+
+
+def test_explain_evidence_reports_first_matching_defect() -> None:
+    obl = _obl()
+    payload = explain_evidence(
+        obl,
+        [_ev(dimension="boundary", type="e2e_test", status="failed")],
+        "behavior",
+    )
+    assert {item.code for item in payload.reasons} == {"DIMENSION_MISMATCH"}
 
 
 def test_explain_gap_already_covered() -> None:

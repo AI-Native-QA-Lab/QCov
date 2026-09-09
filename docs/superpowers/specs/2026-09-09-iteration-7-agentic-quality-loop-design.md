@@ -68,7 +68,7 @@ CLI：explain / agent next  [可选 validate-evidence]
 | `qcov.engine.explain` | 纯函数：从评估结果 / plan item / 证据列表派生结构化 Explanation |
 | `qcov.engine.agent_next` | 纯函数：从 `QualityProposal(type=quality_plan)` 或现场 `build_quality_plan` 取 top-N |
 | `qcov.cli.app` | `explain`、`agent` 子命令组（`next`；可选 `validate-evidence`） |
-| `schemas/agent-contract.schema.json`（或等价） | 校验 agent JSON 外壳与 payload 约定字段 |
+| Agent 契约 | Pydantic `qcov.models.agent_contract`（`extra=forbid`）；不另维护运行时 JSON Schema 文件 |
 | Gap / policy / planner 评分 | **不改**判定与排序语义 |
 
 ## CLI

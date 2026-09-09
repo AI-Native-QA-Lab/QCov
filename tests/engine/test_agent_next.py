@@ -6,6 +6,7 @@ from qcov.engine.agent_next import select_next_actions
 from qcov.engine.gaps import evaluate_obligation
 from qcov.engine.planner import build_quality_plan
 from qcov.models.errors import AgentInputError
+from qcov.models.io import ConfigLoadError
 from qcov.models.protocol import QualityProposal, TestingObligation
 
 
@@ -50,6 +51,23 @@ def test_select_next_empty_plan() -> None:
     )
     payload = select_next_actions(plan, limit=1, source="plan_file")
     assert payload.items == []
+
+
+def test_select_next_rejects_invalid_limit() -> None:
+    plan = QualityProposal.model_validate(
+        {
+            "apiVersion": "qcov.dev/v1alpha1",
+            "kind": "QualityProposal",
+            "metadata": {"id": "QP-empty", "createdAt": "2026-09-08T00:00:00+00:00"},
+            "proposal": {"type": "quality_plan", "status": "draft"},
+            "source": {"kind": "evaluation_gaps", "refs": []},
+            "provider": {"name": "offline", "model": None},
+            "items": [],
+        }
+    )
+    with pytest.raises(ConfigLoadError) as exc:
+        select_next_actions(plan, limit=0, source="plan_file")
+    assert "QCOV-CLI-007" in str(exc.value)
 
 
 def test_select_next_rejects_non_quality_plan() -> None:

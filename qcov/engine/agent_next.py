@@ -6,6 +6,7 @@ from typing import Literal
 
 from qcov.models.agent_contract import NextItem, NextPayload
 from qcov.models.errors import AgentInputError
+from qcov.models.io import ConfigLoadError
 from qcov.models.protocol import QualityProposal
 
 
@@ -21,13 +22,9 @@ def select_next_actions(
             "proposal type must be quality_plan",
         )
     if limit < 1:
-        raise AgentInputError(
-            AgentInputError.CODE_TARGET_NOT_FOUND,
-            "limit must be >= 1",
-        )
-    selected = proposal.items[:limit]
+        raise ConfigLoadError("QCOV-CLI-007: --limit must be >= 1")
     items: list[NextItem] = []
-    for item in selected:
+    for item in proposal.items[:limit]:
         detail = item.detail
         dimension = detail.get("dimension")
         rank = detail.get("rank")
@@ -56,5 +53,9 @@ def select_next_actions(
             )
         )
     return NextPayload.model_validate(
-        {"source": source, "limit": limit, "items": [i.model_dump(by_alias=True, mode="json") for i in items]}
+        {
+            "source": source,
+            "limit": limit,
+            "items": [item.model_dump(by_alias=True, mode="json") for item in items],
+        }
     )

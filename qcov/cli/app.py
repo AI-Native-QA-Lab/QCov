@@ -650,22 +650,12 @@ def _build_explain_payload(
     )
 
 
-def _build_next_payload(
+def _quality_plan_from_inputs(
     *,
     obligation: Path | None,
     evidence: Path | None,
     config: Path | None,
-    plan_path: Path | None,
-    limit: int,
-) -> NextPayload:
-    if plan_path is not None:
-        if config is not None or obligation is not None or evidence is not None:
-            raise ConfigLoadError(
-                "QCOV-CLI-006: --plan cannot be combined with --config or direct inputs"
-            )
-        proposal = load_proposal(plan_path)
-        return select_next_actions(proposal, limit=limit, source="plan_file")
-
+) -> QualityProposal:
     if config is not None and (obligation is not None or evidence is not None):
         raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
     if config is not None:
@@ -682,10 +672,34 @@ def _build_next_payload(
         refs = [str(obligation), str(evidence)]
     else:
         raise ConfigLoadError(
+            f"{ConfigLoadError.code}: provide --obligation/--evidence or --config"
+        )
+    return build_quality_plan(bundle.results, obligations, refs=refs)
+
+
+def _build_next_payload(
+    *,
+    obligation: Path | None,
+    evidence: Path | None,
+    config: Path | None,
+    plan_path: Path | None,
+    limit: int,
+) -> NextPayload:
+    if plan_path is not None:
+        if config is not None or obligation is not None or evidence is not None:
+            raise ConfigLoadError(
+                "QCOV-CLI-006: --plan cannot be combined with --config or direct inputs"
+            )
+        return select_next_actions(load_proposal(plan_path), limit=limit, source="plan_file")
+    if obligation is None and evidence is None and config is None:
+        raise ConfigLoadError(
             f"{ConfigLoadError.code}: provide --plan, --config, or --obligation/--evidence"
         )
-    proposal = build_quality_plan(bundle.results, obligations, refs=refs)
-    return select_next_actions(proposal, limit=limit, source="evaluation")
+    return select_next_actions(
+        _quality_plan_from_inputs(obligation=obligation, evidence=evidence, config=config),
+        limit=limit,
+        source="evaluation",
+    )
 
 
 def _validate_evidence_payload(evidence: Path) -> ValidatePayload:
@@ -800,25 +814,9 @@ def plan(
 ) -> None:
     """Rank next-best verification steps from gaps (proposal only)."""
     try:
-        if config is not None and (obligation is not None or evidence is not None):
-            raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
-        if config is not None:
-            bundle, obligations = _multi_obligation_evaluation(config)
-            refs = [str(config)]
-        elif obligation is not None and evidence is not None:
-            loaded_obligation = load_obligation(obligation)
-            evidence_items = [load_evidence(path) for path in _evidence_files(evidence)]
-            bundle = EvaluationBundle(
-                (evaluate_obligation(loaded_obligation, evidence_items),),
-                None,
-            )
-            obligations = (loaded_obligation,)
-            refs = [str(obligation), str(evidence)]
-        else:
-            raise ConfigLoadError(
-                f"{ConfigLoadError.code}: provide --obligation/--evidence or --config"
-            )
-        proposal = build_quality_plan(bundle.results, obligations, refs=refs)
+        proposal = _quality_plan_from_inputs(
+            obligation=obligation, evidence=evidence, config=config
+        )
     except (
         ConfigLoadError,
         ProtocolLoadError,
