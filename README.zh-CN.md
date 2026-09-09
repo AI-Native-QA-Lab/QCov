@@ -2,7 +2,7 @@
 
 > **发现你的测试尚未证明什么。**
 
-[English](README.md) · [核心概念](docs/zh-CN/concepts.md) · [路线图](docs/zh-CN/roadmap.md) · [贡献指南](CONTRIBUTING.zh-CN.md)
+[English](README.md) · [核心概念](docs/zh-CN/concepts.md) · [Agent](docs/zh-CN/agent.md) · [路线图](docs/zh-CN/roadmap.md) · [贡献指南](CONTRIBUTING.zh-CN.md)
 
 QCov 是开源**质量证据缺口引擎**与**质量覆盖协议**。它不替代 pytest、JUnit、
 Playwright、覆盖率工具、安全扫描或可观测性平台，而是判断这些工具的证据是否足以

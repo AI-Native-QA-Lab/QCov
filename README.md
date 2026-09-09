@@ -2,7 +2,7 @@
 
 > **Find what your tests still don't prove.**
 
-[中文](README.zh-CN.md) · [Concepts](docs/en/concepts.md) · [Roadmap](docs/en/roadmap.md) · [Contributing](CONTRIBUTING.md)
+[中文](README.zh-CN.md) · [Concepts](docs/en/concepts.md) · [Agent](docs/en/agent.md) · [Roadmap](docs/en/roadmap.md) · [Contributing](CONTRIBUTING.md)
 
 QCov is an open-source **Quality Evidence Gap Engine** and **Quality Coverage
 Protocol**. It does not replace pytest, JUnit, Playwright, coverage tools,

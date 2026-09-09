@@ -10,3 +10,7 @@ A **QualityProposal** is a draft suggestion from `qcov obligation suggest`,
 heuristic to unproven gaps and emits a `quality_plan` draft. Proposals are never
 evidence and never change `policy check` or Gap Engine decisions: AI proposes;
 policy approves; the deterministic engine verifies.
+
+`qcov explain` and `qcov agent next` help coding agents consume gaps and plans
+under a stable `qcov.agent/v1` JSON envelope. They do not run tests, write
+evidence, or act as gates. See [agent playbook](agent.md).

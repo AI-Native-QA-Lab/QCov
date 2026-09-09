@@ -22,8 +22,10 @@ from qcov.ai import (
     propose_obligations,
     resolve_provider,
 )
+from qcov.engine.agent_next import select_next_actions
 from qcov.engine.delta import compare_snapshots
 from qcov.engine.delta_reports import render_delta_json, render_delta_markdown
+from qcov.engine.explain import explain_evidence, explain_gap, explain_plan_item
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
 from qcov.engine.git_snapshots import DiffInputError, load_snapshot
 from qcov.engine.inventory import collect_mappable_inventory, config_dir_for
@@ -35,8 +37,6 @@ from qcov.engine.mapping import (
     apply_mappings,
 )
 from qcov.engine.mapping_reports import render_map_preview_json, render_map_preview_markdown
-from qcov.engine.agent_next import select_next_actions
-from qcov.engine.explain import explain_evidence, explain_gap, explain_plan_item
 from qcov.engine.planner import build_quality_plan
 from qcov.engine.policy import PolicyDecision, evaluate_policy
 from qcov.engine.policy_reports import render_policy_json, render_policy_markdown
@@ -761,15 +761,15 @@ def _render_agent_envelope(
                 "## Items",
             ]
         )
-        for item in payload.items:
+        for next_item in payload.items:
             lines.append(
-                f"- `{item.id}` rank={item.rank} "
-                f"{item.obligation_ref}/{item.dimension} "
-                f"suggested={item.suggested_evidence_type or '—'}"
+                f"- `{next_item.id}` rank={next_item.rank} "
+                f"{next_item.obligation_ref}/{next_item.dimension} "
+                f"suggested={next_item.suggested_evidence_type or '—'}"
             )
         if not payload.items:
             lines.append("- —")
-    else:
+    elif isinstance(payload, ValidatePayload):
         lines.extend(
             [
                 f"- allValidForLoad: `{payload.all_valid_for_load}`",
@@ -777,13 +777,15 @@ def _render_agent_envelope(
                 "## Files",
             ]
         )
-        for item in payload.files:
+        for file_item in payload.files:
             lines.append(
-                f"- `{item.path}` validForLoad=`{item.valid_for_load}` "
-                f"id=`{item.evidence_id or '—'}`"
+                f"- `{file_item.path}` validForLoad=`{file_item.valid_for_load}` "
+                f"id=`{file_item.evidence_id or '—'}`"
             )
-            if item.error:
-                lines.append(f"  - error: {item.error}")
+            if file_item.error:
+                lines.append(f"  - error: {file_item.error}")
+    else:
+        raise typer.BadParameter(f"unsupported agent payload: {type(payload)!r}")
     return "\n".join(lines) + "\n"
 
 

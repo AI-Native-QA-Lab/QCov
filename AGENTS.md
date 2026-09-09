@@ -8,9 +8,12 @@ deliver gap evaluation, inventory scan adapters (with retained records), local
 mapping. Iteration 5 adds pytest-marker evaluation merge, limited identity suffix
 wildcards, and proposal-only AI (`obligation suggest` / `risk analyze`) with a
 default offline provider. Iteration 6 adds the deterministic Quality Planner
-(`qcov plan` → draft `quality_plan` proposal). Planned Iterations 7–8 cover an
-Agentic Quality Loop and production evidence; Iteration 8 completes that core
-roadmap arc, not the whole product (see Post-8 backlog in the roadmap).
+(`qcov plan` → draft `quality_plan` proposal). Iteration 7 adds Agentic Quality
+Loop helpers (`qcov explain`, `qcov agent next`, optional
+`qcov agent validate-evidence`) under `qcov.agent/v1`; they never run tests or
+become evidence/gate authority. Planned Iteration 8 covers production evidence;
+Iteration 8 completes that core roadmap arc, not the whole product (see Post-8
+backlog in the roadmap).
 
 Do not add remote LLM providers beyond the approved Iteration 5 provider
 abstraction, a web UI, persistence, remote Git host APIs, external plugins,

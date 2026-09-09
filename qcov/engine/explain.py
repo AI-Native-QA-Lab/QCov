@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from qcov.engine.gaps import ObligationResult, evaluate_obligation
+from qcov.engine.gaps import DimensionResult, ObligationResult, evaluate_obligation
 from qcov.models.agent_contract import ExplainPayload, ReasonCode, ReasonItem
 from qcov.models.errors import AgentInputError
 from qcov.models.protocol import (
@@ -66,7 +66,9 @@ def _parse_dimension(dimension: str) -> QualityDimension:
         ) from error
 
 
-def _dimension_result(result: ObligationResult, dimension: QualityDimension):
+def _dimension_result(
+    result: ObligationResult, dimension: QualityDimension
+) -> DimensionResult:
     for item in result.dimensions:
         if item.dimension is dimension:
             return item

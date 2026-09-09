@@ -1,5 +1,24 @@
 # 更新日志
 
+## Unreleased
+
+### 新功能
+
+- 新增 Agentic Quality Loop 助手：必做 `qcov explain` 与 `qcov agent next`，
+  以及可选 `qcov agent validate-evidence`，输出稳定
+  `contractVersion: qcov.agent/v1` JSON 外壳。
+- 新增确定性 explain reason 码，以及复用 `quality_plan` rank 的下一步选择
+  （不再造第二套排序）。
+
+### 边界
+
+- Agent 助手不跑测试、不写权威证据、不改 Gap / policy 判定。
+  `validForLoad` 不是 COVERED，也不是 policy PASS。
+
+### 文档
+
+- 新增双语 Agent 使用说明，并在路线图中将 Iteration 7 标为已交付。
+
 ## 0.7.0 - 2026-09-09
 
 ### 新功能

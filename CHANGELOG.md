@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- Add Agentic Quality Loop helpers: required `qcov explain` and
+  `qcov agent next`, plus optional `qcov agent validate-evidence`, under
+  stable `contractVersion: qcov.agent/v1` JSON envelopes.
+- Add deterministic explain reason codes and next-action selection that reuses
+  `quality_plan` ranks (never a second scoring system).
+
+### Boundaries
+
+- Agent helpers do not run tests, write authoritative evidence, or change Gap /
+  policy decisions. `validForLoad` is not COVERED and not policy PASS.
+
+### Documentation
+
+- Add bilingual agent playbook and mark Iteration 7 delivered on the roadmap.
+
 ## 0.7.0 - 2026-09-09
 
 ### Features

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import pytest
+
 from qcov.engine.explain import explain_evidence, explain_gap, explain_plan_item
 from qcov.engine.gaps import evaluate_obligation
 from qcov.models.errors import AgentInputError
 from qcov.models.protocol import CoverageStatus, ProposalItem, QualityEvidence, TestingObligation
-import pytest
 
 
 def _obl() -> TestingObligation:
