@@ -116,6 +116,48 @@ items:
     assert proposal.items[0].kind == "affected_obligation"
 
 
+def test_load_proposal_accepts_quality_plan(tmp_path: Path) -> None:
+    from qcov.models.io import load_proposal
+
+    path = tmp_path / "quality-plan.yaml"
+    path.write_text(
+        """apiVersion: qcov.dev/v1alpha1
+kind: QualityProposal
+metadata:
+  id: QP-plan-001
+  createdAt: 2026-09-08T12:00:00+08:00
+proposal:
+  type: quality_plan
+  status: draft
+source:
+  kind: evaluation_gaps
+  refs: [qcov.yaml]
+provider:
+  name: offline
+items:
+  - id: plan-QO-REFUND-001-behavior
+    kind: planned_verification
+    obligationRef: QO-REFUND-001
+    summary:
+      en: Prefer api_test for behavior gap
+      zh-CN: 优先用 api_test 补齐 behavior 缺口
+    detail:
+      dimension: behavior
+      gapStatus: MISSING
+      missingEvidenceTypes: [api_test]
+      suggestedEvidenceType: api_test
+      benefitScore: 100
+      costScore: 10
+      priorityScore: -90
+      rank: 1
+"""
+    )
+    proposal = load_proposal(path)
+    assert proposal.proposal.type == "quality_plan"
+    assert proposal.source.kind == "evaluation_gaps"
+    assert proposal.items[0].kind == "planned_verification"
+
+
 def test_load_proposal_rejects_invalid_with_proposal_001(tmp_path: Path) -> None:
     from qcov.models.errors import ProposalInputError
     from qcov.models.io import load_proposal

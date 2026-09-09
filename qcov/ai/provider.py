@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 from typing import Literal, Protocol
 
 from qcov.ai.context import (
@@ -10,9 +9,8 @@ from qcov.ai.context import (
     ObligationSuggestContext,
 )
 from qcov.models.errors import ProposalInputError
+from qcov.models.proposal_ids import OFFLINE_CREATED_AT, stable_proposal_id
 from qcov.models.protocol import ProposalItem, QualityProposal, TestingObligation
-
-_OFFLINE_CREATED_AT = "1970-01-01T00:00:00+00:00"
 
 
 class AIProvider(Protocol):
@@ -29,13 +27,6 @@ def resolve_provider(name: str) -> AIProvider:
     raise ProposalInputError(f"QCOV-AI-001: unknown AI provider: {name}")
 
 
-def _stable_proposal_id(proposal_type: str, refs: list[str], item_ids: list[str]) -> str:
-    digest = hashlib.sha256(
-        "\0".join([proposal_type, *refs, *item_ids]).encode("utf-8")
-    ).hexdigest()[:12]
-    return f"QP-{digest}"
-
-
 def _draft_proposal(
     *,
     proposal_type: Literal["obligation_suggest", "change_risk"],
@@ -50,8 +41,8 @@ def _draft_proposal(
             "apiVersion": "qcov.dev/v1alpha1",
             "kind": "QualityProposal",
             "metadata": {
-                "id": _stable_proposal_id(proposal_type, refs, item_ids),
-                "createdAt": _OFFLINE_CREATED_AT,
+                "id": stable_proposal_id(proposal_type, refs, item_ids),
+                "createdAt": OFFLINE_CREATED_AT,
             },
             "proposal": {"type": proposal_type, "status": "draft"},
             "source": {"kind": source_kind, "refs": refs},

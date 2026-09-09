@@ -598,16 +598,16 @@ EOF
 - Create: `docs/process/2026-09-08-iteration-6-quality-planner.md`
 - 可选：`docs/en/architecture.md` / `docs/zh-CN/architecture.md` 一句 planner 边界
 
-- [ ] **Step 1: 更新 concepts（双语）**
+- [x] **Step 1: 更新 concepts（双语）**
 
 英文补充一句：`qcov plan` 基于确定性启发式产出 `quality_plan` draft；仍不是证据/门禁。  
 中文对称更新。
 
-- [ ] **Step 2: 更新 roadmap / AGENTS**
+- [x] **Step 2: 更新 roadmap / AGENTS**
 
-- [ ] **Step 3: 写过程记录**（真实 RED/GREEN 命令与输出摘录；全量门禁结果）
+- [x] **Step 3: 写过程记录**（真实 RED/GREEN 命令与输出摘录；全量门禁结果）
 
-- [ ] **Step 4: 全量门禁**
+- [x] **Step 4: 全量门禁**
 
 ```bash
 python3 -m pytest
@@ -619,7 +619,7 @@ git diff --check
 
 Expected: 全部通过。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs AGENTS.md

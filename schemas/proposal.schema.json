@@ -27,7 +27,8 @@
         "type": {
           "enum": [
             "obligation_suggest",
-            "change_risk"
+            "change_risk",
+            "quality_plan"
           ],
           "title": "Type",
           "type": "string"
@@ -57,7 +58,8 @@
           "enum": [
             "proposed_obligation",
             "affected_obligation",
-            "suggested_evidence"
+            "suggested_evidence",
+            "planned_verification"
           ],
           "title": "Kind",
           "type": "string"
@@ -146,7 +148,8 @@
         "kind": {
           "enum": [
             "requirements",
-            "local_diff"
+            "local_diff",
+            "evaluation_gaps"
           ],
           "title": "Kind",
           "type": "string"
