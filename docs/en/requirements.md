@@ -19,14 +19,19 @@ evidence snapshots across local committed revisions. `qcov policy check`
 applies local deterministic gates with exact, expiring waivers and an explicit
 `--as-of` timestamp.
 
-## Planned through Iteration 8
+## Delivered through Iteration 6 (proposal layer)
 
-After the post-4.5 validation gate, Iteration 5 may add mapping hardening
-(pytest-marker evaluation wiring and limited identity DX), plus proposal-only
-AI surfaces for obligation suggestion and change-risk analysis. Iterations 6–7
-add a pure Quality Planner and Agentic Quality Loop. Iteration 8 adds production
-evidence producers under the same protocol rules. AI proposals never become
-evidence or gate authority. See [roadmap](roadmap.md).
+Iteration 5 adds mapping hardening (pytest-marker evaluation wiring and limited
+identity DX) plus proposal-only AI (`obligation suggest`, `risk analyze`).
+Iteration 6 adds deterministic `qcov plan` (fixed benefit/cost heuristics over
+unproven gaps → draft `QualityProposal` with `type: quality_plan`). Proposals
+never become evidence or gate authority.
+
+## Planned Iterations 7–8
+
+Iteration 7 adds an Agentic Quality Loop. Iteration 8 adds production evidence
+producers under the same protocol rules. AI/plan proposals never become evidence
+or gate authority. See [roadmap](roadmap.md).
 
 ## Still excluded without a new approved design
 

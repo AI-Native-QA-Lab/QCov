@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import hashlib
 from collections.abc import Sequence
 from dataclasses import dataclass
 
 from qcov.engine.gaps import ObligationResult
+from qcov.models.proposal_ids import OFFLINE_CREATED_AT, stable_proposal_id
 from qcov.models.protocol import (
     CoverageStatus,
     ProposalItem,
@@ -14,8 +14,6 @@ from qcov.models.protocol import (
     QualityProposal,
     TestingObligation,
 )
-
-_OFFLINE_CREATED_AT = "1970-01-01T00:00:00+00:00"
 
 _STATUS_BENEFIT: dict[CoverageStatus, int] = {
     CoverageStatus.MISSING: 50,
@@ -54,14 +52,6 @@ _COST_BY_TYPE: dict[str, int] = {
     "manual_review": 50,
 }
 _DEFAULT_COST = 40
-_EMPTY_REQUIRED_TYPES_COST = 40
-
-
-def _stable_proposal_id(proposal_type: str, refs: list[str], item_ids: list[str]) -> str:
-    digest = hashlib.sha256(
-        "\0".join([proposal_type, *refs, *item_ids]).encode("utf-8")
-    ).hexdigest()[:12]
-    return f"QP-{digest}"
 
 
 def _severity_benefit(severity: str) -> int:
@@ -78,7 +68,7 @@ def _type_cost(evidence_type: str) -> int:
 
 def _pick_suggested_type(required_types: tuple[str, ...]) -> tuple[str | None, int]:
     if not required_types:
-        return None, _EMPTY_REQUIRED_TYPES_COST
+        return None, _DEFAULT_COST
     best_cost = min(_type_cost(item) for item in required_types)
     candidates = sorted(item for item in required_types if _type_cost(item) == best_cost)
     return candidates[0], best_cost
@@ -220,8 +210,8 @@ def build_quality_plan(
             "apiVersion": "qcov.dev/v1alpha1",
             "kind": "QualityProposal",
             "metadata": {
-                "id": _stable_proposal_id("quality_plan", ref_list, item_ids),
-                "createdAt": _OFFLINE_CREATED_AT,
+                "id": stable_proposal_id("quality_plan", ref_list, item_ids),
+                "createdAt": OFFLINE_CREATED_AT,
             },
             "proposal": {"type": "quality_plan", "status": "draft"},
             "source": {"kind": "evaluation_gaps", "refs": ref_list},

@@ -56,38 +56,67 @@ $ .venv312/bin/python -m pytest tests/engine/test_planner.py -v
 
 ### Task 3 CLI `qcov plan`
 
-提交 `42853d8` 前无 `plan` 子命令与 `tests/cli/test_plan.py`。落地后：
+RED（实现前无 `plan` 子命令；复现：检出 `42853d8^` 并保留当前 `tests/cli/test_plan.py`，或在空命令表上 invoke）：
+
+```text
+$ .venv312/bin/python -c "from typer.testing import CliRunner; from qcov.cli.app import app; \
+  r=CliRunner().invoke(app, ['plan', '--help']); print(r.exit_code, r.output[:200])"
+# 实现前：exit_code != 0，提示 No such command 'plan'
+```
+
+GREEN（提交 `42853d8` 起；审查修复后含 locale 测）：
 
 ```text
 $ .venv312/bin/python -m pytest tests/cli/test_plan.py -v
-4 passed
+5 passed
 ```
 
-覆盖：`--config` 多义务计划、config+直接输入拒绝（`QCOV-CLI-003`）、全 COVERED
-空 items、`QualityProposal` 不可当 evidence。
+覆盖：`--config` 多义务计划、`--locale zh-CN` markdown 文案、config+直接输入拒绝
+（`QCOV-CLI-003`）、全 COVERED 空 items、`QualityProposal` 不可当 evidence。
 
 ## Task 4 文档与全量门禁
 
 更新：`docs/en|zh-CN/concepts.md`、`roadmap.md`、`architecture.md`；`AGENTS.md`；
 本过程记录。
 
-2026-09-08（Asia/Shanghai）在本 worktree 实测：
+## 审查修复（2026-09-09）
+
+对照 `main...HEAD` 双轴审查后修复：
+
+- README / requirements 双语补齐 Iteration 6 / `qcov plan`
+- `plan --locale` 影响 markdown summary 语言
+- 非法 `quality_plan` 枚举拒绝单测
+- 抽取 `qcov.models.proposal_ids`；`_multi_obligation_evaluation` 避免 plan 双载
 
 ```text
 $ .venv312/bin/python -m pytest
-149 passed in 7.90s
+# 见下方全量门禁
+```
+
+2026-09-09（Asia/Shanghai）审查修复后全量门禁：
+
+```text
+$ .venv312/bin/python -m pytest
+151 passed in 8.34s
 
 $ .venv312/bin/ruff check .
 All checks passed!
 
 $ .venv312/bin/mypy qcov
-Success: no issues found in 37 source files
+Success: no issues found in 38 source files
 
 $ .venv312/bin/python -m build
 Successfully built qcov-0.6.0.tar.gz and qcov-0.6.0-py3-none-any.whl
 
 $ git diff --check
 （无输出，通过）
+```
+
+2026-09-08（Asia/Shanghai）初版门禁：
+
+```text
+$ .venv312/bin/python -m pytest
+149 passed in 7.90s
 ```
 
 说明：含 Git 临时仓的用例需完整文件系统权限；沙箱下会出现 diff/snapshot 相关

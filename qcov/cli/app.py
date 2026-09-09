@@ -233,6 +233,26 @@ def _handle_input_error(error: _InputError) -> None:
     raise typer.Exit(code=4) from error
 
 
+def _multi_obligation_evaluation(
+    config_path: Path,
+) -> tuple[EvaluationBundle, tuple[TestingObligation, ...]]:
+    loaded = load_config(config_path)
+    resolved = resolve_paths(loaded, config_path)
+    if not resolved.obligations:
+        raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations")
+    markers = PytestAdapter().collect(config_dir_for(config_path))
+    if not resolved.evidence and not loaded.mapping and not markers:
+        raise ConfigLoadError(
+            f"{ConfigLoadError.code}: config must resolve obligations and evidence files"
+        )
+    _require_mapping_files(loaded, resolved)
+    authored = [load_evidence(path) for path in resolved.evidence]
+    merged, diagnostics = _merge_evidence(config_path, loaded, resolved, authored, markers)
+    obligations = tuple(load_obligation(path) for path in resolved.obligations)
+    results = tuple(evaluate_obligation(item, merged) for item in obligations)
+    return EvaluationBundle(results, diagnostics), obligations
+
+
 def _policy_bundle(
     obligation: Path | None, evidence: Path | None, config: Path | None
 ) -> EvaluationBundle:
@@ -242,20 +262,8 @@ def _policy_bundle(
         raise ConfigLoadError(f"{ConfigLoadError.code}: provide --obligation/--evidence or --config")
     if obligation is not None or evidence is not None:
         raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
-    loaded = load_config(config)
-    resolved = resolve_paths(loaded, config)
-    if not resolved.obligations:
-        raise ConfigLoadError(f"{ConfigLoadError.code}: config must resolve obligations")
-    markers = PytestAdapter().collect(config_dir_for(config))
-    if not resolved.evidence and not loaded.mapping and not markers:
-        raise ConfigLoadError(
-            f"{ConfigLoadError.code}: config must resolve obligations and evidence files"
-        )
-    _require_mapping_files(loaded, resolved)
-    authored = [load_evidence(path) for path in resolved.evidence]
-    merged, diagnostics = _merge_evidence(config, loaded, resolved, authored, markers)
-    results = tuple(evaluate_obligation(load_obligation(path), merged) for path in resolved.obligations)
-    return EvaluationBundle(results, diagnostics)
+    bundle, _obligations = _multi_obligation_evaluation(config)
+    return bundle
 
 
 def _map_preview(config_path: Path) -> MappingMaterialization:
@@ -484,14 +492,16 @@ def plan(
         if config is not None and (obligation is not None or evidence is not None):
             raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
         if config is not None:
-            bundle = _policy_bundle(None, None, config)
-            loaded = load_config(config)
-            resolved = resolve_paths(loaded, config)
-            obligations = tuple(load_obligation(path) for path in resolved.obligations)
+            bundle, obligations = _multi_obligation_evaluation(config)
             refs = [str(config)]
         elif obligation is not None and evidence is not None:
-            bundle = EvaluationBundle((_evaluate(obligation, evidence),), None)
-            obligations = (load_obligation(obligation),)
+            loaded_obligation = load_obligation(obligation)
+            evidence_items = [load_evidence(path) for path in _evidence_files(evidence)]
+            bundle = EvaluationBundle(
+                (evaluate_obligation(loaded_obligation, evidence_items),),
+                None,
+            )
+            obligations = (loaded_obligation,)
             refs = [str(obligation), str(evidence)]
         else:
             raise ConfigLoadError(
@@ -509,11 +519,12 @@ def plan(
         return
     if output is not None:
         _write_proposal_yaml(output, proposal)
-    _ = locale
-    typer.echo(_render_proposal(proposal, output_format))
+    typer.echo(_render_proposal(proposal, output_format, locale=locale))
 
 
-def _render_proposal(proposal: QualityProposal, output_format: str) -> str:
+def _render_proposal(
+    proposal: QualityProposal, output_format: str, *, locale: str = "en"
+) -> str:
     payload = proposal.model_dump(by_alias=True, mode="json")
     if output_format == "json":
         return json.dumps(payload, indent=2, ensure_ascii=False)
@@ -528,7 +539,8 @@ def _render_proposal(proposal: QualityProposal, output_format: str) -> str:
             "## Items",
         ]
         for item in proposal.items:
-            lines.append(f"- `{item.id}` ({item.kind}) {item.summary.en}")
+            summary = item.summary.zh_cn if locale == "zh-CN" else item.summary.en
+            lines.append(f"- `{item.id}` ({item.kind}) {summary}")
         return "\n".join(lines) + "\n"
     raise typer.BadParameter("format must be markdown or json")
 

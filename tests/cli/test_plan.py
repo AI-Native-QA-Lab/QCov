@@ -46,6 +46,20 @@ def test_plan_writes_quality_plan_from_config(tmp_path: Path) -> None:
     assert written["proposal"]["type"] == "quality_plan"
 
 
+def test_plan_markdown_respects_locale(tmp_path: Path) -> None:
+    config = _write_project(tmp_path)
+    en = runner.invoke(app, ["plan", "--config", str(config), "--format", "markdown"])
+    zh = runner.invoke(
+        app,
+        ["plan", "--config", str(config), "--format", "markdown", "--locale", "zh-CN"],
+    )
+    assert en.exit_code == 0, en.output
+    assert zh.exit_code == 0, zh.output
+    assert "Rank " in en.output
+    assert "第 " in zh.output
+    assert "优先补齐" in zh.output
+
+
 def test_plan_rejects_config_with_direct_inputs(tmp_path: Path) -> None:
     config = _write_project(tmp_path)
     result = runner.invoke(

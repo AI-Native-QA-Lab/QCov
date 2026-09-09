@@ -8,9 +8,17 @@
 
 配置驱动的 `scan` 发现 pytest marker，并将 JUnit XML、coverage.py XML、Playwright JSON 与 LCOV 导入为 **inventory observation**。Iteration 4.5 提供 junit/playwright 的声明式 `EvidenceMapping`、`qcov map preview` 与 `--config` 评估合并。`qcov diff` 比较本地已提交版本上的显式义务与证据快照。`qcov policy check` 提供本地确定性门禁、精确且带时限的豁免，以及显式 `--as-of` 时间戳。
 
-## Planned through Iteration 8
+## Delivered through Iteration 6（提案层）
 
-通过 4.5 后验证门槛之后，Iteration 5 可做映射加固（pytest marker 评估接线与有限 identity DX），以及仅提案性质的 AI：义务建议与变更风险分析。Iteration 6–7 分别只做 Quality Planner 与 Agentic Quality Loop。Iteration 8 在同一协议规则下接入生产证据生产者。AI 建议永不成为证据或门禁权威。见 [路线图](roadmap.md)。
+Iteration 5 完成映射加固（pytest marker 评估接线与有限 identity DX）以及仅提案
+AI（`obligation suggest`、`risk analyze`）。Iteration 6 增加确定性 `qcov plan`
+（对 unproven gaps 做固定收益/成本启发式，产出 `type: quality_plan` 的 draft
+`QualityProposal`）。提案永不成为证据或门禁权威。
+
+## Planned Iterations 7–8
+
+Iteration 7 做 Agentic Quality Loop。Iteration 8 在同一协议规则下接入生产证据
+生产者。AI/plan 提案永不成为证据或门禁权威。见 [路线图](roadmap.md)。
 
 ## Still excluded without a new approved design
 

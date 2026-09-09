@@ -212,5 +212,36 @@ def test_quality_proposal_accepts_quality_plan() -> None:
 
     proposal = QualityProposal.model_validate(VALID_QUALITY_PLAN)
     assert proposal.proposal.type == "quality_plan"
+    assert proposal.proposal.status == "draft"
     assert proposal.source.kind == "evaluation_gaps"
     assert proposal.items[0].kind == "planned_verification"
+
+
+def test_quality_proposal_rejects_invalid_quality_plan_enums() -> None:
+    from qcov.models.protocol import QualityProposal
+
+    bad_type = {
+        **VALID_QUALITY_PLAN,
+        "proposal": {"type": "quality_planner", "status": "draft"},
+    }
+    with pytest.raises(ValidationError):
+        QualityProposal.model_validate(bad_type)
+
+    bad_source = {
+        **VALID_QUALITY_PLAN,
+        "source": {"kind": "gap_report", "refs": []},
+    }
+    with pytest.raises(ValidationError):
+        QualityProposal.model_validate(bad_source)
+
+    bad_item = {
+        **VALID_QUALITY_PLAN,
+        "items": [
+            {
+                **VALID_QUALITY_PLAN["items"][0],
+                "kind": "planned_action",
+            }
+        ],
+    }
+    with pytest.raises(ValidationError):
+        QualityProposal.model_validate(bad_item)
