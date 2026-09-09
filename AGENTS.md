@@ -7,15 +7,17 @@ deliver gap evaluation, inventory scan adapters (with retained records), local
 `qcov diff`, local `qcov policy check`, and declarative junit/playwright evidence
 mapping. Iteration 5 adds pytest-marker evaluation merge, limited identity suffix
 wildcards, and proposal-only AI (`obligation suggest` / `risk analyze`) with a
-default offline provider. Planned Iterations 6–8 cover a pure Quality Planner,
-an Agentic Quality Loop, and production evidence; Iteration 8 completes that
-core roadmap arc, not the whole product (see Post-8 backlog in the roadmap).
+default offline provider. Iteration 6 adds the deterministic Quality Planner
+(`qcov plan` → draft `quality_plan` proposal). Planned Iterations 7–8 cover an
+Agentic Quality Loop and production evidence; Iteration 8 completes that core
+roadmap arc, not the whole product (see Post-8 backlog in the roadmap).
 
 Do not add remote LLM providers beyond the approved Iteration 5 provider
 abstraction, a web UI, persistence, remote Git host APIs, external plugins,
 automatic inventory-to-obligation inference, coverage/LCOV promotion to passed
 evidence, or policy DSL / path-based waivers without an approved design and plan
 update. AI must never become evidence or gate authority.
+
 
 Prefer real-project validation of mapping before expanding AI proposal work. Do
 not describe QCov as a line-coverage detector.

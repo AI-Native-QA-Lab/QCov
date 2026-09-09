@@ -16,8 +16,9 @@ those tools proves a requirement, risk, or change.
 - Explicit `EvidenceMapping` from junit/playwright inventory to `QualityEvidence`
 - Local `qcov diff` across committed Git trees
 - Local `qcov policy check` with exact, expiring waivers
-- Proposal-only AI assistants: `qcov obligation suggest` and `qcov risk analyze`
-  (draft `QualityProposal`; never evidence or gate authority)
+- Proposal-only assistants: `qcov obligation suggest`, `qcov risk analyze`, and
+  deterministic `qcov plan` (draft `QualityProposal`; never evidence or gate
+  authority)
 - Markdown and JSON reports with `en` / `zh-CN` presentation
 
 Not included: AI gate decisions, web UI, database persistence, remote Git host
