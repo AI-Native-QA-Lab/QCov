@@ -20,7 +20,7 @@ qcov gaps / qcov plan
 
 | Command | Role |
 | --- | --- |
-| `qcov explain` | Deterministic reasons for a gap, plan item, or evidence mismatch |
+| `qcov explain` | Deterministic reasons for a gap, plan item, or evidence mismatch (`--mode gap` or `evidence`) |
 | `qcov agent next` | Top-N next steps from `--plan` or live evaluation (`--config` / obligation+evidence) |
 | `qcov agent validate-evidence` | Protocol load check only (`validForLoad`); never claims COVERED or policy PASS |
 

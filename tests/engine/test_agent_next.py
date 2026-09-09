@@ -6,7 +6,6 @@ from qcov.engine.agent_next import select_next_actions
 from qcov.engine.gaps import evaluate_obligation
 from qcov.engine.planner import build_quality_plan
 from qcov.models.errors import AgentInputError
-from qcov.models.io import ConfigLoadError
 from qcov.models.protocol import QualityProposal, TestingObligation
 
 
@@ -65,9 +64,51 @@ def test_select_next_rejects_invalid_limit() -> None:
             "items": [],
         }
     )
-    with pytest.raises(ConfigLoadError) as exc:
+    with pytest.raises(AgentInputError) as exc:
         select_next_actions(plan, limit=0, source="plan_file")
-    assert "QCOV-CLI-007" in str(exc.value)
+    assert exc.value.code == AgentInputError.CODE_INVALID_LIMIT
+
+
+def test_select_next_orders_by_rank_not_file_order() -> None:
+    plan = QualityProposal.model_validate(
+        {
+            "apiVersion": "qcov.dev/v1alpha1",
+            "kind": "QualityProposal",
+            "metadata": {"id": "QP-rank", "createdAt": "2026-09-08T00:00:00+00:00"},
+            "proposal": {"type": "quality_plan", "status": "draft"},
+            "source": {"kind": "evaluation_gaps", "refs": []},
+            "provider": {"name": "offline", "model": None},
+            "items": [
+                {
+                    "id": "plan-second",
+                    "kind": "planned_verification",
+                    "obligationRef": "QO-1",
+                    "summary": {"en": "second", "zh-CN": "二"},
+                    "detail": {
+                        "dimension": "boundary",
+                        "priorityScore": 0,
+                        "rank": 2,
+                        "suggestedEvidenceType": "property_test",
+                    },
+                },
+                {
+                    "id": "plan-first",
+                    "kind": "planned_verification",
+                    "obligationRef": "QO-1",
+                    "summary": {"en": "first", "zh-CN": "一"},
+                    "detail": {
+                        "dimension": "behavior",
+                        "priorityScore": -10,
+                        "rank": 1,
+                        "suggestedEvidenceType": "api_test",
+                    },
+                },
+            ],
+        }
+    )
+    payload = select_next_actions(plan, limit=1, source="plan_file")
+    assert payload.items[0].id == "plan-first"
+    assert payload.items[0].rank == 1
 
 
 def test_select_next_rejects_non_quality_plan() -> None:

@@ -79,12 +79,12 @@ CLI：explain / agent next  [可选 validate-evidence]
 
 | 模式 | 触发 | 行为 |
 | --- | --- | --- |
-| gap | `--config`（或 `--obligation`+`--evidence`）+ `--obligation-id` + `--dimension` | 评估后解释该维度状态与派生 `reasons` |
+| gap | `--config` + ids，或 `--obligation`+`--evidence` + ids（默认 `--mode gap`） | 评估后解释该维度状态与派生 `reasons` |
 | plan-item | `--plan` + `--item-id` | 解释该 `planned_verification` 项（含 rank/分数摘要）；**不**重新排序 |
-| evidence | **仅** `--obligation` + `--evidence` + `--obligation-id` + `--dimension`（用义务文件取 `required_types`；**不**与 `--config` 组合） | 对给定证据列出为何不能使该维度 `COVERED` 的派生码 |
+| evidence | `--obligation` + `--evidence` + ids + `--mode evidence` | 对给定证据列出为何不能使该维度 `COVERED` 的派生码 |
 
-- gap 模式下 `--config` 与直接义务/证据组合：**禁止**（`QCOV-CLI-003`），与 `plan` / `policy check` 一致。
-- evidence 模式固定走直接义务+证据，避免「配置内证据」与「待解释证据」混淆。
+- gap 模式下 `--config` 与直接义务/证据组合：**禁止**（`QCOV-CLI-003`）。
+- 直接义务+证据默认 `--mode gap`；`--mode evidence` 走证据缺陷派生。
 - 缺少模式所需参数：输入错误（现有 `QCOV-CLI-*` / `ConfigLoadError` 风格）。
 - 退出码：加载/协议错误走现有输入错误路径；解释成功为 **0**。
 
@@ -132,7 +132,8 @@ CLI：explain / agent next  [可选 validate-evidence]
 - `mode`: `gap` \| `plan_item` \| `evidence`
 - `obligationId`, `dimension`（适用时）
 - `status`: 维度级 `COVERED` \| `MISSING` \| `UNKNOWN`（若可知）
-- `requiredTypes`: string[]
+- `requiredTypes`: string[]（gap/evidence：义务维度所需类型；plan_item 为空）
+- `missingEvidenceTypes`: string[]（仅 plan_item：对齐 plan detail 的 missingEvidenceTypes）
 - `observedEvidenceIds`: string[]
 - `reasons`: 对象数组，每项含稳定 `code` + `summary.en` / `summary.zh-CN`
 - plan-item 模式另含：`itemId`, `rank`, `priorityScore`, `suggestedEvidenceType` 等与 plan detail 对齐的只读摘要
@@ -148,7 +149,8 @@ CLI：explain / agent next  [可选 validate-evidence]
 
 - `files`: 每项含 `path`, `validForLoad`, `evidenceId`（成功时）, `error`（失败时）
 - 顶层可含 `allValidForLoad: boolean`
-- 文案/字段不得使用 `COVERED` / `PASS` 表示加载成功
+- `disclaimer`: `{en, zh-CN}`，明确 `validForLoad` ≠ COVERED ≠ policy PASS
+- 文案/字段不得把加载成功写成 `COVERED` / `PASS`
 
 ## 派生 reason 码（本迭代冻结）
 
@@ -177,6 +179,7 @@ CLI：explain / agent next  [可选 validate-evidence]
 | `QCOV-CLI-006` | `--plan` 与 `--config` / 直接义务证据同时出现（`005` 已用于 locale） |
 | `QCOV-AGENT-001` | `--plan` 不是 `type=quality_plan` 的合法 proposal |
 | `QCOV-AGENT-002` | explain / next 目标找不到（未知 obligationId、dimension、item-id） |
+| `QCOV-AGENT-003` | `--limit` 非法（必须 ≥ 1） |
 
 成功路径的 JSON 始终含完整外壳；失败不输出半截契约 JSON（对齐现有 CLI）。
 

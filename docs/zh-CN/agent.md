@@ -17,7 +17,7 @@ qcov gaps / qcov plan
 
 | 命令 | 作用 |
 | --- | --- |
-| `qcov explain` | 确定性解释 gap、plan item，或证据为何未满足 |
+| `qcov explain` | 确定性解释 gap、plan item，或证据为何未满足（`--mode gap` 或 `evidence`） |
 | `qcov agent next` | 从 `--plan` 或现场评估（`--config` / 义务+证据）给出 top-N 下一步 |
 | `qcov agent validate-evidence` | 仅协议加载检查（`validForLoad`）；绝不表示 COVERED 或 policy PASS |
 

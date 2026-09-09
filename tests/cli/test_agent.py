@@ -60,7 +60,7 @@ def test_agent_next_rejects_invalid_limit(tmp_path: Path) -> None:
         app, ["agent", "next", "--config", str(config), "--limit", "0"]
     )
     assert result.exit_code == 4
-    assert "QCOV-CLI-007" in result.output
+    assert "QCOV-AGENT-003" in result.output
 
 
 def test_agent_next_rejects_plan_with_config(tmp_path: Path) -> None:
@@ -86,5 +86,7 @@ def test_agent_validate_evidence_valid_for_load(tmp_path: Path) -> None:
     body = json.loads(result.output)
     assert body["command"] == "agent.validate_evidence"
     assert body["payload"]["allValidForLoad"] is True
-    assert "COVERED" not in result.output
-    assert "PASS" not in result.output
+    disclaimer = body["payload"]["disclaimer"]["en"]
+    assert "validForLoad" in disclaimer
+    assert "COVERED" in disclaimer
+    assert "PASS" in disclaimer

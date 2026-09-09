@@ -58,3 +58,4 @@ def test_agent_envelope_rejects_unknown_contract_version() -> None:
 def test_agent_input_error_codes() -> None:
     assert AgentInputError.CODE_NOT_QUALITY_PLAN == "QCOV-AGENT-001"
     assert AgentInputError.CODE_TARGET_NOT_FOUND == "QCOV-AGENT-002"
+    assert AgentInputError.CODE_INVALID_LIMIT == "QCOV-AGENT-003"

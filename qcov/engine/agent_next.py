@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Literal
 
+from qcov.engine.plan_detail import planned_verification_detail
 from qcov.models.agent_contract import NextItem, NextPayload
 from qcov.models.errors import AgentInputError
-from qcov.models.io import ConfigLoadError
 from qcov.models.protocol import QualityProposal
 
 
@@ -22,33 +22,31 @@ def select_next_actions(
             "proposal type must be quality_plan",
         )
     if limit < 1:
-        raise ConfigLoadError("QCOV-CLI-007: --limit must be >= 1")
+        raise AgentInputError(
+            AgentInputError.CODE_INVALID_LIMIT,
+            "--limit must be >= 1",
+        )
+    ordered = sorted(
+        proposal.items,
+        key=lambda item: planned_verification_detail(item).rank,
+    )
     items: list[NextItem] = []
-    for item in proposal.items[:limit]:
-        detail = item.detail
-        dimension = detail.get("dimension")
-        rank = detail.get("rank")
-        priority = detail.get("priorityScore")
-        if item.obligation_ref is None or not isinstance(dimension, str):
+    for item in ordered[:limit]:
+        detail = planned_verification_detail(item)
+        if item.obligation_ref is None:
             raise AgentInputError(
                 AgentInputError.CODE_TARGET_NOT_FOUND,
-                f"plan item missing obligationRef or dimension: {item.id}",
+                f"plan item missing obligationRef: {item.id}",
             )
-        if not isinstance(rank, int) or not isinstance(priority, int):
-            raise AgentInputError(
-                AgentInputError.CODE_TARGET_NOT_FOUND,
-                f"plan item missing rank or priorityScore: {item.id}",
-            )
-        suggested = detail.get("suggestedEvidenceType")
         items.append(
             NextItem.model_validate(
                 {
                     "id": item.id,
                     "obligationRef": item.obligation_ref,
-                    "dimension": dimension,
-                    "suggestedEvidenceType": suggested if isinstance(suggested, str) else None,
-                    "rank": rank,
-                    "priorityScore": priority,
+                    "dimension": detail.dimension,
+                    "suggestedEvidenceType": detail.suggested_evidence_type,
+                    "rank": detail.rank,
+                    "priorityScore": detail.priority_score,
                 }
             )
         )

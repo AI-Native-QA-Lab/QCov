@@ -38,6 +38,9 @@ class ExplainPayload(ProtocolModel):
     rank: int | None = None
     priority_score: int | None = Field(default=None, alias="priorityScore")
     suggested_evidence_type: str | None = Field(default=None, alias="suggestedEvidenceType")
+    missing_evidence_types: list[str] = Field(
+        default_factory=list, alias="missingEvidenceTypes"
+    )
 
 
 class NextItem(ProtocolModel):
@@ -65,6 +68,7 @@ class ValidateFileResult(ProtocolModel):
 class ValidatePayload(ProtocolModel):
     files: list[ValidateFileResult] = Field(default_factory=list)
     all_valid_for_load: bool = Field(alias="allValidForLoad")
+    disclaimer: LocalizedText
 
 
 class AgentEnvelope(ProtocolModel):

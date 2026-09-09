@@ -70,6 +70,33 @@ def test_explain_plan_item(tmp_path: Path) -> None:
     assert body["payload"]["itemId"] == item_id
 
 
+def test_explain_gap_from_direct_inputs(tmp_path: Path) -> None:
+    obl = tmp_path / "obligation.yaml"
+    obl.write_text(Path("examples/refund/obligation.yaml").read_text())
+    (tmp_path / "evidence").mkdir()
+    ev = tmp_path / "evidence" / "behavior.yaml"
+    ev.write_text(Path("examples/refund/evidence/behavior.yaml").read_text())
+    result = runner.invoke(
+        app,
+        [
+            "explain",
+            "--obligation",
+            str(obl),
+            "--evidence",
+            str(ev),
+            "--obligation-id",
+            "QO-REFUND-001",
+            "--dimension",
+            "boundary",
+            "--format",
+            "json",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    body = json.loads(result.output)
+    assert body["payload"]["mode"] == "gap"
+
+
 def test_explain_evidence_mode(tmp_path: Path) -> None:
     obl = tmp_path / "obligation.yaml"
     obl.write_text(Path("examples/refund/obligation.yaml").read_text())
@@ -91,6 +118,8 @@ def test_explain_evidence_mode(tmp_path: Path) -> None:
             "QO-REFUND-001",
             "--dimension",
             "behavior",
+            "--mode",
+            "evidence",
             "--format",
             "json",
         ],

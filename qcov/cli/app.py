@@ -500,6 +500,18 @@ def map_preview(
         typer.echo(render_map_preview_markdown(materialization, locale))
 
 
+_VALIDATE_DISCLAIMER = {
+    "en": (
+        "validForLoad=true means the file loaded as QualityEvidence only; "
+        "it does not mean COVERED and is not a policy PASS."
+    ),
+    "zh-CN": (
+        "validForLoad=true 仅表示文件可作为 QualityEvidence 加载；"
+        "不表示 COVERED，也不是 policy PASS。"
+    ),
+}
+
+
 @app.command("explain")
 def explain(
     obligation: OptionalObligationPath = None,
@@ -509,6 +521,7 @@ def explain(
     item_id: Annotated[str | None, typer.Option("--item-id")] = None,
     obligation_id: Annotated[str | None, typer.Option("--obligation-id")] = None,
     dimension: Annotated[str | None, typer.Option("--dimension")] = None,
+    mode: Annotated[str | None, typer.Option("--mode", case_sensitive=False)] = None,
     locale: Locale = "en",
     output_format: OutputFormat = "markdown",
 ) -> None:
@@ -522,6 +535,7 @@ def explain(
             item_id=item_id,
             obligation_id=obligation_id,
             dimension=dimension,
+            mode=mode,
         )
         envelope = AgentEnvelope.model_validate(
             {
@@ -548,6 +562,11 @@ def agent_next(
 ) -> None:
     """Return the next-best planned verification steps for agents."""
     try:
+        if limit < 1:
+            raise AgentInputError(
+                AgentInputError.CODE_INVALID_LIMIT,
+                "--limit must be >= 1",
+            )
         payload = _build_next_payload(
             obligation=obligation,
             evidence=evidence,
@@ -599,6 +618,7 @@ def _build_explain_payload(
     item_id: str | None,
     obligation_id: str | None,
     dimension: str | None,
+    mode: str | None,
 ) -> ExplainPayload:
     if plan_path is not None:
         if config is not None or obligation is not None or evidence is not None:
@@ -622,9 +642,15 @@ def _build_explain_payload(
             "(or --plan with --item-id)"
         )
 
+    explain_mode = (mode or "gap").lower()
+    if explain_mode not in {"gap", "evidence"}:
+        raise ConfigLoadError(f"{ConfigLoadError.code}: --mode must be gap or evidence")
+
     if config is not None:
         if obligation is not None or evidence is not None:
             raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
+        if explain_mode != "gap":
+            raise ConfigLoadError(f"{ConfigLoadError.code}: --config explain supports --mode gap only")
         bundle, obligations = _multi_obligation_evaluation(config)
         matched = next((item for item in obligations if item.metadata.id == obligation_id), None)
         result = next((item for item in bundle.results if item.obligation_id == obligation_id), None)
@@ -643,7 +669,10 @@ def _build_explain_payload(
                 f"obligation not found: {obligation_id}",
             )
         evidence_items = [load_evidence(path) for path in _evidence_files(evidence)]
-        return explain_evidence(loaded_obligation, evidence_items, dimension)
+        if explain_mode == "evidence":
+            return explain_evidence(loaded_obligation, evidence_items, dimension)
+        result = evaluate_obligation(loaded_obligation, evidence_items)
+        return explain_gap(loaded_obligation, result, dimension)
 
     raise ConfigLoadError(
         f"{ConfigLoadError.code}: provide --config, --obligation/--evidence, or --plan"
@@ -732,6 +761,7 @@ def _validate_evidence_payload(evidence: Path) -> ValidatePayload:
         {
             "files": [item.model_dump(by_alias=True, mode="json") for item in files],
             "allValidForLoad": all(item.valid_for_load for item in files),
+            "disclaimer": _VALIDATE_DISCLAIMER,
         }
     )
 
@@ -784,9 +814,11 @@ def _render_agent_envelope(
         if not payload.items:
             lines.append("- —")
     elif isinstance(payload, ValidatePayload):
+        disclaimer = payload.disclaimer.zh_cn if locale == "zh-CN" else payload.disclaimer.en
         lines.extend(
             [
                 f"- allValidForLoad: `{payload.all_valid_for_load}`",
+                f"- disclaimer: {disclaimer}",
                 "",
                 "## Files",
             ]

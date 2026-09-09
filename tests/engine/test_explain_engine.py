@@ -95,6 +95,7 @@ def test_explain_plan_item_reads_detail() -> None:
             "detail": {
                 "dimension": "behavior",
                 "gapStatus": "MISSING",
+                "missingEvidenceTypes": ["api_test"],
                 "suggestedEvidenceType": "api_test",
                 "priorityScore": -90,
                 "rank": 1,
@@ -106,6 +107,8 @@ def test_explain_plan_item_reads_detail() -> None:
     assert payload.item_id == item.id
     assert payload.rank == 1
     assert payload.priority_score == -90
+    assert payload.required_types == []
+    assert payload.missing_evidence_types == ["api_test"]
 
 
 def test_explain_gap_unknown_dimension_raises() -> None:

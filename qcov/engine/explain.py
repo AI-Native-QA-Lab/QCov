@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from qcov.engine.gaps import DimensionResult, ObligationResult, evaluate_obligation
+from qcov.engine.plan_detail import planned_verification_detail
 from qcov.models.agent_contract import ExplainPayload, ReasonCode, ReasonItem
 from qcov.models.errors import AgentInputError
 from qcov.models.protocol import (
@@ -161,39 +162,23 @@ def explain_evidence(
 
 
 def explain_plan_item(item: ProposalItem) -> ExplainPayload:
-    if item.kind != "planned_verification":
-        raise AgentInputError(
-            AgentInputError.CODE_TARGET_NOT_FOUND,
-            f"item kind must be planned_verification, got {item.kind}",
-        )
-    detail = item.detail
-    dimension = detail.get("dimension")
-    gap_status = detail.get("gapStatus")
-    if not isinstance(dimension, str):
-        raise AgentInputError(
-            AgentInputError.CODE_TARGET_NOT_FOUND,
-            "plan item missing dimension",
-        )
-    status = gap_status if isinstance(gap_status, str) else None
+    detail = planned_verification_detail(item)
+    status = detail.gap_status
     if status not in {None, "COVERED", "MISSING", "UNKNOWN"}:
         status = None
-    missing = detail.get("missingEvidenceTypes")
-    required_types = list(missing) if isinstance(missing, list) else []
-    rank = detail.get("rank")
-    priority = detail.get("priorityScore")
-    suggested = detail.get("suggestedEvidenceType")
     return ExplainPayload.model_validate(
         {
             "mode": "plan_item",
             "obligationId": item.obligation_ref,
-            "dimension": dimension,
+            "dimension": detail.dimension,
             "status": status,
-            "requiredTypes": required_types,
+            "requiredTypes": [],
             "observedEvidenceIds": [],
             "reasons": [],
             "itemId": item.id,
-            "rank": rank if isinstance(rank, int) else None,
-            "priorityScore": priority if isinstance(priority, int) else None,
-            "suggestedEvidenceType": suggested if isinstance(suggested, str) else None,
+            "rank": detail.rank,
+            "priorityScore": detail.priority_score,
+            "suggestedEvidenceType": detail.suggested_evidence_type,
+            "missingEvidenceTypes": detail.missing_evidence_types,
         }
     )

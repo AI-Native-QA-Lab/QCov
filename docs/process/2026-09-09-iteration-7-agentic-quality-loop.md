@@ -15,7 +15,7 @@
 | Task | 结果 |
 | --- | --- |
 | 1 契约模型 | RED：`ModuleNotFoundError: agent_contract` → GREEN：`tests/models/test_agent_contract.py` 3 passed |
-| 2 explain 引擎 | RED：缺模块 → GREEN：`tests/engine/test_explain.py` 5 passed |
+| 2 explain 引擎 | RED：缺模块 → GREEN：`tests/engine/test_explain_engine.py` passed |
 | 3 agent_next | RED：缺模块 → GREEN：`tests/engine/test_agent_next.py` 3 passed |
 | 4–6 CLI | RED：无 `explain`/`agent` 命令 → GREEN：`tests/cli/test_explain.py` + `test_agent.py` 9 passed（含可选 validate） |
 | 7 文档 | 双语 `agent.md` + roadmap/requirements/concepts/architecture/`AGENTS.md` |

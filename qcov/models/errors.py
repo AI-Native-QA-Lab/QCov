@@ -12,6 +12,7 @@ class AgentInputError(ValueError):
 
     CODE_NOT_QUALITY_PLAN = "QCOV-AGENT-001"
     CODE_TARGET_NOT_FOUND = "QCOV-AGENT-002"
+    CODE_INVALID_LIMIT = "QCOV-AGENT-003"
 
     def __init__(self, code: str, message: str) -> None:
         self.code = code
