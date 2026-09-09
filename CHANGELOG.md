@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.7.0 - 2026-09-09
+
+### Features
+
+- Add deterministic `qcov plan`, which ranks unproven obligation dimensions
+  with fixed benefit/cost heuristics and emits a draft `quality_plan` proposal
+  for the next best verification work.
+- Add stable `quality_plan`, `evaluation_gaps`, and `planned_verification`
+  protocol values, including localized Markdown planning output.
+
+### Boundaries
+
+- Planning proposals remain local, deterministic, and proposal-only: they are
+  never QualityEvidence and cannot change Gap Engine or policy decisions.
+
+### Documentation
+
+- Document Iteration 6 planner behavior, boundaries, and implementation
+  verification evidence in the bilingual public docs and Chinese process record.
+
 ## 0.6.0 - 2026-09-08
 
 ### Features

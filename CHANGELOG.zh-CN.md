@@ -1,5 +1,23 @@
 # 更新日志
 
+## 0.7.0 - 2026-09-09
+
+### 新功能
+
+- 新增确定性的 `qcov plan`：使用固定收益/成本启发式对未被证明的义务维度排序，
+  为下一步最优验证工作产出 draft `quality_plan` 提议。
+- 新增稳定的 `quality_plan`、`evaluation_gaps` 与 `planned_verification`
+  协议取值，并提供本地化 Markdown 计划输出。
+
+### 边界
+
+- 计划提议保持本地、确定性且仅提议：它们永远不是 QualityEvidence，也不能改变
+  Gap Engine 或 policy 决策。
+
+### 文档
+
+- 在双语公开文档和中文过程记录中说明 Iteration 6 planner 的行为、边界与验证证据。
+
 ## 0.6.0 - 2026-09-08
 
 ### 新功能
