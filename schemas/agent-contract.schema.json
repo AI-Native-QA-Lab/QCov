@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QCovAgentContract",
+  "$defs": {
+    "LocalizedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "zh-CN"],
+      "properties": {
+        "en": { "type": "string" },
+        "zh-CN": { "type": "string" }
+      }
+    },
+    "ReasonItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "summary"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "ALREADY_COVERED",
+            "DIMENSION_MISMATCH",
+            "NO_EVIDENCE_FOR_OBLIGATION",
+            "OBLIGATION_REF_MISMATCH",
+            "STATUS_NOT_PASSED",
+            "STATUS_UNKNOWN",
+            "TYPE_NOT_REQUIRED"
+          ]
+        },
+        "summary": { "$ref": "#/$defs/LocalizedText" }
+      }
+    },
+    "ExplainPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "requiredTypes", "observedEvidenceIds", "reasons"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["gap", "plan_item", "evidence"] },
+        "obligationId": { "type": ["string", "null"] },
+        "dimension": { "type": ["string", "null"] },
+        "status": {
+          "type": ["string", "null"],
+          "enum": ["COVERED", "MISSING", "UNKNOWN", null]
+        },
+        "requiredTypes": { "type": "array", "items": { "type": "string" } },
+        "observedEvidenceIds": { "type": "array", "items": { "type": "string" } },
+        "reasons": { "type": "array", "items": { "$ref": "#/$defs/ReasonItem" } },
+        "itemId": { "type": ["string", "null"] },
+        "rank": { "type": ["integer", "null"] },
+        "priorityScore": { "type": ["integer", "null"] },
+        "suggestedEvidenceType": { "type": ["string", "null"] }
+      }
+    },
+    "NextItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "obligationRef",
+        "dimension",
+        "rank",
+        "priorityScore"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "obligationRef": { "type": "string", "minLength": 1 },
+        "dimension": { "type": "string" },
+        "suggestedEvidenceType": { "type": ["string", "null"] },
+        "rank": { "type": "integer" },
+        "priorityScore": { "type": "integer" }
+      }
+    },
+    "NextPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "limit", "items"],
+      "properties": {
+        "source": { "type": "string", "enum": ["plan_file", "evaluation"] },
+        "limit": { "type": "integer" },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/NextItem" } }
+      }
+    },
+    "ValidateFileResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "validForLoad"],
+      "properties": {
+        "path": { "type": "string" },
+        "validForLoad": { "type": "boolean" },
+        "evidenceId": { "type": ["string", "null"] },
+        "error": { "type": ["string", "null"] }
+      }
+    },
+    "ValidatePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "allValidForLoad"],
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ValidateFileResult" }
+        },
+        "allValidForLoad": { "type": "boolean" }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractVersion", "command", "payload"],
+      "properties": {
+        "contractVersion": { "const": "qcov.agent/v1" },
+        "command": { "const": "explain" },
+        "payload": { "$ref": "#/$defs/ExplainPayload" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractVersion", "command", "payload"],
+      "properties": {
+        "contractVersion": { "const": "qcov.agent/v1" },
+        "command": { "const": "agent.next" },
+        "payload": { "$ref": "#/$defs/NextPayload" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractVersion", "command", "payload"],
+      "properties": {
+        "contractVersion": { "const": "qcov.agent/v1" },
+        "command": { "const": "agent.validate_evidence" },
+        "payload": { "$ref": "#/$defs/ValidatePayload" }
+      }
+    }
+  ]
+}
