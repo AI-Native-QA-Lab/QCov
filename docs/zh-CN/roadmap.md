@@ -2,9 +2,9 @@
 
 QCov 仍是本地、确定性的质量证据缺口引擎：报告某项义务还有什么未被证明。它不是行覆盖率检测器，也不是测试执行器。
 
-## Delivered through Iteration 4.5
+## Delivered through Iteration 6
 
-Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱动的 pytest marker、JUnit XML 与 coverage.py XML inventory 本地发现。Iteration 2 通过明确的 built-in registry 增加 Playwright JSON 与 LCOV inventory reader；external adapter plugin 仍不在范围内。Iteration 3 通过 `qcov diff` 提供只读的已提交树比较。Iteration 4 提供本地 `qcov policy check`：默认状态规则、可审计的精确豁免、显式 `--as-of` 与 PASS/WARN/BLOCK 判定。Iteration 4.5 提供声明式 `EvidenceMapping`（junit/playwright）、`qcov map preview`，以及 `--config` 评估合并。
+Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱动的 pytest marker、JUnit XML 与 coverage.py XML inventory 本地发现。Iteration 2 通过明确的 built-in registry 增加 Playwright JSON 与 LCOV inventory reader；external adapter plugin 仍不在范围内。Iteration 3 通过 `qcov diff` 提供只读的已提交树比较。Iteration 4 提供本地 `qcov policy check`：默认状态规则、可审计的精确豁免、显式 `--as-of` 与 PASS/WARN/BLOCK 判定。Iteration 4.5 提供声明式 `EvidenceMapping`（junit/playwright）、`qcov map preview`，以及 `--config` 评估合并。Iteration 5 增加 pytest marker 评估合并、有限 identity 后缀通配，以及仅提案 AI（`obligation suggest` / `risk analyze`，默认 offline provider）。Iteration 6 增加确定性 `qcov plan`：对未满足缺口按固定收益/成本启发式排序，产出 draft `QualityProposal`（`type: quality_plan`），指示下一步最值得验证什么——仍不是证据或门禁权威。
 
 远程 Git、源码行级影响推断、策略 DSL、维度阈值、通配符豁免、coverage/LCOV 提升为 passed 证据，以及 inventory 自动推断在无后续设计批准前仍延后。
 
@@ -13,14 +13,12 @@ Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱
 在加速 AI 之前，先用真实项目验证接入时间、可解释性与相对普通报告的缺口价值。映射必须保持声明式与本地。适配器仍不得推断「通过的测试」或「覆盖率」足以证明业务义务。设计见：
 `docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`。说明见 [显式证据映射](mapping.md)。
 
-## Planned Iterations 5–8
+## Planned Iterations 7–8
 
 原则：AI 提出建议；策略批准；确定性引擎核验。AI 不得成为证据或门禁权威。
 
 | 迭代 | 焦点 |
 | --- | --- |
-| **5** | 映射加固（pytest marker 评估接线，以及按需的有限 identity DX）+ AI Obligation Assistant + Change Risk Analyzer（`obligation suggest`、`risk analyze`） |
-| **6** | 仅 AI Quality Planner（`plan` / 下一步最值得验证什么） |
 | **7** | 仅 Agentic Quality Loop（稳定 Agent 契约；可选 `explain`） |
 | **8** | 仅生产证据（runtime / incident / observability 类生产者，仍受协议规则约束） |
 

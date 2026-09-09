@@ -221,12 +221,12 @@ class ProposalMetadata(ProtocolModel):
 
 
 class ProposalDescriptor(ProtocolModel):
-    type: Literal["obligation_suggest", "change_risk"]
+    type: Literal["obligation_suggest", "change_risk", "quality_plan"]
     status: Literal["draft"]
 
 
 class ProposalSource(ProtocolModel):
-    kind: Literal["requirements", "local_diff"]
+    kind: Literal["requirements", "local_diff", "evaluation_gaps"]
     refs: list[str] = Field(default_factory=list)
 
 
@@ -237,7 +237,12 @@ class ProposalProvider(ProtocolModel):
 
 class ProposalItem(ProtocolModel):
     id: str = Field(min_length=1)
-    kind: Literal["proposed_obligation", "affected_obligation", "suggested_evidence"]
+    kind: Literal[
+        "proposed_obligation",
+        "affected_obligation",
+        "suggested_evidence",
+        "planned_verification",
+    ]
     obligation_ref: str | None = Field(default=None, alias="obligationRef", min_length=1)
     summary: LocalizedText
     detail: dict[str, object] = Field(default_factory=dict)
