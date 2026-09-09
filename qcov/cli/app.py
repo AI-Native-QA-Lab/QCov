@@ -35,13 +35,23 @@ from qcov.engine.mapping import (
     apply_mappings,
 )
 from qcov.engine.mapping_reports import render_map_preview_json, render_map_preview_markdown
+from qcov.engine.agent_next import select_next_actions
+from qcov.engine.explain import explain_evidence, explain_gap, explain_plan_item
 from qcov.engine.planner import build_quality_plan
 from qcov.engine.policy import PolicyDecision, evaluate_policy
 from qcov.engine.policy_reports import render_policy_json, render_policy_markdown
 from qcov.engine.reports import render_json, render_markdown, render_scan_json, render_scan_markdown
 from qcov.engine.scan import scan_project
+from qcov.models.agent_contract import (
+    CONTRACT_VERSION,
+    AgentEnvelope,
+    ExplainPayload,
+    NextPayload,
+    ValidateFileResult,
+    ValidatePayload,
+)
 from qcov.models.config import ProjectConfig, ResolvedPaths, resolve_paths
-from qcov.models.errors import ProposalInputError
+from qcov.models.errors import AgentInputError, ProposalInputError
 from qcov.models.io import (
     ConfigLoadError,
     ProtocolLoadError,
@@ -50,6 +60,7 @@ from qcov.models.io import (
     load_mapping,
     load_obligation,
     load_policy,
+    load_proposal,
 )
 from qcov.models.protocol import (
     CoverageStatus,
@@ -64,10 +75,12 @@ policy_app = typer.Typer(no_args_is_help=True)
 map_app = typer.Typer(no_args_is_help=True)
 obligation_app = typer.Typer(no_args_is_help=True)
 risk_app = typer.Typer(no_args_is_help=True)
+agent_app = typer.Typer(no_args_is_help=True)
 app.add_typer(policy_app, name="policy")
 app.add_typer(map_app, name="map")
 app.add_typer(obligation_app, name="obligation")
 app.add_typer(risk_app, name="risk")
+app.add_typer(agent_app, name="agent")
 
 ObligationPath = Annotated[Path, typer.Option("--obligation", "--obligations", exists=True, readable=True)]
 EvidencePath = Annotated[Path, typer.Option(exists=True, readable=True)]
@@ -219,12 +232,21 @@ def _render(
     return render_markdown([result], locale=locale, mapping_diagnostics=mapping_diagnostics)
 
 
+_INPUT_ERRORS = (
+    ConfigLoadError,
+    ProtocolLoadError,
+    MappingConflictError,
+    MappingDocumentError,
+    ProposalInputError,
+    AgentInputError,
+)
 _InputError = (
     ConfigLoadError
     | ProtocolLoadError
     | MappingConflictError
     | MappingDocumentError
     | ProposalInputError
+    | AgentInputError
 )
 
 
@@ -476,6 +498,293 @@ def map_preview(
         typer.echo(render_map_preview_json(materialization))
     else:
         typer.echo(render_map_preview_markdown(materialization, locale))
+
+
+@app.command("explain")
+def explain(
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
+    plan_path: Annotated[Path | None, typer.Option("--plan", exists=True, readable=True)] = None,
+    item_id: Annotated[str | None, typer.Option("--item-id")] = None,
+    obligation_id: Annotated[str | None, typer.Option("--obligation-id")] = None,
+    dimension: Annotated[str | None, typer.Option("--dimension")] = None,
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Explain a gap, plan item, or why evidence does not COVER a dimension."""
+    try:
+        payload = _build_explain_payload(
+            obligation=obligation,
+            evidence=evidence,
+            config=config,
+            plan_path=plan_path,
+            item_id=item_id,
+            obligation_id=obligation_id,
+            dimension=dimension,
+        )
+        envelope = AgentEnvelope.model_validate(
+            {
+                "contractVersion": CONTRACT_VERSION,
+                "command": "explain",
+                "payload": payload,
+            }
+        )
+    except _INPUT_ERRORS as error:
+        _handle_input_error(error)
+        return
+    typer.echo(_render_agent_envelope(envelope, output_format, locale=locale))
+
+
+@agent_app.command("next")
+def agent_next(
+    obligation: OptionalObligationPath = None,
+    evidence: OptionalEvidencePath = None,
+    config: OptionalEvidencePath = None,
+    plan_path: Annotated[Path | None, typer.Option("--plan", exists=True, readable=True)] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 1,
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Return the next-best planned verification steps for agents."""
+    try:
+        payload = _build_next_payload(
+            obligation=obligation,
+            evidence=evidence,
+            config=config,
+            plan_path=plan_path,
+            limit=limit,
+        )
+        envelope = AgentEnvelope.model_validate(
+            {
+                "contractVersion": CONTRACT_VERSION,
+                "command": "agent.next",
+                "payload": payload,
+            }
+        )
+    except _INPUT_ERRORS as error:
+        _handle_input_error(error)
+        return
+    typer.echo(_render_agent_envelope(envelope, output_format, locale=locale))
+
+
+@agent_app.command("validate-evidence")
+def agent_validate_evidence(
+    evidence: EvidencePath,
+    locale: Locale = "en",
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Check whether evidence files are valid for protocol load (not gate/COVERED)."""
+    try:
+        payload = _validate_evidence_payload(evidence)
+        envelope = AgentEnvelope.model_validate(
+            {
+                "contractVersion": CONTRACT_VERSION,
+                "command": "agent.validate_evidence",
+                "payload": payload,
+            }
+        )
+    except _INPUT_ERRORS as error:
+        _handle_input_error(error)
+        return
+    typer.echo(_render_agent_envelope(envelope, output_format, locale=locale))
+
+
+def _build_explain_payload(
+    *,
+    obligation: Path | None,
+    evidence: Path | None,
+    config: Path | None,
+    plan_path: Path | None,
+    item_id: str | None,
+    obligation_id: str | None,
+    dimension: str | None,
+) -> ExplainPayload:
+    if plan_path is not None:
+        if config is not None or obligation is not None or evidence is not None:
+            raise ConfigLoadError(
+                "QCOV-CLI-006: --plan cannot be combined with --config or direct inputs"
+            )
+        if item_id is None:
+            raise ConfigLoadError(f"{ConfigLoadError.code}: --plan requires --item-id")
+        proposal = load_proposal(plan_path)
+        for item in proposal.items:
+            if item.id == item_id:
+                return explain_plan_item(item)
+        raise AgentInputError(
+            AgentInputError.CODE_TARGET_NOT_FOUND,
+            f"plan item not found: {item_id}",
+        )
+
+    if obligation_id is None or dimension is None:
+        raise ConfigLoadError(
+            f"{ConfigLoadError.code}: provide --obligation-id and --dimension "
+            "(or --plan with --item-id)"
+        )
+
+    if config is not None:
+        if obligation is not None or evidence is not None:
+            raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
+        bundle, obligations = _multi_obligation_evaluation(config)
+        matched = next((item for item in obligations if item.metadata.id == obligation_id), None)
+        result = next((item for item in bundle.results if item.obligation_id == obligation_id), None)
+        if matched is None or result is None:
+            raise AgentInputError(
+                AgentInputError.CODE_TARGET_NOT_FOUND,
+                f"obligation not found: {obligation_id}",
+            )
+        return explain_gap(matched, result, dimension)
+
+    if obligation is not None and evidence is not None:
+        loaded_obligation = load_obligation(obligation)
+        if loaded_obligation.metadata.id != obligation_id:
+            raise AgentInputError(
+                AgentInputError.CODE_TARGET_NOT_FOUND,
+                f"obligation not found: {obligation_id}",
+            )
+        evidence_items = [load_evidence(path) for path in _evidence_files(evidence)]
+        return explain_evidence(loaded_obligation, evidence_items, dimension)
+
+    raise ConfigLoadError(
+        f"{ConfigLoadError.code}: provide --config, --obligation/--evidence, or --plan"
+    )
+
+
+def _build_next_payload(
+    *,
+    obligation: Path | None,
+    evidence: Path | None,
+    config: Path | None,
+    plan_path: Path | None,
+    limit: int,
+) -> NextPayload:
+    if plan_path is not None:
+        if config is not None or obligation is not None or evidence is not None:
+            raise ConfigLoadError(
+                "QCOV-CLI-006: --plan cannot be combined with --config or direct inputs"
+            )
+        proposal = load_proposal(plan_path)
+        return select_next_actions(proposal, limit=limit, source="plan_file")
+
+    if config is not None and (obligation is not None or evidence is not None):
+        raise ConfigLoadError("QCOV-CLI-003: --config cannot be combined with direct inputs")
+    if config is not None:
+        bundle, obligations = _multi_obligation_evaluation(config)
+        refs = [str(config)]
+    elif obligation is not None and evidence is not None:
+        loaded_obligation = load_obligation(obligation)
+        evidence_items = [load_evidence(path) for path in _evidence_files(evidence)]
+        bundle = EvaluationBundle(
+            (evaluate_obligation(loaded_obligation, evidence_items),),
+            None,
+        )
+        obligations = (loaded_obligation,)
+        refs = [str(obligation), str(evidence)]
+    else:
+        raise ConfigLoadError(
+            f"{ConfigLoadError.code}: provide --plan, --config, or --obligation/--evidence"
+        )
+    proposal = build_quality_plan(bundle.results, obligations, refs=refs)
+    return select_next_actions(proposal, limit=limit, source="evaluation")
+
+
+def _validate_evidence_payload(evidence: Path) -> ValidatePayload:
+    files: list[ValidateFileResult] = []
+    for path in _evidence_files(evidence):
+        try:
+            loaded = load_evidence(path)
+            files.append(
+                ValidateFileResult.model_validate(
+                    {
+                        "path": str(path),
+                        "validForLoad": True,
+                        "evidenceId": loaded.metadata.id,
+                        "error": None,
+                    }
+                )
+            )
+        except ProtocolLoadError as error:
+            files.append(
+                ValidateFileResult.model_validate(
+                    {
+                        "path": str(path),
+                        "validForLoad": False,
+                        "evidenceId": None,
+                        "error": str(error),
+                    }
+                )
+            )
+    return ValidatePayload.model_validate(
+        {
+            "files": [item.model_dump(by_alias=True, mode="json") for item in files],
+            "allValidForLoad": all(item.valid_for_load for item in files),
+        }
+    )
+
+
+def _render_agent_envelope(
+    envelope: AgentEnvelope, output_format: str, *, locale: str = "en"
+) -> str:
+    if output_format == "json":
+        return json.dumps(envelope.model_dump(by_alias=True, mode="json"), indent=2, ensure_ascii=False)
+    if output_format != "markdown":
+        raise typer.BadParameter("format must be markdown or json")
+    lines = [
+        f"# Agent `{envelope.command}`",
+        "",
+        f"- contractVersion: `{envelope.contract_version}`",
+        "",
+    ]
+    payload = envelope.payload
+    if isinstance(payload, ExplainPayload):
+        lines.extend(
+            [
+                f"- mode: `{payload.mode}`",
+                f"- obligationId: `{payload.obligation_id or '—'}`",
+                f"- dimension: `{payload.dimension or '—'}`",
+                f"- status: `{payload.status or '—'}`",
+                "",
+                "## Reasons",
+            ]
+        )
+        for reason in payload.reasons:
+            summary = reason.summary.zh_cn if locale == "zh-CN" else reason.summary.en
+            lines.append(f"- `{reason.code}`: {summary}")
+        if not payload.reasons:
+            lines.append("- —")
+    elif isinstance(payload, NextPayload):
+        lines.extend(
+            [
+                f"- source: `{payload.source}`",
+                f"- limit: `{payload.limit}`",
+                "",
+                "## Items",
+            ]
+        )
+        for item in payload.items:
+            lines.append(
+                f"- `{item.id}` rank={item.rank} "
+                f"{item.obligation_ref}/{item.dimension} "
+                f"suggested={item.suggested_evidence_type or '—'}"
+            )
+        if not payload.items:
+            lines.append("- —")
+    else:
+        lines.extend(
+            [
+                f"- allValidForLoad: `{payload.all_valid_for_load}`",
+                "",
+                "## Files",
+            ]
+        )
+        for item in payload.files:
+            lines.append(
+                f"- `{item.path}` validForLoad=`{item.valid_for_load}` "
+                f"id=`{item.evidence_id or '—'}`"
+            )
+            if item.error:
+                lines.append(f"  - error: {item.error}")
+    return "\n".join(lines) + "\n"
 
 
 @app.command("plan")
