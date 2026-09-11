@@ -1,5 +1,23 @@
 # 更新日志
 
+## 0.9.0 - 2026-09-11
+
+### 新功能
+
+- 新增本地 `production-observation` inventory adapter，读取版本化的 runtime、
+  incident 与 observability 工件。
+- 生产 observation 仅经显式 mapping 成为证据，并保留 observation 自身时间戳为
+  证据执行时间。
+
+### 边界
+
+- 未映射的生产 observation 仍只是 inventory；QCov 不执行服务、不访问远程
+  可观测性平台，也不推断义务。
+
+### 文档
+
+- 新增双语生产证据说明和可运行本地示例，并将 Iteration 8 标为已交付。
+
 ## 0.8.0 - 2026-09-09
 
 ### 新功能

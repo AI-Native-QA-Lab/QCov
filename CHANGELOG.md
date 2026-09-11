@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.0 - 2026-09-11
+
+### Features
+
+- Add the local `production-observation` inventory adapter for versioned
+  runtime, incident, and observability artifacts.
+- Allow only explicit mappings from production observations to evidence and
+  preserve the observation timestamp as the evidence execution timestamp.
+
+### Boundaries
+
+- Production observations remain inventory without a mapping; QCov does not
+  execute services, access remote observability platforms, or infer obligations.
+
+### Documentation
+
+- Add bilingual production-evidence guidance and a runnable local example; mark
+  Iteration 8 delivered.
+
 ## 0.8.0 - 2026-09-09
 
 ### Features
