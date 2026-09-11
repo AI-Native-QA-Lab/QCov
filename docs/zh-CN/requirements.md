@@ -6,20 +6,16 @@
 
 ## Delivered local capabilities
 
-配置驱动的 `scan` 发现 pytest marker，并将 JUnit XML、coverage.py XML、Playwright JSON 与 LCOV 导入为 **inventory observation**。Iteration 4.5 提供 junit/playwright 的声明式 `EvidenceMapping`、`qcov map preview` 与 `--config` 评估合并。`qcov diff` 比较本地已提交版本上的显式义务与证据快照。`qcov policy check` 提供本地确定性门禁、精确且带时限的豁免，以及显式 `--as-of` 时间戳。
+配置驱动的 `scan` 发现 pytest marker，并将 JUnit XML、coverage.py XML、Playwright JSON、LCOV 与本地 `ProductionObservationReport` 导入为 **inventory observation**。Iteration 4.5 提供 junit/playwright 的声明式 `EvidenceMapping`、`qcov map preview` 与 `--config` 评估合并。`qcov diff` 比较本地已提交版本上的显式义务与证据快照。`qcov policy check` 提供本地确定性门禁、精确且带时限的豁免，以及显式 `--as-of` 时间戳。
 
-## Delivered through Iteration 7（提案 + Agent 助手）
+## Delivered through Iteration 8（提案 + Agent 助手 + 生产证据）
 
 Iteration 5 完成映射加固（pytest marker 评估接线与有限 identity DX）以及仅提案
 AI（`obligation suggest`、`risk analyze`）。Iteration 6 增加确定性 `qcov plan`
 （对 unproven gaps 做固定收益/成本启发式，产出 `type: quality_plan` 的 draft
 `QualityProposal`）。Iteration 7 增加 Agentic Quality Loop 助手：必做
 `qcov explain` 与 `qcov agent next`（`contractVersion: qcov.agent/v1`），以及可选
-`qcov agent validate-evidence`（仅加载检查）。提案与 Agent 助手永不成为证据或门禁权威。见 [Agent 使用说明](agent.md)。
-
-## Planned Iteration 8
-
-Iteration 8 在同一协议规则下接入生产证据生产者。AI/plan/Agent 助手永不成为证据或门禁权威。见 [路线图](roadmap.md)。
+`qcov agent validate-evidence`（仅加载检查）。提案与 Agent 助手永不成为证据或门禁权威。见 [Agent 使用说明](agent.md)。Iteration 8 增加本地 `production-observation`；观察需经显式 mapping 才成为证据，且自身时间戳为执行时间权威。见[生产证据](production-evidence.md)。
 
 ## Still excluded without a new approved design
 

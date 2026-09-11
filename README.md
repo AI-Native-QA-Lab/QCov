@@ -12,8 +12,8 @@ those tools proves a requirement, risk, or change.
 ## Features
 
 - Deterministic gap evaluation: `COVERED`, `PARTIAL`, `MISSING`, `UNKNOWN`
-- Local inventory scan for pytest markers, JUnit, coverage.py, Playwright (`scan.playwright`), and LCOV (`scan.lcov`)
-- Explicit `EvidenceMapping` from junit/playwright inventory to `QualityEvidence`
+- Local inventory scan for pytest markers, JUnit, coverage.py, Playwright (`scan.playwright`), LCOV (`scan.lcov`), and production observations (`scan.production`)
+- Explicit `EvidenceMapping` from junit/playwright/production-observation inventory to `QualityEvidence`
 - Local `qcov diff` across committed Git trees
 - Local `qcov policy check` with exact, expiring waivers
 - Proposal-only assistants: `qcov obligation suggest`, `qcov risk analyze`, and
@@ -75,7 +75,7 @@ exist; concurrency, idempotency, and production evidence remain unproven.
 
 See the [imported-reports example](examples/imported-reports/README.md),
 [mapping guide](docs/en/mapping.md), [PR delta](docs/en/pr-delta.md), and
-[policy gates](docs/en/policy.md).
+[policy gates](docs/en/policy.md), and [production evidence](docs/en/production-evidence.md).
 
 ## Documentation
 

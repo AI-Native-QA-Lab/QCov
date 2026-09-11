@@ -38,14 +38,14 @@ business obligation. Design reference:
 `docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`.
 See also [explicit evidence mapping](mapping.md).
 
-## Planned Iteration 8
+## Delivered through Iteration 8
 
 Principle: AI proposes; policy approves; the deterministic engine verifies. AI
 must never become evidence or gate authority.
 
 | Iteration | Focus |
 | --- | --- |
-| **8** | Production evidence only (runtime / incident / observability-style producers under protocol rules) |
+| **8** | Local `production-observation` inventory for runtime / incident / observability artifacts; explicit mapping only |
 
 **Roadmap Complete through Iteration 8** closes this core arc (gap → change →
 policy → mapping → AI propose/plan/agent feedback → production feedback). It is

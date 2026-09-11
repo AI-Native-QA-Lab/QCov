@@ -1,6 +1,27 @@
 from __future__ import annotations
 
 import pytest
+
+from qcov.models.protocol import ProductionObservationReport
+
+
+def test_production_observation_report_rejects_timezone_less_timestamp() -> None:
+    with pytest.raises(ValueError, match="timezone-aware"):
+        ProductionObservationReport.model_validate(
+            {
+                "apiVersion": "qcov.dev/v1alpha1",
+                "kind": "ProductionObservationReport",
+                "metadata": {"id": "checkout-release"},
+                "observations": [
+                    {
+                        "id": "availability",
+                        "category": "runtime",
+                        "status": "passed",
+                        "timestamp": "2026-09-11T00:00:00",
+                    }
+                ],
+            }
+        )
 from pydantic import ValidationError
 
 from qcov.models.protocol import QualityEvidence, QualityPolicy, TestingObligation
