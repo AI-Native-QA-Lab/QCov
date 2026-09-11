@@ -51,6 +51,46 @@ def test_apply_mappings_translates_junit_passed(tmp_path: Path) -> None:
     )
 
 
+def test_apply_mappings_preserves_explicit_production_observation_timestamp(tmp_path: Path) -> None:
+    mapping = EvidenceMapping.model_validate(
+        {
+            "apiVersion": "qcov.dev/v1alpha1",
+            "kind": "EvidenceMapping",
+            "metadata": {"id": "production"},
+            "defaultTimestamp": "2026-09-10T00:00:00+08:00",
+            "mappings": [
+                {
+                    "from": {
+                        "producer": "production-observation",
+                        "identity": "checkout-release::availability",
+                    },
+                    "to": {
+                        "obligationRef": "QO-REFUND-001",
+                        "dimension": "production",
+                        "type": "availability_slo",
+                    },
+                }
+            ],
+        }
+    )
+    result = apply_mappings(
+        [
+            InventoryRecord(
+                "production-observation",
+                "checkout-release::availability",
+                "passed",
+                str(tmp_path / "production.yaml"),
+                {"timestamp": "2026-09-11T00:00:00+08:00"},
+            )
+        ],
+        [mapping],
+        tmp_path,
+    )
+
+    assert result.evidence[0].execution.status == "passed"
+    assert result.evidence[0].execution.timestamp.isoformat() == "2026-09-11T00:00:00+08:00"
+
+
 def test_apply_mappings_reports_missing_identity(tmp_path: Path) -> None:
     result = apply_mappings([], [MAPPING], tmp_path)
     assert result.evidence == ()

@@ -22,6 +22,7 @@ def test_scan_project_collects_configured_junit_and_coverage_inventory(tmp_path:
         ("junit", 1),
         ("lcov", 0),
         ("playwright", 0),
+        ("production-observation", 0),
         ("pytest-marker", 0),
     ]
     assert len(report.records) == 2
@@ -58,5 +59,30 @@ def test_scan_project_uses_deterministic_cross_language_adapter_order(tmp_path: 
     report = scan_project(tmp_path, config)
 
     assert [item.adapter for item in report.adapters] == [
-        "coverage.py", "junit", "lcov", "playwright", "pytest-marker"
+        "coverage.py", "junit", "lcov", "playwright", "production-observation", "pytest-marker"
     ]
+
+
+def test_scan_project_collects_configured_production_inventory(tmp_path: Path) -> None:
+    (tmp_path / "production.yaml").write_text(
+        """apiVersion: qcov.dev/v1alpha1
+kind: ProductionObservationReport
+metadata: {id: checkout-release}
+observations:
+  - id: availability
+    category: runtime
+    status: passed
+    timestamp: 2026-09-11T00:00:00+08:00
+"""
+    )
+    config = tmp_path / "qcov.yaml"
+    config.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "scan:\n  production: [production.yaml]\n"
+    )
+
+    report = scan_project(tmp_path, config)
+
+    production = next(item for item in report.adapters if item.adapter == "production-observation")
+    assert production.record_count == 1
+    assert report.records[-1].identity == "checkout-release::availability"

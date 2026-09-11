@@ -13,13 +13,13 @@ Iteration 0 验证 Obligation → Evidence → Gap。Iteration 1 增加配置驱
 在加速 AI 之前，先用真实项目验证接入时间、可解释性与相对普通报告的缺口价值。映射必须保持声明式与本地。适配器仍不得推断「通过的测试」或「覆盖率」足以证明业务义务。设计见：
 `docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`。说明见 [显式证据映射](mapping.md)。
 
-## Planned Iteration 8
+## Delivered through Iteration 8
 
 原则：AI 提出建议；策略批准；确定性引擎核验。AI 不得成为证据或门禁权威。
 
 | 迭代 | 焦点 |
 | --- | --- |
-| **8** | 仅生产证据（runtime / incident / observability 类生产者，仍受协议规则约束） |
+| **8** | 本地 `production-observation` inventory：runtime / incident / observability 工件仅经显式 mapping 成为证据 |
 
 **Roadmap Complete through Iteration 8** 表示这条核心弧（缺口 → 变更 → 策略 → 映射 → AI 建议/规划/Agent 反馈 → 生产回流）收官。这是里程碑，不是产品终点。
 

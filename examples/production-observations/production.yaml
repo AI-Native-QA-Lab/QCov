@@ -1,0 +1,9 @@
+apiVersion: qcov.dev/v1alpha1
+kind: ProductionObservationReport
+metadata: {id: refund-release-2026-09-11}
+observations:
+  - id: runtime-monitor
+    category: observability
+    status: passed
+    timestamp: 2026-09-11T00:00:00+08:00
+    attributes: {service: refunds, signal: invariant-alert}

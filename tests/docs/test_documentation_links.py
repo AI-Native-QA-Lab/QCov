@@ -19,6 +19,7 @@ def test_bilingual_docs_have_matching_stems() -> None:
         "mapping.md",
         "process.md",
         "policy.md",
+        "production-evidence.md",
         "pr-delta.md",
         "protocol.md",
         "requirements.md",
@@ -38,3 +39,8 @@ def test_docs_name_iteration_two_inventory_adapters() -> None:
         text = path.read_text()
         assert "scan.playwright" in text
         assert "scan.lcov" in text
+
+
+def test_readmes_link_to_production_evidence_guides() -> None:
+    assert "docs/en/production-evidence.md" in (ROOT / "README.md").read_text()
+    assert "docs/zh-CN/production-evidence.md" in (ROOT / "README.zh-CN.md").read_text()

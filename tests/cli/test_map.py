@@ -61,6 +61,42 @@ def test_map_preview_json_lists_mapped_evidence(tmp_path: Path) -> None:
     assert payload["evidence"][0]["artifactPath"] == "junit.xml"
 
 
+def test_map_preview_materializes_explicit_production_observation(tmp_path: Path) -> None:
+    (tmp_path / "production.yaml").write_text(
+        """apiVersion: qcov.dev/v1alpha1
+kind: ProductionObservationReport
+metadata: {id: release}
+observations:
+  - id: monitor
+    category: observability
+    status: passed
+    timestamp: 2026-09-11T00:00:00+08:00
+"""
+    )
+    (tmp_path / "mapping.yaml").write_text(
+        """apiVersion: qcov.dev/v1alpha1
+kind: EvidenceMapping
+metadata: {id: production}
+defaultTimestamp: 2026-09-10T00:00:00+08:00
+mappings:
+  - from: {producer: production-observation, identity: release::monitor}
+    to: {obligationRef: QO-REFUND-001, dimension: production, type: runtime_monitor}
+"""
+    )
+    config = tmp_path / "qcov.yaml"
+    config.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "mapping: [mapping.yaml]\nscan:\n  production: [production.yaml]\n"
+    )
+
+    result = runner.invoke(app, ["map", "preview", "--config", str(config), "--format", "json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["evidence"][0]["producer"] == "production-observation"
+    assert payload["evidence"][0]["executionStatus"] == "passed"
+
+
 def test_gaps_config_merges_mapped_evidence(tmp_path: Path) -> None:
     config = _write_mapping_project(tmp_path)
     result = runner.invoke(app, ["gaps", "--config", str(config), "--format", "json"])

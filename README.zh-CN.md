@@ -11,8 +11,8 @@ Playwright、覆盖率工具、安全扫描或可观测性平台，而是判断�
 ## 功能
 
 - 确定性缺口评估：`COVERED`、`PARTIAL`、`MISSING`、`UNKNOWN`
-- 本地 inventory 扫描：pytest marker、JUnit、coverage.py、Playwright（`scan.playwright`）、LCOV（`scan.lcov`）
-- 显式 `EvidenceMapping`：将 junit/playwright inventory 提升为 `QualityEvidence`
+- 本地 inventory 扫描：pytest marker、JUnit、coverage.py、Playwright（`scan.playwright`）、LCOV（`scan.lcov`）、生产观察（`scan.production`）
+- 显式 `EvidenceMapping`：将 junit/playwright/production-observation inventory 提升为 `QualityEvidence`
 - 本地 `qcov diff`：比较已提交 Git 树上的义务/证据快照
 - 本地 `qcov policy check`：精确且带时限的豁免
 - 仅提案助手：`qcov obligation suggest`、`qcov risk analyze`，以及确定性
@@ -72,7 +72,7 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 
 参见[导入报告示例](examples/imported-reports/README.zh-CN.md)、
 [显式证据映射](docs/zh-CN/mapping.md)、[PR 质量覆盖增量](docs/zh-CN/pr-delta.md)
-与[策略门禁与豁免](docs/zh-CN/policy.md)。
+与[策略门禁与豁免](docs/zh-CN/policy.md)，以及[生产证据](docs/zh-CN/production-evidence.md)。
 
 ## 文档
 
