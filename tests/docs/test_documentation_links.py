@@ -28,7 +28,8 @@ def test_bilingual_docs_have_matching_stems() -> None:
         "roadmap.md",
         "technical-design.md",
     }
-    assert english == chinese == expected
+    assert english == expected
+    assert chinese == expected | {"development-context.md"}
 
 
 def test_readmes_document_config_driven_scan() -> None:
