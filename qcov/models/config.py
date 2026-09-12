@@ -18,6 +18,7 @@ class ScanConfig(ProtocolModel):
     coverage: list[str] = Field(default_factory=list)
     playwright: list[str] = Field(default_factory=list)
     lcov: list[str] = Field(default_factory=list)
+    production: list[str] = Field(default_factory=list)
 
 
 class AIConfig(ProtocolModel):
@@ -49,6 +50,7 @@ class ResolvedPaths:
     coverage: tuple[Path, ...]
     playwright: tuple[Path, ...]
     lcov: tuple[Path, ...]
+    production: tuple[Path, ...]
 
 
 def resolve_patterns(
@@ -80,4 +82,5 @@ def resolve_paths(config: ProjectConfig, config_path: Path) -> ResolvedPaths:
         coverage=resolve_patterns(config.scan.coverage, base),
         playwright=resolve_patterns(config.scan.playwright, base),
         lcov=resolve_patterns(config.scan.lcov, base),
+        production=resolve_patterns(config.scan.production, base),
     )

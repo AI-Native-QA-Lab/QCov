@@ -60,6 +60,20 @@ def test_config_resolves_playwright_and_lcov_scan_paths(tmp_path: Path) -> None:
     assert paths.lcov == ((tmp_path / "reports/lcov.info").resolve(),)
 
 
+def test_config_resolves_production_scan_paths(tmp_path: Path) -> None:
+    config_path = tmp_path / "qcov.yaml"
+    config_path.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "scan:\n  production: [reports/production.yaml]\n"
+    )
+    (tmp_path / "reports").mkdir()
+    (tmp_path / "reports/production.yaml").write_text("example")
+
+    paths = resolve_paths(load_config(config_path), config_path)
+
+    assert paths.production == ((tmp_path / "reports/production.yaml").resolve(),)
+
+
 def test_config_resolves_mapping_paths(tmp_path: Path) -> None:
     mapping = tmp_path / "mappings"
     mapping.mkdir()

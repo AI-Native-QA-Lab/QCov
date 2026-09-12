@@ -17,6 +17,9 @@ AI（`obligation suggest`、`risk analyze`）。Iteration 6 增加确定性 `qco
 `qcov explain` 与 `qcov agent next`（`contractVersion: qcov.agent/v1`），以及可选
 `qcov agent validate-evidence`（仅加载检查）。提案与 Agent 助手永不成为证据或门禁权威。见 [Agent 使用说明](agent.md)。
 
+Iteration 8 已交付本地 `production-observation` inventory producer；观察需经显式 mapping
+才成为证据，并保留执行时间戳。见[生产证据](production-evidence.md)。
+
 ## 计划中的 Iteration 8 与 QCov 1.0 入口门槛
 
 Iteration 8 在同一协议规则下接入离线 production-observation inventory producer。观察只有经显式 mapping 才能成为证据；AI/plan/Agent 助手永不成为证据或门禁权威。

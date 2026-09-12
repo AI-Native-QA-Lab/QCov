@@ -8,7 +8,7 @@ Iteration 0–4 建立显式 Obligation → Evidence → Gap 评估、本地 inv
 
 ## 计划中的 Iteration 8：生产观测基础
 
-Iteration 8 在既有协议规则下增加离线 production-observation inventory producer。runtime、incident 与 observability 观察在经过显式 `EvidenceMapping` 物化为证据前始终只是 inventory。它为真实验证提供基础，不代表生产反馈或产品路线图已经完成。
+Iteration 8 已在既有协议规则下交付离线 production-observation inventory producer。runtime、incident 与 observability 观察在经过显式 `EvidenceMapping` 物化为证据前始终只是 inventory。它为真实验证提供基础，不代表生产反馈或产品路线图已经完成。
 
 ## QCov 1.0 — Find the Gap
 

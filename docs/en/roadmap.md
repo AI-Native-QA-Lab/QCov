@@ -15,7 +15,7 @@ evidence, or decide gates. See the [agent playbook](agent.md).
 
 ## Planned Iteration 8: production-observation foundation
 
-Iteration 8 adds an offline production-observation inventory producer under the
+Iteration 8 delivered an offline production-observation inventory producer under the
 existing protocol rules. Runtime, incident, and observability observations stay
 inventory until an explicit `EvidenceMapping` materializes them as evidence.
 It is a foundation for validation, not a claim that production feedback or the

@@ -1,0 +1,12 @@
+apiVersion: qcov.dev/v1alpha1
+kind: EvidenceMapping
+metadata: {id: refund-production}
+defaultTimestamp: 2026-09-10T00:00:00+08:00
+mappings:
+  - from:
+      producer: production-observation
+      identity: refund-release-2026-09-11::runtime-monitor
+    to:
+      obligationRef: QO-REFUND-001
+      dimension: production
+      type: runtime_monitor

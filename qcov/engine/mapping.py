@@ -49,6 +49,12 @@ _PLAYWRIGHT_STATUS = {
     "skipped": "skipped",
     "flaky": "failed",
 }
+_PRODUCTION_STATUS = {
+    "passed": "passed",
+    "failed": "failed",
+    "skipped": "skipped",
+    "unknown": "unknown",
+}
 
 
 def stable_evidence_id(
@@ -75,10 +81,21 @@ def relative_artifact_path(artifact_path: str, config_dir: Path) -> tuple[str, b
 
 
 def _translate_status(producer: str, status: str) -> tuple[str, bool]:
-    table = _JUNIT_STATUS if producer == "junit" else _PLAYWRIGHT_STATUS
+    tables = {
+        "junit": _JUNIT_STATUS,
+        "playwright": _PLAYWRIGHT_STATUS,
+        "production-observation": _PRODUCTION_STATUS,
+    }
+    table = tables.get(producer, {})
     if status in table:
         return table[status], False
     return "unknown", True
+
+
+def _execution_timestamp(record: InventoryRecord, entry: MappingEntry, mapping: EvidenceMapping) -> datetime:
+    if record.producer == "production-observation":
+        return datetime.fromisoformat(record.metadata["timestamp"])
+    return entry.timestamp or mapping.default_timestamp
 
 
 def identity_matches(pattern: str, identity: str) -> bool:
@@ -193,7 +210,7 @@ def apply_mappings(
                     )
                 )
 
-            timestamp: datetime = entry.timestamp or mapping.default_timestamp
+            timestamp = _execution_timestamp(record, entry, mapping)
             evidence.append(
                 QualityEvidence.model_validate(
                     {

@@ -19,9 +19,10 @@ def test_bilingual_docs_have_matching_stems() -> None:
         "getting-started.md",
         "mapping.md",
         "process.md",
-        "policy.md",
-        "pr-delta.md",
-        "protocol.md",
+            "policy.md",
+            "pr-delta.md",
+            "production-evidence.md",
+            "protocol.md",
         "requirements.md",
         "roadmap.md",
         "technical-design.md",
@@ -83,3 +84,8 @@ def test_bilingual_onboarding_documents_the_supported_five_minute_flow() -> None
         assert "qcov impact" in text
         assert "qcov affected" in text
         assert "implemented change-impact command" in text or "已实现的变更影响命令" in text
+
+
+def test_readmes_link_to_production_evidence_guides() -> None:
+    assert "docs/en/production-evidence.md" in (ROOT / "README.md").read_text()
+    assert "docs/zh-CN/production-evidence.md" in (ROOT / "README.zh-CN.md").read_text()

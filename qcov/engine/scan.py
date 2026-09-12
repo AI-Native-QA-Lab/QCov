@@ -66,6 +66,7 @@ def scan_project(project_path: Path, config_path: Path) -> ScanReport:
         "coverage.py": config.scan.coverage,
         "lcov": config.scan.lcov,
         "playwright": config.scan.playwright,
+        "production-observation": config.scan.production,
     }
     summaries: list[AdapterScanSummary] = [pytest_summary]
     diagnostics: list[ScanDiagnostic] = []

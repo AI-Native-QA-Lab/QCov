@@ -30,6 +30,10 @@ adds Agentic Quality Loop helpers: required `qcov explain` and `qcov agent next`
 (load check only). Proposals and agent helpers never become evidence or gate
 authority. See [agent playbook](agent.md).
 
+Iteration 8 is delivered as the local `production-observation` inventory
+producer. Observations require explicit mapping and retain their execution
+timestamp; see [production evidence](production-evidence.md).
+
 ## Planned Iteration 8 and QCov 1.0 entry gate
 
 Iteration 8 adds an offline production-observation inventory producer under the

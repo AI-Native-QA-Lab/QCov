@@ -113,6 +113,35 @@ class QualityEvidence(ProtocolModel):
     confidence: Confidence
 
 
+class ProductionObservation(ProtocolModel):
+    id: str = Field(min_length=1)
+    category: Literal["runtime", "incident", "observability"]
+    status: Literal["passed", "failed", "skipped", "unknown"]
+    timestamp: datetime
+    attributes: dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("timestamp")
+    @classmethod
+    def timestamp_must_be_timezone_aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("timestamp must be timezone-aware")
+        return value
+
+
+class ProductionObservationReport(ProtocolModel):
+    api_version: Literal["qcov.dev/v1alpha1"] = Field(alias="apiVersion")
+    kind: Literal["ProductionObservationReport"]
+    metadata: EvidenceMetadata
+    observations: list[ProductionObservation] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def observation_ids_must_be_unique(self) -> ProductionObservationReport:
+        ids = [observation.id for observation in self.observations]
+        if len(ids) != len(set(ids)):
+            raise ValueError("duplicate production observation id")
+        return self
+
+
 class DefaultPolicyRule(ProtocolModel):
     allowed_statuses: list[CoverageStatus] = Field(alias="allowedStatuses", min_length=1)
 
@@ -151,7 +180,7 @@ class QualityPolicy(ProtocolModel):
 
 
 class MappingSource(ProtocolModel):
-    producer: Literal["junit", "playwright"]
+    producer: Literal["junit", "playwright", "production-observation"]
     identity: str = Field(min_length=1)
 
 
