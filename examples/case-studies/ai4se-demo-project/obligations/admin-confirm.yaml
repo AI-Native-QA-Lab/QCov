@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-009, title: {en: Admin confirms pending appointments, zh-CN: 管理员可确认待确认预约}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: authorization, severity: high}
+invariants: [{id: INV-CASE-JAVA-009, expression: only an admin may transition an appointment from PENDING to CONFIRMED}]
+requiredEvidence: {behavior: [junit], integration: [junit]}

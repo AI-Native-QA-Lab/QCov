@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-003, title: {en: Agent loop terminates only in declared states, zh-CN: Agent 循环只能以声明的状态终止}}
+source: {type: specification, ref: docs/v1.0-engineering/AGENT_LOOP.md}
+risk: {domain: agent_governance, severity: high}
+invariants: [{id: INV-CASE-PY-003, expression: terminal state is EVIDENCE_SUFFICIENT INSUFFICIENT_EVIDENCE BUDGET_EXHAUSTED TIMEOUT HUMAN_APPROVAL_REQUIRED or ERROR}]
+requiredEvidence: {behavior: [pytest], boundary: [pytest]}

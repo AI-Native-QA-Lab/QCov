@@ -1,3 +1,4 @@
+import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -39,6 +40,7 @@ def test_diff_emits_deterministic_json_and_localized_markdown(tmp_path: Path) ->
     assert json_result.exit_code == 0
     assert '"baseCommit"' in json_result.stdout
     assert '"change": "MODIFIED"' in json_result.stdout
+    assert json.loads(json_result.stdout)["changedFiles"] == ["quality/evidence/behavior.yaml"]
     assert chinese_result.exit_code == 0
     assert "质量覆盖增量" in chinese_result.stdout
     assert "行为" in chinese_result.stdout

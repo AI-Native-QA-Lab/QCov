@@ -1,0 +1,10 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QCovConfig
+obligations:
+  - obligations/*.yaml
+evidence: []
+mapping: [mapping.yaml]
+scan:
+  junit: [evidence/pytest-junit.xml]
+  coverage:
+    - evidence/coverage.xml

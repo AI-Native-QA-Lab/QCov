@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-006, title: {en: Users cancel only their own appointments, zh-CN: 用户只能取消自己的预约}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: authorization, severity: high}
+invariants: [{id: INV-CASE-JAVA-006, expression: cancellation by a user other than the appointment owner is rejected}]
+requiredEvidence: {security: [junit], integration: [junit]}

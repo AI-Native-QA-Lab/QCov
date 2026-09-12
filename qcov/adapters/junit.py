@@ -6,12 +6,14 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from qcov.adapters.base import InventoryRecord, ScanDiagnostic, ScanResult
+from qcov.adapters.sdk import ADAPTER_PROTOCOL_VERSION
 
 
 class JUnitAdapter:
     """Read testcase outcomes from JUnit XML without executing a test suite."""
 
     name = "junit"
+    protocol_version = ADAPTER_PROTOCOL_VERSION
 
     def scan(self, path: Path) -> ScanResult:
         try:

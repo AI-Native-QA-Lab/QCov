@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QCov Impact v1",
+  "description": "Deterministic Change to Obligation Impact output. Array ordering is validated by fixtures and is not expressible in JSON Schema.",
+  "$defs": {
+    "Gap": {
+      "additionalProperties": false,
+      "properties": {
+        "obligationId": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["MISSING", "PARTIAL", "UNKNOWN"] },
+        "missingDimensions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "behavior",
+              "boundary",
+              "data",
+              "concurrency",
+              "idempotency",
+              "production",
+              "security",
+              "fault",
+              "integration"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": ["obligationId", "status", "missingDimensions"],
+      "type": "object"
+    },
+    "Diagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["error", "warning", "info"] }
+      },
+      "required": ["code", "message", "severity"],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": { "const": "qcov.impact/v1" },
+    "changedFiles": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "affectedObligations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "newGaps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Gap" }
+    },
+    "resolvedGaps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Gap" }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Diagnostic" }
+    },
+    "keyGaps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Gap" }
+    }
+  },
+  "required": [
+    "contractVersion",
+    "changedFiles",
+    "affectedObligations",
+    "newGaps",
+    "resolvedGaps",
+    "diagnostics"
+  ],
+  "type": "object"
+}

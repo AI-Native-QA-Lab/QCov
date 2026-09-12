@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-TS-004, title: {en: English blog navigation reaches the blog, zh-CN: 英文博客导航必须到达博客页}}
+source: {type: e2e_specification, ref: tests/e2e/specs/navigation.spec.ts}
+risk: {domain: navigation, severity: medium}
+invariants: [{id: INV-CASE-TS-004, expression: English blog link reaches blog}]
+requiredEvidence: {behavior: [playwright], integration: [playwright]}

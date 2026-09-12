@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-003, title: {en: Disabled consultants cannot be booked, zh-CN: 禁用咨询师不可预约}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: scheduling, severity: high}
+invariants: [{id: INV-CASE-JAVA-003, expression: disabled consultant booking is rejected}]
+requiredEvidence: {behavior: [junit], boundary: [junit]}

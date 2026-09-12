@@ -2,7 +2,7 @@
 
 > **发现你的测试尚未证明什么。**
 
-[English](README.md) · [核心概念](docs/zh-CN/concepts.md) · [Agent](docs/zh-CN/agent.md) · [路线图](docs/zh-CN/roadmap.md) · [贡献指南](CONTRIBUTING.zh-CN.md)
+[English](README.md) · [快速上手](docs/zh-CN/getting-started.md) · [核心概念](docs/zh-CN/concepts.md) · [Agent](docs/zh-CN/agent.md) · [路线图](docs/zh-CN/roadmap.md) · [贡献指南](CONTRIBUTING.zh-CN.md)
 
 QCov 是开源**质量证据缺口引擎**与**质量覆盖协议**。它不替代 pytest、JUnit、
 Playwright、覆盖率工具、安全扫描或可观测性平台，而是判断这些工具的证据是否足以
@@ -14,6 +14,8 @@ Playwright、覆盖率工具、安全扫描或可观测性平台，而是判断�
 - 本地 inventory 扫描：pytest marker、JUnit、coverage.py、Playwright（`scan.playwright`）、LCOV（`scan.lcov`）、生产观察（`scan.production`）
 - 显式 `EvidenceMapping`：将 junit/playwright/production-observation inventory 提升为 `QualityEvidence`
 - 本地 `qcov diff`：比较已提交 Git 树上的义务/证据快照
+- 确定性 `qcov impact` / `qcov affected`：基于显式变更路径映射
+- 稳定 Adapter SDK（`qcov.adapter/v1`）与 JaCoCo inventory 扫描
 - 本地 `qcov policy check`：精确且带时限的豁免
 - 仅提案助手：`qcov obligation suggest`、`qcov risk analyze`，以及确定性
   `qcov plan`（产出 draft `QualityProposal`；不是证据，也不是门禁权威）
@@ -42,6 +44,10 @@ python3 -m venv .venv
 
 Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发、幂等性和生产证据仍缺失。
 
+可执行的 5 分钟 `gaps → scan → map preview → gaps → 本地 Git 变更影响 → policy check`
+流程，以及 Python、Java/JUnit、TypeScript/Playwright 三类入口，见[快速上手](docs/zh-CN/getting-started.md)。
+其中也明确了 `coverage.py` 与 LCOV 为什么只作为 inventory，以及哪些记录才是权威证据。
+
 ## 使用
 
 ```bash
@@ -55,12 +61,18 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
 # 使用配置默认值与可选 mapping 评估缺口
 .venv/bin/python -m qcov gaps --config examples/imported-reports/qcov.yaml
 
-# 比较已提交的义务/证据快照
+# 比较已提交的义务/证据快照（当前的本地 Git 影响视图）
 .venv/bin/python -m qcov diff --base origin/main --head HEAD --config qcov.yaml
+
+# 将变更路径映射为受影响的 obligation（仅显式映射）
+.venv/bin/python -m qcov impact \
+  --config qcov.yaml --impact-config impact.yaml \
+  --changed-file src/payments/refund.py --format json
 
 # 本地策略门禁
 .venv/bin/python -m qcov policy check \
-  --config qcov.yaml --policy policy.yaml \
+  --config examples/imported-reports/qcov.yaml \
+  --policy examples/refund/policy.yaml \
   --as-of 2026-09-07T00:00:00+08:00
 
 # 义务 / 变更风险草案（默认 offline；不是证据）
@@ -70,13 +82,15 @@ Refund 示例会报告 `PARTIAL`：已有行为、边界和数据证据；并发
   --config qcov.yaml --base HEAD~1 --head HEAD --format json
 ```
 
-参见[导入报告示例](examples/imported-reports/README.zh-CN.md)、
+先阅读[5 分钟快速上手](docs/zh-CN/getting-started.md)。也可参见[导入报告示例](examples/imported-reports/README.zh-CN.md)、
 [显式证据映射](docs/zh-CN/mapping.md)、[PR 质量覆盖增量](docs/zh-CN/pr-delta.md)
 与[策略门禁与豁免](docs/zh-CN/policy.md)，以及[生产证据](docs/zh-CN/production-evidence.md)。
 
 ## 文档
 
 - [需求](docs/zh-CN/requirements.md)
+- [5 分钟快速上手](docs/zh-CN/getting-started.md)
+- [真实项目案例边界](docs/case-studies/README.zh-CN.md)
 - [架构](docs/zh-CN/architecture.md)
 - [协议](docs/zh-CN/protocol.md)
 - [技术设计](docs/zh-CN/technical-design.md)

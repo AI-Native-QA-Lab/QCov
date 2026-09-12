@@ -1,0 +1,25 @@
+apiVersion: qcov.dev/v1alpha1
+kind: EvidenceMapping
+metadata: {id: case-ts-playwright-mapping}
+defaultTimestamp: "2026-09-11T16:05:00+08:00"
+mappings:
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 首页：Hero、探索中心与最新文章可见 [chromium]"}, to: {obligationRef: QO-CASE-TS-001, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 首页：Hero、探索中心与最新文章可见 [chromium]"}, to: {obligationRef: QO-CASE-TS-001, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 首页：Hero、探索中心与最新文章可见 [chromium]"}, to: {obligationRef: QO-CASE-TS-002, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 首页：Hero、探索中心与最新文章可见 [chromium]"}, to: {obligationRef: QO-CASE-TS-002, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 首页：Hero、探索中心与最新文章可见 [chromium]"}, to: {obligationRef: QO-CASE-TS-003, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 首页：Hero、探索中心与最新文章可见 [chromium]"}, to: {obligationRef: QO-CASE-TS-003, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 从首页点击「博客」进入博客列表 [chromium]"}, to: {obligationRef: QO-CASE-TS-004, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 从首页点击「博客」进入博客列表 [chromium]"}, to: {obligationRef: QO-CASE-TS-004, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 从首页点击「博客」进入博客列表 [chromium]"}, to: {obligationRef: QO-CASE-TS-005, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 从首页点击「博客」进入博客列表 [chromium]"}, to: {obligationRef: QO-CASE-TS-005, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 从博客首页点击「归档」按钮进入归档页 [chromium]"}, to: {obligationRef: QO-CASE-TS-006, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 从博客首页点击「归档」按钮进入归档页 [chromium]"}, to: {obligationRef: QO-CASE-TS-006, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 从首页点击「关于」进入关于页 [chromium]"}, to: {obligationRef: QO-CASE-TS-007, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 从首页点击「关于」进入关于页 [chromium]"}, to: {obligationRef: QO-CASE-TS-007, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 从首页点击「百科 > 软件测试百科」进入百科首页 [chromium]"}, to: {obligationRef: QO-CASE-TS-008, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 从首页点击「百科 > 软件测试百科」进入百科首页 [chromium]"}, to: {obligationRef: QO-CASE-TS-008, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 从首页点击「指南」进入指南页 [chromium]"}, to: {obligationRef: QO-CASE-TS-009, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > zh-cn 从首页点击「指南」进入指南页 [chromium]"}, to: {obligationRef: QO-CASE-TS-009, dimension: integration, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 首页「Encyclopedia > QA wiki」链接指向外站 ray.run [chromium]"}, to: {obligationRef: QO-CASE-TS-010, dimension: behavior, type: playwright}}
+  - {from: {producer: playwright, identity: "navigation.spec.ts::导航与首页内容 > en 首页「Encyclopedia > QA wiki」链接指向外站 ray.run [chromium]"}, to: {obligationRef: QO-CASE-TS-010, dimension: boundary, type: playwright}}

@@ -1,0 +1,15 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityImpactConfig
+mappings:
+  - id: requirements
+    paths: [packages/qa_agent/requirements.py]
+    obligations: [QO-CASE-PY-001]
+  - id: agent-loop
+    paths: [docs/v1.0-engineering/AGENT_LOOP.md]
+    obligations: [QO-CASE-PY-002, QO-CASE-PY-003, QO-CASE-PY-004, QO-CASE-PY-005, QO-CASE-PY-010]
+  - id: evidence-gates
+    paths: [docs/v1.0-engineering/EVIDENCE_AND_GATES.md]
+    obligations: [QO-CASE-PY-006, QO-CASE-PY-007]
+  - id: security
+    paths: [docs/v1.0-engineering/SECURITY.md]
+    obligations: [QO-CASE-PY-008, QO-CASE-PY-009]

@@ -2,7 +2,7 @@
 
 > **Find what your tests still don't prove.**
 
-[中文](README.zh-CN.md) · [Concepts](docs/en/concepts.md) · [Agent](docs/en/agent.md) · [Roadmap](docs/en/roadmap.md) · [Contributing](CONTRIBUTING.md)
+[中文](README.zh-CN.md) · [Get started](docs/en/getting-started.md) · [Concepts](docs/en/concepts.md) · [Agent](docs/en/agent.md) · [Roadmap](docs/en/roadmap.md) · [Contributing](CONTRIBUTING.md)
 
 QCov is an open-source **Quality Evidence Gap Engine** and **Quality Coverage
 Protocol**. It does not replace pytest, JUnit, Playwright, coverage tools,
@@ -15,6 +15,8 @@ those tools proves a requirement, risk, or change.
 - Local inventory scan for pytest markers, JUnit, coverage.py, Playwright (`scan.playwright`), LCOV (`scan.lcov`), and production observations (`scan.production`)
 - Explicit `EvidenceMapping` from junit/playwright/production-observation inventory to `QualityEvidence`
 - Local `qcov diff` across committed Git trees
+- Deterministic `qcov impact` / `qcov affected` from explicit changed-path mappings
+- Stable adapter SDK (`qcov.adapter/v1`) and JaCoCo inventory scanning
 - Local `qcov policy check` with exact, expiring waivers
 - Proposal-only assistants: `qcov obligation suggest`, `qcov risk analyze`, and
   deterministic `qcov plan` (draft `QualityProposal`; never evidence or gate
@@ -45,6 +47,12 @@ python3 -m venv .venv
 The Refund example reports `PARTIAL`: behavior, boundary, and data evidence
 exist; concurrency, idempotency, and production evidence remain unproven.
 
+For a five-minute, executable `gaps → scan → map preview → gaps → local Git
+change impact → policy check` walkthrough, including Python, Java/JUnit, and
+TypeScript/Playwright entry points, read the [getting-started guide](docs/en/getting-started.md).
+It also explains why `coverage.py` and LCOV are inventory-only, and which
+records are authoritative evidence.
+
 ## Usage
 
 ```bash
@@ -58,12 +66,18 @@ exist; concurrency, idempotency, and production evidence remain unproven.
 # Evaluate gaps with config defaults and optional mappings
 .venv/bin/python -m qcov gaps --config examples/imported-reports/qcov.yaml
 
-# Compare committed obligation/evidence snapshots
+# Compare committed obligation/evidence snapshots (the current local Git impact view)
 .venv/bin/python -m qcov diff --base origin/main --head HEAD --config qcov.yaml
+
+# Map changed paths to affected obligations (explicit mappings only)
+.venv/bin/python -m qcov impact \
+  --config qcov.yaml --impact-config impact.yaml \
+  --changed-file src/payments/refund.py --format json
 
 # Local policy gate
 .venv/bin/python -m qcov policy check \
-  --config qcov.yaml --policy policy.yaml \
+  --config examples/imported-reports/qcov.yaml \
+  --policy examples/refund/policy.yaml \
   --as-of 2026-09-07T00:00:00+08:00
 
 # Draft obligation / change-risk proposals (offline by default; not evidence)
@@ -73,13 +87,16 @@ exist; concurrency, idempotency, and production evidence remain unproven.
   --config qcov.yaml --base HEAD~1 --head HEAD --format json
 ```
 
-See the [imported-reports example](examples/imported-reports/README.md),
+Start with the [five-minute guide](docs/en/getting-started.md). See the
+[imported-reports example](examples/imported-reports/README.md),
 [mapping guide](docs/en/mapping.md), [PR delta](docs/en/pr-delta.md), and
 [policy gates](docs/en/policy.md), and [production evidence](docs/en/production-evidence.md).
 
 ## Documentation
 
 - [Requirements](docs/en/requirements.md)
+- [Five-minute guide](docs/en/getting-started.md)
+- [Real-project case-study boundary](docs/case-studies/README.md)
 - [Architecture](docs/en/architecture.md)
 - [Protocol](docs/en/protocol.md)
 - [Technical design](docs/en/technical-design.md)

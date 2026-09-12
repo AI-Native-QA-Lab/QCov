@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-004, title: {en: Agent execution honors its budget, zh-CN: Agent 执行必须遵守预算}}
+source: {type: specification, ref: docs/v1.0-engineering/AGENT_LOOP.md}
+risk: {domain: resource_control, severity: high}
+invariants: [{id: INV-CASE-PY-004, expression: each loop action is denied when its declared execution budget is exhausted}]
+requiredEvidence: {behavior: [pytest], boundary: [pytest]}

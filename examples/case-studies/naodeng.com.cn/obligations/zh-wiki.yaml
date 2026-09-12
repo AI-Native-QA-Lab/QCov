@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-TS-008, title: {en: Chinese wiki navigation exposes the docs shell, zh-CN: 中文百科导航必须展示文档壳层}}
+source: {type: e2e_specification, ref: tests/e2e/specs/navigation.spec.ts}
+risk: {domain: navigation, severity: medium}
+invariants: [{id: INV-CASE-TS-008, expression: wiki page exposes sidebar and heading}]
+requiredEvidence: {behavior: [playwright], integration: [playwright]}

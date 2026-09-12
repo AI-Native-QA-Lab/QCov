@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-006, title: {en: Missing critical evidence returns insufficient evidence, zh-CN: 缺少关键证据必须返回证据不足}}
+source: {type: specification, ref: docs/v1.0-engineering/EVIDENCE_AND_GATES.md}
+risk: {domain: evidence_integrity, severity: critical}
+invariants: [{id: INV-CASE-PY-006, expression: missing critical evidence returns INSUFFICIENT_EVIDENCE}]
+requiredEvidence: {behavior: [pytest], boundary: [pytest]}
