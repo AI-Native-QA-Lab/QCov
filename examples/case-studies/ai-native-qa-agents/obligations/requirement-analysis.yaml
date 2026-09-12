@@ -6,14 +6,14 @@ metadata:
     en: Requirement analysis must preserve an explicit traceable requirement identity
     zh-CN: 需求分析必须保留可追溯的显式需求标识
 source:
-  type: source_file
-  ref: packages/qa_agent/requirements.py
+  type: specification
+  ref: docs/v1.0-engineering/DOMAIN_MODEL.md
 risk:
   domain: requirement_intelligence
   severity: high
 invariants:
   - id: INV-CASE-PY-001
-    expression: every analyzed requirement has an explicit identity
+    expression: every analyzed requirement has a non-empty explicit identity
 requiredEvidence:
   behavior: [pytest]
   boundary: [pytest]

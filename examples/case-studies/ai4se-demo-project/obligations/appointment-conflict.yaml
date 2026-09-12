@@ -3,17 +3,17 @@ kind: TestingObligation
 metadata:
   id: QO-CASE-JAVA-001
   title:
-    en: Appointment conflict decisions must reject overlapping appointments
-    zh-CN: 预约冲突判定必须拒绝重叠预约
+    en: Appointment conflict decisions must reject duplicate consultant slots
+    zh-CN: 预约冲突判定必须拒绝同一咨询师的重复时段
 source:
-  type: source_file
-  ref: backend/src/main/java/com/consultation/domain/service/AppointmentConflictService.java
+  type: specification
+  ref: docs/features/appointment.md
 risk:
   domain: scheduling
   severity: high
 invariants:
   - id: INV-CASE-JAVA-001
-    expression: overlapping appointments are rejected
+    expression: duplicate consultant date and time slots are rejected
 requiredEvidence:
   behavior: [junit]
   boundary: [junit]

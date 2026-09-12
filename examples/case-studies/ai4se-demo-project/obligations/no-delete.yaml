@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-010, title: {en: Appointments cannot be deleted, zh-CN: 预约不可删除}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: auditability, severity: high}
+invariants: [{id: INV-CASE-JAVA-010, expression: appointment delete is rejected}]
+requiredEvidence: {behavior: [junit], boundary: [junit]}

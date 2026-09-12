@@ -1,0 +1,1 @@
+<testsuite name="ai-native-qa-agents" tests="1" failures="0" errors="0" skipped="0"><testcase classname="tests.test_adapters" name="test_pytest_adapter_discovers_test_entity"/></testsuite>

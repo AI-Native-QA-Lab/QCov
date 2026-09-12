@@ -51,8 +51,9 @@ python3 -m venv .venv
 
 ## 5. 查看已提交 Git 快照中的变更影响
 
-当前 QCov 已实现的变更影响命令是 `qcov diff`，不是 `qcov impact` 或 `qcov affected`。它比较
-两个已存在的本地提交中的显式 obligation 与 evidence。运行自包含演示：
+`qcov impact` 将仓库相对变更路径映射为显式 obligation；提供两个本地 Git 快照时，还会输出确定性的
+`newGaps` 与 `resolvedGaps`。`qcov affected` 只输出当前未 COVERED 的受影响 obligation。运行自包含
+diff 演示：
 
 ```bash
 .venv/bin/python examples/pr-delta/demo.py
@@ -63,6 +64,15 @@ python3 -m venv .venv
 ```bash
 .venv/bin/python -m qcov diff \
   --repo . --base origin/main --head HEAD --config qcov.yaml
+```
+
+要运行 Impact，请将 `qcov.yaml` 与 path mapping 的 `QualityImpactConfig` 保留在仓库中，然后使用重复的
+`--changed-file` 或一对本地 Git 快照（两者不能混用）：
+
+```bash
+.venv/bin/python -m qcov impact \
+  --config qcov.yaml --impact-config impact.yaml \
+  --repo . --base origin/main --head HEAD --format json
 ```
 
 它只读取 Git object：不会 fetch、切换提交、执行测试，也不会读取脏文件或未跟踪文件。

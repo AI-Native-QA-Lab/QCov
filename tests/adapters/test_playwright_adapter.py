@@ -28,7 +28,7 @@ def test_playwright_scan_collects_nested_spec_outcomes(tmp_path: Path) -> None:
     result = PlaywrightAdapter().scan(path)
 
     assert [(record.identity, record.status) for record in result.records] == [
-        ("tests/checkout.spec.ts::checkout > pays [chromium]", "expected"),
+        ("tests/checkout.spec.ts::checkout > pays [chromium]", "passed"),
         ("tests/checkout.spec.ts::checkout > refund [firefox]", "unexpected"),
         ("tests/checkout.spec.ts::checkout > retry > recovers [webkit]", "flaky"),
         ("tests/checkout.spec.ts::checkout > retry > recovers [webkit]", "skipped"),

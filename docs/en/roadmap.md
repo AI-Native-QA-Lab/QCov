@@ -1,46 +1,48 @@
 # Roadmap
 
-QCov is a local, deterministic Quality Evidence Gap Engine. It answers what
-remains unproven about an explicit requirement, risk, or change; it is neither a
-line-coverage detector nor a test runner.
+QCov is a local, deterministic Quality Evidence Gap Engine. It reports what
+remains unproven for an explicit requirement, risk, or change; it is not a
+line-coverage detector or test runner.
 
-## Delivered through Iteration 7
+## Delivered through Iteration 8
 
-Iterations 0–4 establish explicit Obligation → Evidence → Gap evaluation,
-local inventory discovery, committed-tree `qcov diff`, and deterministic local
+Iterations 0–4 establish Obligation → Evidence → Gap evaluation, local
+inventory discovery, committed-tree `qcov diff`, and deterministic local
 `qcov policy check`. Iteration 4.5 adds declarative `EvidenceMapping` and map
 preview. Iterations 5–7 add proposal-only assistance, deterministic planning,
-and `qcov.agent/v1` helpers. These helpers do not run tests, write authoritative
-evidence, or decide gates. See the [agent playbook](agent.md).
-
-## Planned Iteration 8: production-observation foundation
-
-Iteration 8 delivered an offline production-observation inventory producer under the
-existing protocol rules. Runtime, incident, and observability observations stay
-inventory until an explicit `EvidenceMapping` materializes them as evidence.
-It is a foundation for validation, not a claim that production feedback or the
-product roadmap is complete.
+and `qcov.agent/v1` helpers; none runs tests, writes authoritative evidence, or
+decides gates. Iteration 8 adds a local `production-observation` inventory
+producer: runtime, incident, and observability observations become evidence only
+through explicit mappings. See the [agent playbook](agent.md) and
+[production-evidence guide](production-evidence.md).
 
 ## QCov 1.0 — Find the Gap
 
 **Question:** What is still unproven?
 
-**Goal:** Prove QCov creates value in real projects without an AI dependency for
-core correctness.
+**Goal:** Prove QCov creates measurable value in real projects, without an AI
+dependency for core correctness.
 
 Iteration 9 is the 1.0 delivery track:
 
 | Workstream | Outcome |
 | --- | --- |
-| Real-project validation | Validate Python/pytest/coverage, Java/JUnit/JaCoCo, and TypeScript/Playwright projects; target at least 3 projects, 30 real obligations, and time to first value of 10 minutes or less. |
-| Change → obligation impact | Deterministic path/package/module/service/API/component mappings produce affected obligations and the resulting gap delta through `qcov impact`, `qcov affected`, and local `qcov diff`. |
-| Adapter extensibility | Define `qcov.adapter/v1` and an Adapter SDK v1 without making adapters evidence authorities. A passing JUnit result or coverage rate still does not prove a business obligation. |
-| Protocol stability | Stabilize `qcov.dev/v1`, `qcov.agent/v1`, `qcov.impact/v1`, and `qcov.adapter/v1` as compatibility promises. |
+| Real-project validation | Validate `ai-native-qa-agents` (Python/pytest/coverage), `ai4se-demo-project` (Java/JUnit/JaCoCo), and `naodeng.com.cn` (TypeScript/Playwright); use `ai-test-auditor` as an extra TypeScript/Node ecosystem case. Target at least 3 projects, 30 real obligations, and time to first value of 10 minutes or less. |
+| Change → obligation impact | Deterministic repository-relative path glob mappings produce affected obligations and, when two local snapshots are supplied, the resulting gap delta through `qcov impact`, `qcov affected`, and `qcov diff`. Higher-level package/module/service/API mappings must be pre-expanded to paths. |
+| Adapter extensibility | Define the in-process `qcov.adapter/v1` contract and add a JaCoCo XML inventory reader without making adapters evidence authorities. Passing JUnit or coverage rates still do not prove a business obligation; external plugin loading remains deferred. |
+| Protocol stability | Preserve released `qcov.dev/v1alpha1` and stabilize `qcov.agent/v1`, `qcov.impact/v1`, and `qcov.adapter/v1` as compatibility promises; no implicit core-protocol rename. |
+| Documentation and onboarding | Clean paired READMEs; provide tested installation paths, a first runnable example, command/configuration guidance, and troubleshooting so a new Python, Java, or TypeScript user can reach first value without source inspection. |
 
-The release gate requires evidence that ordinary test, coverage, and static
-reports do not directly expose: critical or previously unknown, explainable
-quality gaps; plus measured false-gap rate, gap-to-verification conversion, and
-developer/QA acceptance.
+The 1.0 release gate requires three real projects, three technology stacks, at
+least 30 real Testing Obligations, and measured time to first value of 10 minutes
+or less. It must also show critical or previously unknown, explainable gaps that
+ordinary test, coverage, and static reports do not directly expose; record
+false-gap rate, gap-to-verification conversion, and developer/QA acceptance.
+
+The documentation gate requires paired README navigation, verified install and
+quick-start commands, links to configuration and examples, clear local-only and
+evidence-authority boundaries, and a troubleshooting path. Documentation is a
+1.0 product deliverable, not post-release cleanup.
 
 ## QCov 1.5 — Understand & Plan
 
@@ -48,10 +50,11 @@ developer/QA acceptance.
 
 **Goal:** AI-assisted Quality Evidence Intelligence.
 
-After 1.0 validation, add AI obligation discovery, AI-suggested change impact,
-`qcov explain --ai`, an AI-suggested plan alongside the deterministic `qcov
-plan`, and Quality Evidence ROI. AI proposals must remain separate from
-authoritative obligations and deterministic impact. AI can understand, suggest,
+After 1.0 validation, these are candidate 1.5 themes that each require a
+separate approved design: AI obligation discovery, AI-suggested change impact,
+`qcov explain --ai`, an AI-suggested plan alongside deterministic `qcov plan`,
+and Quality Evidence ROI. Any AI suggestion must remain separate from
+authoritative obligations and deterministic impact. AI may understand, suggest,
 explain, and plan; it cannot prove evidence or decide a gate.
 
 ## QCov 2.0 — Close the Loop
@@ -60,11 +63,12 @@ explain, and plan; it cannot prove evidence or decide a gate.
 
 **Goal:** AI Native Quality Planning.
 
-Evolve the Agent contract from `qcov.agent/v1` to a separately designed
-`qcov.agent/v2` that accepts candidate evidence. The deterministic system must
-validate, normalize, map, and evaluate that candidate. Agents cannot mark their
-own work `COVERED`. This release track also designs QA-for-AI evidence
-dimensions, a production quality feedback loop, and a Quality BOM.
+These are candidate 2.0 themes that require a separate approved design:
+evolving the Agent contract from `qcov.agent/v1` to `qcov.agent/v2` for
+candidate evidence, QA-for-AI evidence dimensions, a production quality
+feedback loop, and a Quality BOM. If accepted, the deterministic system must
+validate, normalize, map, and evaluate candidates; agents cannot mark their own
+work `COVERED`.
 
 ## Future: Continuous Quality Control Plane
 

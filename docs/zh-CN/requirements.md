@@ -6,25 +6,22 @@
 
 ## Delivered local capabilities
 
-配置驱动的 `scan` 发现 pytest marker，并将 JUnit XML、coverage.py XML、Playwright JSON 与 LCOV 导入为 **inventory observation**。Iteration 4.5 提供 junit/playwright 的声明式 `EvidenceMapping`、`qcov map preview` 与 `--config` 评估合并。`qcov diff` 比较本地已提交版本上的显式义务与证据快照。`qcov policy check` 提供本地确定性门禁、精确且带时限的豁免，以及显式 `--as-of` 时间戳。
+配置驱动的 `scan` 发现 pytest marker，并将 JUnit XML、coverage.py XML、Playwright JSON、LCOV 与本地 `ProductionObservationReport` 导入为 **inventory observation**。Iteration 4.5 提供 junit/playwright 的声明式 `EvidenceMapping`、`qcov map preview` 与 `--config` 评估合并。`qcov diff` 比较本地已提交版本上的显式义务与证据快照。`qcov policy check` 提供本地确定性门禁、精确且带时限的豁免，以及显式 `--as-of` 时间戳。
 
-## Delivered through Iteration 7（提案 + Agent 助手）
+## Delivered through Iteration 8（提案 + Agent 助手 + 生产证据）
 
 Iteration 5 完成映射加固（pytest marker 评估接线与有限 identity DX）以及仅提案
 AI（`obligation suggest`、`risk analyze`）。Iteration 6 增加确定性 `qcov plan`
 （对 unproven gaps 做固定收益/成本启发式，产出 `type: quality_plan` 的 draft
 `QualityProposal`）。Iteration 7 增加 Agentic Quality Loop 助手：必做
 `qcov explain` 与 `qcov agent next`（`contractVersion: qcov.agent/v1`），以及可选
-`qcov agent validate-evidence`（仅加载检查）。提案与 Agent 助手永不成为证据或门禁权威。见 [Agent 使用说明](agent.md)。
+`qcov agent validate-evidence`（仅加载检查）。提案与 Agent 助手永不成为证据或门禁权威。见 [Agent 使用说明](agent.md)。Iteration 8 增加本地 `production-observation`；观察需经显式 mapping 才成为证据，且自身时间戳为执行时间权威。见[生产证据](production-evidence.md)。
 
-Iteration 8 已交付本地 `production-observation` inventory producer；观察需经显式 mapping
-才成为证据，并保留执行时间戳。见[生产证据](production-evidence.md)。
+## QCov 1.0 入口门槛
 
-## 计划中的 Iteration 8 与 QCov 1.0 入口门槛
+Iteration 9 开启 QCov 1.0：真实项目验证、确定性的 Change → Obligation Impact、Adapter SDK v1、协议稳定性与文档/上手就绪。Release Gate 为至少 3 个真实项目（固定必需案例为 `ai-native-qa-agents`、`ai4se-demo-project`、`naodeng.com.cn`，覆盖 Python/pytest/coverage、Java/JUnit/JaCoCo、TypeScript/Playwright；`ai-test-auditor` 为额外 TypeScript/Node 案例）、至少 30 条真实 obligation，并使首次价值时间不超过 10 分钟。双语 README 必须提供已验证的安装、快速开始、使用、配置与故障排查路径。见 [路线图](roadmap.md)。
 
-Iteration 8 在同一协议规则下接入离线 production-observation inventory producer。观察只有经显式 mapping 才能成为证据；AI/plan/Agent 助手永不成为证据或门禁权威。
-
-Iteration 9 开启 QCov 1.0：真实项目验证、确定性的 Change → Obligation Impact、Adapter SDK v1 与协议稳定性。1.0 Release Gate 为至少 3 个真实项目（Python/pytest/coverage、Java/JUnit/JaCoCo、TypeScript/Playwright）、至少 30 条真实 obligation，并使首次价值时间不超过 10 分钟。见 [路线图](roadmap.md)。
+1.0 的 impact 契约接受重复的仓库相对 `--changed-file`，或本地 `--base` / `--head` 快照。直接模式报告受影响义务并将 gap delta 标为未评估；快照模式计算 `newGaps` 与 `resolvedGaps`。Path glob 必须显式且确定性；package/module/service/API mapping 由调用方预先展开为路径。核心协议仍为 `qcov.dev/v1alpha1`；`qcov.impact/v1` 与 `qcov.adapter/v1` 是新增契约。
 
 ## Still excluded without a new approved design
 

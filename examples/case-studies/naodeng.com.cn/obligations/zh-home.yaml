@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-TS-003, title: {en: Chinese home exposes core content, zh-CN: 中文首页必须展示核心内容}}
+source: {type: e2e_specification, ref: tests/e2e/specs/navigation.spec.ts}
+risk: {domain: navigation, severity: medium}
+invariants: [{id: INV-CASE-TS-003, expression: Chinese hero explore and posts are visible}]
+requiredEvidence: {behavior: [playwright], integration: [playwright]}

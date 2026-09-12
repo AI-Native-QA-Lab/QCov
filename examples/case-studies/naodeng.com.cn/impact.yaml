@@ -1,0 +1,6 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityImpactConfig
+mappings:
+  - id: navigation-spec
+    paths: [tests/e2e/specs/navigation.spec.ts]
+    obligations: [QO-CASE-TS-001, QO-CASE-TS-002, QO-CASE-TS-003, QO-CASE-TS-004, QO-CASE-TS-005, QO-CASE-TS-006, QO-CASE-TS-007, QO-CASE-TS-008, QO-CASE-TS-009, QO-CASE-TS-010]

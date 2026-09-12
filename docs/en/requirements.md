@@ -11,7 +11,8 @@ calculated. `UNKNOWN` must never masquerade as a pass.
 ## Delivered local capabilities
 
 Config-driven `scan` discovers pytest markers and imports JUnit XML,
-coverage.py XML, Playwright JSON, and LCOV as **inventory observations** until
+coverage.py XML, Playwright JSON, LCOV, and local `ProductionObservationReport`
+artifacts as **inventory observations** until
 an explicit obligation mapping exists. Iteration 4.5 provides declarative
 `EvidenceMapping` for junit/playwright identities, `qcov map preview`, and
 `--config` evaluation merge. `qcov diff` compares explicit obligation and
@@ -19,7 +20,7 @@ evidence snapshots across local committed revisions. `qcov policy check`
 applies local deterministic gates with exact, expiring waivers and an explicit
 `--as-of` timestamp.
 
-## Delivered through Iteration 7 (proposal + agent helpers)
+## Delivered through Iteration 8 (proposal + agent helpers + production evidence)
 
 Iteration 5 adds mapping hardening (pytest-marker evaluation wiring and limited
 identity DX) plus proposal-only AI (`obligation suggest`, `risk analyze`).
@@ -28,23 +29,29 @@ unproven gaps → draft `QualityProposal` with `type: quality_plan`). Iteration 
 adds Agentic Quality Loop helpers: required `qcov explain` and `qcov agent next`
 (`contractVersion: qcov.agent/v1`), plus optional `qcov agent validate-evidence`
 (load check only). Proposals and agent helpers never become evidence or gate
-authority. See [agent playbook](agent.md).
+authority. See [agent playbook](agent.md). Iteration 8 adds local
+`production-observation`; observations require explicit mapping and retain their
+own execution timestamp. See [production evidence](production-evidence.md).
 
-Iteration 8 is delivered as the local `production-observation` inventory
-producer. Observations require explicit mapping and retain their execution
-timestamp; see [production evidence](production-evidence.md).
-
-## Planned Iteration 8 and QCov 1.0 entry gate
-
-Iteration 8 adds an offline production-observation inventory producer under the
-same protocol rules. An observation can become evidence only through explicit
-mapping; AI/plan/agent helpers never become evidence or gate authority.
+## QCov 1.0 entry gate
 
 Iteration 9 begins QCov 1.0 with real-project validation, deterministic Change
-→ Obligation Impact, Adapter SDK v1, and protocol-stability work. The 1.0 release
-gate is at least three real projects across Python/pytest/coverage,
-Java/JUnit/JaCoCo, and TypeScript/Playwright; at least 30 real obligations; and
-time to first value of 10 minutes or less. See [roadmap](roadmap.md).
+→ Obligation Impact, Adapter SDK v1, protocol stability, and documentation /
+onboarding readiness. The release gate is at least three real projects across
+Python/pytest/coverage, Java/JUnit/JaCoCo, and TypeScript/Playwright (the fixed
+required cases are `ai-native-qa-agents`, `ai4se-demo-project`, and
+`naodeng.com.cn`; `ai-test-auditor` is an extra TypeScript/Node case); at least
+30 real obligations; and time to first value of 10 minutes or less. The paired
+README must provide verified installation, quick-start, usage, configuration,
+and troubleshooting paths. See [roadmap](roadmap.md).
+
+The 1.0 impact contract accepts either repeated repository-relative
+`--changed-file` values or local `--base` / `--head` snapshots. Direct mode
+reports affected obligations and leaves gap delta unassessed; snapshot mode
+computes `newGaps` and `resolvedGaps`. Path globs are explicit and deterministic;
+package/module/service/API mappings must be expanded to paths by the caller.
+The core protocol remains `qcov.dev/v1alpha1`; `qcov.impact/v1` and
+`qcov.adapter/v1` are additive contracts.
 
 ## Still excluded without a new approved design
 

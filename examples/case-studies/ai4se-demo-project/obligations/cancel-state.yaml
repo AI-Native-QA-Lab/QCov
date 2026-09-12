@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-007, title: {en: Only pending and confirmed appointments cancel, zh-CN: 只有待确认和已确认预约可取消}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: scheduling, severity: high}
+invariants: [{id: INV-CASE-JAVA-007, expression: cancellation is accepted only for PENDING or CONFIRMED appointments}]
+requiredEvidence: {behavior: [junit], boundary: [junit]}

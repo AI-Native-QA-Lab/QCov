@@ -27,7 +27,14 @@ from qcov.engine.delta import compare_snapshots
 from qcov.engine.delta_reports import render_delta_json, render_delta_markdown
 from qcov.engine.explain import explain_evidence, explain_gap, explain_plan_item
 from qcov.engine.gaps import ObligationResult, evaluate_obligation
-from qcov.engine.git_snapshots import DiffInputError, load_snapshot
+from qcov.engine.git_snapshots import DiffInputError, changed_files_between, load_snapshot
+from qcov.engine.impact import ImpactInputError, affected_report, direct_impact, snapshot_impact
+from qcov.engine.impact_reports import (
+    render_affected_json,
+    render_affected_markdown,
+    render_impact_json,
+    render_impact_markdown,
+)
 from qcov.engine.inventory import collect_mappable_inventory, config_dir_for
 from qcov.engine.mapping import (
     MappingConflictError,
@@ -57,6 +64,7 @@ from qcov.models.io import (
     ProtocolLoadError,
     load_config,
     load_evidence,
+    load_impact_config,
     load_mapping,
     load_obligation,
     load_policy,
@@ -185,28 +193,29 @@ def _config_evaluation(
 ) -> EvaluationBundle:
     config = load_config(config_path)
     resolved = resolve_paths(config, config_path)
-    selected_obligation = obligation
-    if selected_obligation is None and len(resolved.obligations) == 1:
-        selected_obligation = resolved.obligations[0]
+    selected_obligations = [obligation] if obligation is not None else list(resolved.obligations)
     selected_evidence_paths = (
         _evidence_files(evidence) if evidence is not None else list(resolved.evidence)
     )
-    if selected_obligation is None:
+    if not selected_obligations:
         raise ConfigLoadError(
-            f"{ConfigLoadError.code}: config must resolve exactly one obligation"
+            f"{ConfigLoadError.code}: config must resolve at least one obligation"
         )
     markers = PytestAdapter().collect(config_dir_for(config_path))
     if not selected_evidence_paths and not config.mapping and not markers:
         raise ConfigLoadError(
-            f"{ConfigLoadError.code}: config must resolve exactly one obligation and at least one evidence file"
+            f"{ConfigLoadError.code}: config must resolve obligations and at least one evidence file"
         )
     _require_mapping_files(config, resolved)
     authored = [load_evidence(path) for path in selected_evidence_paths]
     merged, diagnostics = _merge_evidence(
         config_path, config, resolved, authored, markers
     )
-    result = evaluate_obligation(load_obligation(selected_obligation), merged)
-    return EvaluationBundle((result,), diagnostics)
+    results = tuple(
+        evaluate_obligation(load_obligation(obligation_path), merged)
+        for obligation_path in selected_obligations
+    )
+    return EvaluationBundle(results, diagnostics)
 
 
 def _result_from_inputs(
@@ -220,16 +229,16 @@ def _result_from_inputs(
 
 
 def _render(
-    result: ObligationResult,
+    results: tuple[ObligationResult, ...],
     locale: str,
     output_format: str,
     mapping_diagnostics: tuple[MappingDiagnostic, ...] | None = None,
 ) -> str:
     if output_format == "json":
-        return render_json([result], mapping_diagnostics=mapping_diagnostics)
+        return render_json(results, mapping_diagnostics=mapping_diagnostics)
     if output_format != "markdown":
         raise typer.BadParameter("format must be markdown or json")
-    return render_markdown([result], locale=locale, mapping_diagnostics=mapping_diagnostics)
+    return render_markdown(results, locale=locale, mapping_diagnostics=mapping_diagnostics)
 
 
 _INPUT_ERRORS = (
@@ -239,6 +248,8 @@ _INPUT_ERRORS = (
     MappingDocumentError,
     ProposalInputError,
     AgentInputError,
+    ImpactInputError,
+    DiffInputError,
 )
 _InputError = (
     ConfigLoadError
@@ -247,6 +258,8 @@ _InputError = (
     | MappingDocumentError
     | ProposalInputError
     | AgentInputError
+    | ImpactInputError
+    | DiffInputError
 )
 
 
@@ -314,7 +327,7 @@ def gaps(
     """Show explainable gaps for one Testing Obligation."""
     try:
         bundle = _result_from_inputs(obligation, evidence, config)
-        typer.echo(_render(bundle.results[0], locale, output_format, bundle.mapping_diagnostics))
+        typer.echo(_render(bundle.results, locale, output_format, bundle.mapping_diagnostics))
     except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
         _handle_input_error(error)
 
@@ -331,7 +344,7 @@ def check(
     try:
         bundle = _result_from_inputs(obligation, evidence, config)
         result = bundle.results[0]
-        typer.echo(_render(result, locale, output_format, bundle.mapping_diagnostics))
+        typer.echo(_render((result,), locale, output_format, bundle.mapping_diagnostics))
     except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
         _handle_input_error(error)
         return
@@ -355,7 +368,7 @@ def inspect(
     if result.obligation_id != obligation_id:
         typer.echo(f"QCOV-CLI-001: obligation not found: {obligation_id}", err=True)
         raise typer.Exit(code=4)
-    typer.echo(_render(result, locale, output_format))
+    typer.echo(_render((result,), locale, output_format))
 
 
 @app.command()
@@ -373,7 +386,7 @@ def report(
     except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError) as error:
         _handle_input_error(error)
         return
-    output.write_text(_render(bundle.results[0], locale, output_format, bundle.mapping_diagnostics))
+    output.write_text(_render(bundle.results, locale, output_format, bundle.mapping_diagnostics))
     typer.echo(str(output))
 
 
@@ -424,15 +437,120 @@ def diff(
     """Compare explicit quality coverage in two local committed Git trees."""
     try:
         report = compare_snapshots(load_snapshot(repo, base, config), load_snapshot(repo, head, config))
+        changed_files = changed_files_between(repo, base, head)
     except DiffInputError as error:
         typer.echo(str(error), err=True)
         raise typer.Exit(code=4) from error
     if output_format == "json":
-        typer.echo(render_delta_json(report))
+        typer.echo(render_delta_json(report, changed_files))
     elif output_format == "markdown":
         typer.echo(render_delta_markdown(report, locale))
     else:
         raise typer.BadParameter("format must be markdown or json")
+
+
+@app.command()
+def impact(
+    config: Annotated[Path, typer.Option(exists=True, readable=True)],
+    impact_config: Annotated[Path, typer.Option("--impact-config", exists=True, readable=True)],
+    changed_file: Annotated[list[str] | None, typer.Option("--changed-file")] = None,
+    base: Annotated[str | None, typer.Option()] = None,
+    head: Annotated[str | None, typer.Option()] = None,
+    repo: Annotated[Path | None, typer.Option()] = None,
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Map explicit local changed files to Testing Obligations."""
+    changed_files = tuple(changed_file or ())
+    if changed_files and (base is not None or head is not None):
+        _handle_input_error(ImpactInputError("QCOV-IMPACT-001: --changed-file cannot be combined with --base/--head"))
+        return
+    if (base is None) != (head is None):
+        _handle_input_error(ImpactInputError("QCOV-IMPACT-001: provide both --base and --head"))
+        return
+    try:
+        if base is not None and head is not None:
+            target_repo = repo or config.parent
+            try:
+                config_ref = str(config.resolve().relative_to(target_repo.resolve()))
+            except ValueError as error:
+                raise ImpactInputError("QCOV-IMPACT-001: --config must be inside --repo") from error
+            report = snapshot_impact(load_impact_config(impact_config), changed_files_between(target_repo, base, head), load_snapshot(target_repo, base, config_ref), load_snapshot(target_repo, head, config_ref))
+        else:
+            project = load_config(config)
+            resolved = resolve_paths(project, config)
+            known_obligations = {load_obligation(path).metadata.id for path in resolved.obligations}
+            report = direct_impact(load_impact_config(impact_config), changed_files, known_obligation_ids=known_obligations)
+    except DiffInputError as error:
+        _handle_input_error(ImpactInputError(f"QCOV-IMPACT-001: {error}"))
+        return
+    except (ConfigLoadError, ProtocolLoadError, ImpactInputError) as error:
+        _handle_input_error(error)
+        return
+    if output_format == "json":
+        typer.echo(render_impact_json(report))
+    elif output_format == "markdown":
+        typer.echo(render_impact_markdown(report))
+    else:
+        _handle_input_error(ImpactInputError("QCOV-IMPACT-001: format must be markdown or json"))
+
+
+@app.command()
+def affected(
+    config: Annotated[Path, typer.Option(exists=True, readable=True)],
+    impact_config: Annotated[Path, typer.Option("--impact-config", exists=True, readable=True)],
+    changed_file: Annotated[list[str] | None, typer.Option("--changed-file")] = None,
+    base: Annotated[str | None, typer.Option()] = None,
+    head: Annotated[str | None, typer.Option()] = None,
+    repo: Annotated[Path | None, typer.Option()] = None,
+    output_format: OutputFormat = "markdown",
+) -> None:
+    """Show current non-covered gaps for explicitly affected obligations."""
+    changed_files = tuple(changed_file or ())
+    if changed_files and (base is not None or head is not None):
+        _handle_input_error(ImpactInputError("QCOV-IMPACT-001: --changed-file cannot be combined with --base/--head"))
+        return
+    if (base is None) != (head is None):
+        _handle_input_error(ImpactInputError("QCOV-IMPACT-001: provide both --base and --head"))
+        return
+    try:
+        mappings = load_impact_config(impact_config)
+        if base is not None and head is not None:
+            target_repo = repo or config.parent
+            try:
+                config_ref = str(config.resolve().relative_to(target_repo.resolve()))
+            except ValueError as error:
+                raise ImpactInputError("QCOV-IMPACT-001: --config must be inside --repo") from error
+            snapshot = load_snapshot(target_repo, head, config_ref)
+            impact = direct_impact(
+                mappings,
+                changed_files_between(target_repo, base, head),
+                known_obligation_ids=set(snapshot.obligations),
+            )
+            results = tuple(
+                evaluate_obligation(item, tuple(snapshot.evidence.values()))
+                for item in snapshot.obligations.values()
+            )
+        else:
+            bundle, _obligations = _multi_obligation_evaluation(config)
+            impact = direct_impact(
+                mappings,
+                changed_files,
+                known_obligation_ids={item.obligation_id for item in bundle.results},
+            )
+            results = bundle.results
+        report = affected_report(impact, results)
+    except DiffInputError as error:
+        _handle_input_error(ImpactInputError(f"QCOV-IMPACT-001: {error}"))
+        return
+    except (ConfigLoadError, ProtocolLoadError, MappingConflictError, MappingDocumentError, ImpactInputError) as error:
+        _handle_input_error(error)
+        return
+    if output_format == "json":
+        typer.echo(render_affected_json(report))
+    elif output_format == "markdown":
+        typer.echo(render_affected_markdown(report))
+    else:
+        _handle_input_error(ImpactInputError("QCOV-IMPACT-001: format must be markdown or json"))
 
 
 @policy_app.command("check")

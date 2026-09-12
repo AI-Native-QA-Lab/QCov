@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-008, title: {en: Cancellation records a reason, zh-CN: 取消预约必须记录原因}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: auditability, severity: medium}
+invariants: [{id: INV-CASE-JAVA-008, expression: cancellation requires a non-empty reason and records it on the appointment}]
+requiredEvidence: {behavior: [junit], data: [junit]}

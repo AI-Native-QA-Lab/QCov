@@ -6,12 +6,14 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from qcov.adapters.base import InventoryRecord, ScanDiagnostic, ScanResult
+from qcov.adapters.sdk import ADAPTER_PROTOCOL_VERSION
 
 
 class CoverageAdapter:
     """Read structural coverage observations without producing quality scores."""
 
     name = "coverage.py"
+    protocol_version = ADAPTER_PROTOCOL_VERSION
 
     def scan(self, path: Path) -> ScanResult:
         try:

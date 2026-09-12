@@ -1,6 +1,6 @@
 # Evidence import boundary
 
-No pytest or coverage output is bundled. Generate reports in the pinned source
-checkout, redact any paths or payloads, then map them explicitly before QCov
-evaluates them. Coverage is inventory input, never passed obligation evidence by
-itself.
+`pytest-junit.xml` is a minimal, path-free JUnit inventory from the pinned
+temporary clone (90 passed). `coverage.xml` contains only an aggregate inventory
+record. The JUnit identities are promoted only by `../mapping.yaml`; coverage.py
+remains inventory and can never satisfy an obligation by itself.

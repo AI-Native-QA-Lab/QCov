@@ -11,11 +11,17 @@ default offline provider. Iteration 6 adds the deterministic Quality Planner
 (`qcov plan` → draft `quality_plan` proposal). Iteration 7 adds Agentic Quality
 Loop helpers (`qcov explain`, `qcov agent next`, optional
 `qcov agent validate-evidence`) under `qcov.agent/v1`; they never run tests or
-become evidence/gate authority. Planned Iteration 8 is an offline production-
-observation foundation. Iteration 9 begins QCov 1.0: real-project validation,
-deterministic Change → Obligation Impact, Adapter SDK design, and protocol
-stability. QCov 1.5 and 2.0 require separately approved designs; see the
-roadmap.
+become evidence/gate authority. Iteration 8 is delivered in v0.9.0 as an
+offline production-observation foundation. Iteration 9 begins QCov 1.0:
+real-project validation, deterministic Change → Obligation Impact, Adapter SDK
+design, protocol stability, and documentation/onboarding readiness. QCov 1.5
+and 2.0 require separately approved designs; see the roadmap.
+
+For Iteration 9 validation, the target projects are read-only. Run their test
+commands only from fixed-commit temporary copies or temporary output
+directories, preserve any existing uncommitted changes, and keep all QCov case
+configuration, mappings, artifacts, and reports under this repository's
+`examples/case-studies/` or `docs/case-studies/` paths.
 
 Do not add remote LLM providers beyond the approved Iteration 5 provider
 abstraction, a web UI, persistence, remote Git host APIs, external plugins,
@@ -46,7 +52,7 @@ Use the environment's available `python3` command when `python` is absent.
 For every behavior change, write one focused automated test first and run it to
 observe the expected RED failure. Only then write the smallest implementation
 needed for GREEN; re-run the scoped test and relevant regression suite. Record
-the RED and GREEN evidence in the corresponding `docs/process/` entry.
+the RED and GREEN evidence in the commit or pull-request description.
 
 ## Documentation and Process
 
@@ -56,11 +62,10 @@ Protocol keys, CLI flags, enums, and error IDs are English.
 product pages under paired `docs/en/` and `docs/zh-CN/` (matching stems and
 heading structures).
 
-**Development process docs (Chinese-only going forward):** design specs and
-implementation plans under `docs/superpowers/`, process records under
-`docs/process/`, and similar engineering working notes (including ADRs written
-after this rule). Do not maintain paired English copies of these process docs.
+**Development context (Chinese-only):** retain durable maintenance decisions in
+`docs/zh-CN/development-context.md`. Detailed iteration plans and transient
+process records are kept in Git history rather than the release worktree.
 
-Update the relevant `docs/process/` entry when closing a planned implementation
-task; record executed verification commands and results, not expectations
-presented as results.
+When closing a planned implementation task, record executed verification
+commands and results in the commit or pull-request description, not as
+expectations presented as results.

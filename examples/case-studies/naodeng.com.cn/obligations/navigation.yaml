@@ -3,17 +3,17 @@ kind: TestingObligation
 metadata:
   id: QO-CASE-TS-001
   title:
-    en: Primary navigation must expose reachable site destinations
-    zh-CN: 主导航必须提供可访问的站点目的地
+    en: Navigation smoke checks cover the explicitly listed destinations
+    zh-CN: 导航冒烟检查覆盖已显式列出的目的地
 source:
-  type: source_file
+  type: e2e_specification
   ref: tests/e2e/specs/navigation.spec.ts
 risk:
   domain: navigation
   severity: medium
 invariants:
   - id: INV-CASE-TS-001
-    expression: primary navigation destinations are reachable
+    expression: explicitly mapped navigation destinations are reachable
 requiredEvidence:
   behavior: [playwright]
   integration: [playwright]

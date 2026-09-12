@@ -1,5 +1,6 @@
 # Evidence import boundary
 
-No JUnit XML or JaCoCo report is bundled. The pinned project currently lacks a
-JaCoCo configuration; establish that configuration and obtain owner-approved,
-redacted artifacts before writing an explicit evidence mapping.
+`junit.xml` retains only 18 failed test identities from the fixed-commit run;
+error payloads, paths, and database details were removed. `jacoco.xml` is a
+minimal aggregate inventory. Failed JUnit mappings remain failed evidence, and
+JaCoCo remains inventory only.

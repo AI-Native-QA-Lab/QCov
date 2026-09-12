@@ -3,3 +3,8 @@ kind: QCovConfig
 obligations:
   - obligations/*.yaml
 evidence: []
+mapping:
+  - mapping.yaml
+scan:
+  playwright:
+    - evidence/playwright.json

@@ -5,10 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from qcov.adapters.base import InventoryRecord, ScanDiagnostic, ScanResult
+from qcov.adapters.sdk import ADAPTER_PROTOCOL_VERSION
 
 
 class LcovAdapter:
     name = "lcov"
+    protocol_version = ADAPTER_PROTOCOL_VERSION
 
     def scan(self, path: Path) -> ScanResult:
         try:

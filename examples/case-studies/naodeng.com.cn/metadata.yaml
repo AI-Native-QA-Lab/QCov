@@ -8,8 +8,18 @@ source:
   redaction: Site content, analytics settings, reports, paths, and environment values are not redistributed.
 commands:
   - cd tests && npm run test:e2e
-execution_status: NOT_RUN
+execution_status: PASSED
+obligation_status: OWNER_ACCEPTED
+obligation_review:
+  reviewer: QCov validation review (agent-assisted)
+  reviewed_at: 2026-09-11
+  result: All ten obligations were accepted by the project owner on 2026-09-11 after two QA review rounds.
+verification:
+  environment: User-authorized fixed-commit source checkout with Chrome channel
+  command: cd tests && PLAYWRIGHT_CHANNEL=chrome npx playwright test e2e/specs/navigation.spec.ts --reporter=json
+  result: PASSED; user captured a 32017-byte JSON report on 2026-09-11. The imported report is minimized and redacted.
 release_gate_status: NOT_MET
 release_gate_gaps:
-  - Fewer than ten reviewed obligations are recorded for this project.
-  - No source-project execution or report import has been recorded.
+  - Local-listener permission blocks browser verification; mapping preview therefore reports missing Playwright identities.
+  - Owner acceptance and two independent developer/QA conclusions are not yet recorded.
+  - No measured false-gap or gap-to-added-verification conversion cohort is available.

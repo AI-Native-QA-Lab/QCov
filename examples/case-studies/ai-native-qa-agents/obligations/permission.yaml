@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-005, title: {en: Agent checks permission before action, zh-CN: Agent 行动前必须检查权限}}
+source: {type: specification, ref: docs/v1.0-engineering/AGENT_LOOP.md}
+risk: {domain: authorization, severity: critical}
+invariants: [{id: INV-CASE-PY-005, expression: an action with denied or absent permission is not executed}]
+requiredEvidence: {behavior: [pytest], security: [pytest]}

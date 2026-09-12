@@ -146,3 +146,9 @@ def load_snapshot(repo: Path, ref: str, config: str) -> Snapshot:
     )
     evidence = _load_models(repo, entries, _select(entries, base, configuration.evidence), QualityEvidence)
     return Snapshot(commit, obligations, evidence)
+
+
+def changed_files_between(repo: Path, base: str, head: str) -> tuple[str, ...]:
+    """Return sorted, safe repository-relative paths changed by two local commits."""
+    output = _git(repo, "diff", "--name-only", "-z", base, head)
+    return tuple(sorted({str(_safe_path(item.decode())) for item in output.split(b"\0") if item}))

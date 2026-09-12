@@ -11,6 +11,7 @@ from pydantic import BaseModel, ValidationError
 
 from .config import ProjectConfig
 from .errors import ProposalInputError
+from .impact import QualityImpactConfig
 from .protocol import (
     EvidenceMapping,
     QualityEvidence,
@@ -56,6 +57,10 @@ def load_policy(path: Path) -> QualityPolicy:
 
 def load_mapping(path: Path) -> EvidenceMapping:
     return _load(path, EvidenceMapping)
+
+
+def load_impact_config(path: Path) -> QualityImpactConfig:
+    return _load(path, QualityImpactConfig)
 
 
 def load_proposal(path: Path) -> QualityProposal:

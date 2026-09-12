@@ -58,9 +58,10 @@ authored evidence, explicit pytest-marker evidence, and those mapping results.
 
 ## 5. Inspect change impact in committed Git snapshots
 
-Today QCov's implemented change-impact command is `qcov diff`, not `qcov impact`
-or `qcov affected`. It compares explicit obligations and evidence in
-two existing local commits. Run the self-contained demo:
+`qcov impact` maps changed repository paths to explicit obligations. With two
+local Git snapshots it also reports deterministic `newGaps` and `resolvedGaps`.
+`qcov affected` reports only the currently non-covered affected obligations.
+Run the self-contained diff demo:
 
 ```bash
 .venv/bin/python examples/pr-delta/demo.py
@@ -72,6 +73,16 @@ files first, then use:
 ```bash
 .venv/bin/python -m qcov diff \
   --repo . --base origin/main --head HEAD --config qcov.yaml
+```
+
+To run Impact, keep `qcov.yaml` and a `QualityImpactConfig` path mapping in the
+repository, then use either repeated `--changed-file` values or a local Git
+snapshot pair (never both):
+
+```bash
+.venv/bin/python -m qcov impact \
+  --config qcov.yaml --impact-config impact.yaml \
+  --repo . --base origin/main --head HEAD --format json
 ```
 
 It reads Git objects only: it does not fetch, check out commits, run tests, or
