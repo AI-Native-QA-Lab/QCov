@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-005, title: {en: Booking time is an allowed hourly slot, zh-CN: 预约时间必须是允许的整点时段}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: scheduling, severity: medium}
+invariants: [{id: INV-CASE-JAVA-005, expression: booking time is an on-the-hour slot from 09:00 through 18:00 inclusive}]
+requiredEvidence: {boundary: [junit], behavior: [junit]}

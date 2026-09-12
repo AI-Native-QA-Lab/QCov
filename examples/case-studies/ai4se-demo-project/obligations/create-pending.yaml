@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-002, title: {en: Valid appointment creation starts pending, zh-CN: 有效预约创建必须以待确认开始}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: scheduling, severity: high}
+invariants: [{id: INV-CASE-JAVA-002, expression: valid creation produces pending appointment}]
+requiredEvidence: {behavior: [junit], integration: [junit]}

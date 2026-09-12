@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-010, title: {en: Agent decisions retain loop traces, zh-CN: Agent 决策必须保留循环追踪}}
+source: {type: specification, ref: docs/v1.0-engineering/AGENT_LOOP.md}
+risk: {domain: auditability, severity: high}
+invariants: [{id: INV-CASE-PY-010, expression: each decision references a LoopTrace with its action observation and verification identifiers}]
+requiredEvidence: {behavior: [pytest], data: [pytest]}

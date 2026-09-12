@@ -1,67 +1,80 @@
 # Roadmap
 
-QCov remains a local, deterministic Quality Evidence Gap Engine. It reports
-what remains unproven for an obligation; it is not a line-coverage detector or
-test runner.
-
-## Delivered through Iteration 7
-
-Iteration 0 proves Obligation → Evidence → Gap. Iteration 1 adds config-driven
-local discovery for pytest markers, JUnit XML, and coverage.py XML inventory.
-Iteration 2 adds Playwright JSON and LCOV inventory readers through an explicit
-built-in registry; external adapter plugins remain out of scope. Iteration 3
-adds read-only committed-tree comparison through `qcov diff`. Iteration 4 adds
-local `qcov policy check` with default status rules, auditable exact waivers,
-explicit `--as-of`, and PASS/WARN/BLOCK decisions. Iteration 4.5 adds declarative
-`EvidenceMapping` for junit/playwright inventory, `qcov map preview`, and
-`--config` evaluation merge. Iteration 5 adds pytest-marker evaluation merge,
-limited identity suffix wildcards, and proposal-only AI (`obligation suggest` /
-`risk analyze`) with a default offline provider. Iteration 6 adds deterministic
-`qcov plan`: fixed benefit/cost heuristics over unproven gaps emit a draft
-`QualityProposal` (`type: quality_plan`) for next-best verification—never
-evidence or gate authority. Iteration 7 adds the Agentic Quality Loop helpers:
-required `qcov explain` and `qcov agent next` (stable `qcov.agent/v1` JSON),
-plus optional `qcov agent validate-evidence` for load checks only. QCov still
-does not run tests or write authoritative evidence. See [agent playbook](agent.md).
-
-Remote Git operations, source-line impact inference, policy DSL, dimension
-thresholds, wildcard waivers, coverage/LCOV promotion to passed evidence, and
-automatic inventory-to-evidence inference remain deferred unless a later design
-approves them.
-
-## Gate after 4.5
-
-Validate real-project integration time, explainability, and gap value beyond
-ordinary reports before accelerating AI. Mapping must stay declarative and local.
-Adapters still must not infer that a passing test or coverage rate proves a
-business obligation. Design reference:
-`docs/superpowers/specs/2026-09-08-post-4.5-iteration-roadmap-design.md`.
-See also [explicit evidence mapping](mapping.md).
+QCov is a local, deterministic Quality Evidence Gap Engine. It reports what
+remains unproven for an explicit requirement, risk, or change; it is not a
+line-coverage detector or test runner.
 
 ## Delivered through Iteration 8
 
-Principle: AI proposes; policy approves; the deterministic engine verifies. AI
-must never become evidence or gate authority.
+Iterations 0–4 establish Obligation → Evidence → Gap evaluation, local
+inventory discovery, committed-tree `qcov diff`, and deterministic local
+`qcov policy check`. Iteration 4.5 adds declarative `EvidenceMapping` and map
+preview. Iterations 5–7 add proposal-only assistance, deterministic planning,
+and `qcov.agent/v1` helpers; none runs tests, writes authoritative evidence, or
+decides gates. Iteration 8 adds a local `production-observation` inventory
+producer: runtime, incident, and observability observations become evidence only
+through explicit mappings. See the [agent playbook](agent.md) and
+[production-evidence guide](production-evidence.md).
 
-| Iteration | Focus |
+## QCov 1.0 — Find the Gap
+
+**Question:** What is still unproven?
+
+**Goal:** Prove QCov creates measurable value in real projects, without an AI
+dependency for core correctness.
+
+Iteration 9 is the 1.0 delivery track:
+
+| Workstream | Outcome |
 | --- | --- |
-| **8** | Local `production-observation` inventory for runtime / incident / observability artifacts; explicit mapping only |
+| Real-project validation | Validate `ai-native-qa-agents` (Python/pytest/coverage), `ai4se-demo-project` (Java/JUnit/JaCoCo), and `naodeng.com.cn` (TypeScript/Playwright); use `ai-test-auditor` as an extra TypeScript/Node ecosystem case. Target at least 3 projects, 30 real obligations, and time to first value of 10 minutes or less. |
+| Change → obligation impact | Deterministic repository-relative path glob mappings produce affected obligations and, when two local snapshots are supplied, the resulting gap delta through `qcov impact`, `qcov affected`, and `qcov diff`. Higher-level package/module/service/API mappings must be pre-expanded to paths. |
+| Adapter extensibility | Define the in-process `qcov.adapter/v1` contract and add a JaCoCo XML inventory reader without making adapters evidence authorities. Passing JUnit or coverage rates still do not prove a business obligation; external plugin loading remains deferred. |
+| Protocol stability | Preserve released `qcov.dev/v1alpha1` and stabilize `qcov.agent/v1`, `qcov.impact/v1`, and `qcov.adapter/v1` as compatibility promises; no implicit core-protocol rename. |
+| Documentation and onboarding | Clean paired READMEs; provide tested installation paths, a first runnable example, command/configuration guidance, and troubleshooting so a new Python, Java, or TypeScript user can reach first value without source inspection. |
 
-**Roadmap Complete through Iteration 8** closes this core arc (gap → change →
-policy → mapping → AI propose/plan/agent feedback → production feedback). It is
-a milestone, not the end of the product.
+The 1.0 release gate requires three real projects, three technology stacks, at
+least 30 real Testing Obligations, and measured time to first value of 10 minutes
+or less. It must also show critical or previously unknown, explainable gaps that
+ordinary test, coverage, and static reports do not directly expose; record
+false-gap rate, gap-to-verification conversion, and developer/QA acceptance.
 
-## Post-8 backlog
+The documentation gate requires paired README navigation, verified install and
+quick-start commands, links to configuration and examples, clear local-only and
+evidence-authority boundaries, and a troubleshooting path. Documentation is a
+1.0 product deliverable, not post-release cleanup.
 
-Separate approved designs are required for QA-for-AI dimensions, Quality BOM,
-Adapter SDK / broader ecosystems, remote Git and deeper CI automation, policy
-DSL and dimension thresholds, coverage/LCOV promotion to covering evidence,
-automatic inventory-to-obligation inference, web UI, persistence, and a packaged
-Continuous Quality Control Plane.
+## QCov 1.5 — Understand & Plan
 
-## Validation gates before expansion
+**Question:** What should we verify next?
 
-Validate these assumptions before accelerating into AI or production adapters:
-Testing Obligations add value beyond requirement-to-test links; initial
-integration is fast; gaps remain explainable; the tool finds omissions that
-ordinary reports hide; and AI proposals never override deterministic decisions.
+**Goal:** AI-assisted Quality Evidence Intelligence.
+
+After 1.0 validation, these are candidate 1.5 themes that each require a
+separate approved design: AI obligation discovery, AI-suggested change impact,
+`qcov explain --ai`, an AI-suggested plan alongside deterministic `qcov plan`,
+and Quality Evidence ROI. Any AI suggestion must remain separate from
+authoritative obligations and deterministic impact. AI may understand, suggest,
+explain, and plan; it cannot prove evidence or decide a gate.
+
+## QCov 2.0 — Close the Loop
+
+**Question:** How can agents continuously close quality gaps?
+
+**Goal:** AI Native Quality Planning.
+
+These are candidate 2.0 themes that require a separate approved design:
+evolving the Agent contract from `qcov.agent/v1` to `qcov.agent/v2` for
+candidate evidence, QA-for-AI evidence dimensions, a production quality
+feedback loop, and a Quality BOM. If accepted, the deterministic system must
+validate, normalize, map, and evaluate candidates; agents cannot mark their own
+work `COVERED`.
+
+## Future: Continuous Quality Control Plane
+
+Only after 2.0: cross-project quality graphs, organization policy, historical
+evidence, release intelligence, cross-repository impact, multi-agent
+coordination, and compliance evidence. Web UI, persistence, remote Git,
+automatic inventory-to-obligation inference, policy DSL, dimension thresholds,
+wildcard/path waivers, and coverage/LCOV promotion remain out of scope until a
+separate approved design.

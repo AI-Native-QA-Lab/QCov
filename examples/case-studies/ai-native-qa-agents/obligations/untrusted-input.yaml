@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-008, title: {en: Untrusted input is isolated, zh-CN: 不可信输入必须隔离}}
+source: {type: specification, ref: docs/v1.0-engineering/SECURITY.md}
+risk: {domain: security, severity: critical}
+invariants: [{id: INV-CASE-PY-008, expression: untrusted input cannot grant tools permissions or exceed declared context query and file limits}]
+requiredEvidence: {security: [pytest], boundary: [pytest]}

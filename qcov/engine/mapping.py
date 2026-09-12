@@ -44,6 +44,7 @@ class MappingMaterialization:
 
 _JUNIT_STATUS = {"passed": "passed", "failed": "failed", "skipped": "skipped"}
 _PLAYWRIGHT_STATUS = {
+    "passed": "passed",
     "expected": "passed",
     "unexpected": "failed",
     "skipped": "skipped",

@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-TS-010, title: {en: English wiki link opens in a new tab, zh-CN: 英文百科链接必须在新标签页打开}}
+source: {type: e2e_specification, ref: tests/e2e/specs/navigation.spec.ts}
+risk: {domain: navigation, severity: low}
+invariants: [{id: INV-CASE-TS-010, expression: wiki link has a new-tab target}]
+requiredEvidence: {behavior: [playwright], boundary: [playwright]}

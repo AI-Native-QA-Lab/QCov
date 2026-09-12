@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-TS-009, title: {en: Guides navigation reaches guides, zh-CN: 指南导航必须到达指南页}}
+source: {type: e2e_specification, ref: tests/e2e/specs/navigation.spec.ts}
+risk: {domain: navigation, severity: medium}
+invariants: [{id: INV-CASE-TS-009, expression: guides navigation reaches guide hero}]
+requiredEvidence: {behavior: [playwright], integration: [playwright]}

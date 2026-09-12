@@ -15,6 +15,8 @@ those tools proves a requirement, risk, or change.
 - Local inventory scan for pytest markers, JUnit, coverage.py, Playwright (`scan.playwright`), LCOV (`scan.lcov`), and production observations (`scan.production`)
 - Explicit `EvidenceMapping` from junit/playwright/production-observation inventory to `QualityEvidence`
 - Local `qcov diff` across committed Git trees
+- Deterministic `qcov impact` / `qcov affected` from explicit changed-path mappings
+- Stable adapter SDK (`qcov.adapter/v1`) and JaCoCo inventory scanning
 - Local `qcov policy check` with exact, expiring waivers
 - Proposal-only assistants: `qcov obligation suggest`, `qcov risk analyze`, and
   deterministic `qcov plan` (draft `QualityProposal`; never evidence or gate
@@ -61,6 +63,11 @@ exist; concurrency, idempotency, and production evidence remain unproven.
 # Compare committed obligation/evidence snapshots
 .venv/bin/python -m qcov diff --base origin/main --head HEAD --config qcov.yaml
 
+# Map changed paths to affected obligations (explicit mappings only)
+.venv/bin/python -m qcov impact \
+  --config qcov.yaml --impact-config impact.yaml \
+  --changed-file src/payments/refund.py --format json
+
 # Local policy gate
 .venv/bin/python -m qcov policy check \
   --config qcov.yaml --policy policy.yaml \
@@ -73,13 +80,16 @@ exist; concurrency, idempotency, and production evidence remain unproven.
   --config qcov.yaml --base HEAD~1 --head HEAD --format json
 ```
 
-See the [imported-reports example](examples/imported-reports/README.md),
+Start with the [five-minute guide](docs/en/getting-started.md). See the
+[imported-reports example](examples/imported-reports/README.md),
 [mapping guide](docs/en/mapping.md), [PR delta](docs/en/pr-delta.md), and
 [policy gates](docs/en/policy.md), and [production evidence](docs/en/production-evidence.md).
 
 ## Documentation
 
 - [Requirements](docs/en/requirements.md)
+- [Five-minute guide](docs/en/getting-started.md)
+- [Real-project case-study boundary](docs/case-studies/README.md)
 - [Architecture](docs/en/architecture.md)
 - [Protocol](docs/en/protocol.md)
 - [Technical design](docs/en/technical-design.md)

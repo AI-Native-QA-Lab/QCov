@@ -10,6 +10,7 @@ import yaml
 from pydantic import ValidationError
 
 from qcov.adapters.base import InventoryRecord, ScanDiagnostic, ScanResult
+from qcov.adapters.sdk import ADAPTER_PROTOCOL_VERSION
 from qcov.models.protocol import ProductionObservationReport
 
 
@@ -17,6 +18,7 @@ class ProductionObservationAdapter:
     """Read offline production observations without inferring evidence."""
 
     name = "production-observation"
+    protocol_version = ADAPTER_PROTOCOL_VERSION
 
     def scan(self, path: Path) -> ScanResult:
         try:

@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: EvidenceMapping
+metadata: {id: case-py-explicit-junit}
+defaultTimestamp: "2026-09-11T00:00:00+08:00"
+mappings:
+  - from: {producer: junit, identity: "tests.test_adapters::test_pytest_adapter_discovers_test_entity"}
+    to: {obligationRef: QO-CASE-PY-001, dimension: behavior, type: pytest}

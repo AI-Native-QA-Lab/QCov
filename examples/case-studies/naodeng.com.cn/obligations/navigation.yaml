@@ -1,0 +1,19 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata:
+  id: QO-CASE-TS-001
+  title:
+    en: Navigation smoke checks cover the explicitly listed destinations
+    zh-CN: 导航冒烟检查覆盖已显式列出的目的地
+source:
+  type: e2e_specification
+  ref: tests/e2e/specs/navigation.spec.ts
+risk:
+  domain: navigation
+  severity: medium
+invariants:
+  - id: INV-CASE-TS-001
+    expression: explicitly mapped navigation destinations are reachable
+requiredEvidence:
+  behavior: [playwright]
+  integration: [playwright]

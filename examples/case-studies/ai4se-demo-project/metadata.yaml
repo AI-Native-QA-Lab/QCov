@@ -1,0 +1,28 @@
+case_id: ai4se-demo-project
+stack: Java JUnit JaCoCo
+source:
+  repository: ai4se-demo-project
+  commit: c7d19b48433e9794c58b2c498201bd1181d4c99a
+  reference_files:
+    - backend/src/main/java/com/consultation/domain/service/AppointmentConflictService.java
+    - backend/src/main/java/com/consultation/application/service/AppointmentService.java
+    - backend/src/test/java/com/consultation/adapter/rest/AppointmentControllerTest.java
+    - docs/features/appointment.md
+  redaction: Source, database configuration, tests, reports, paths, and environment values are not redistributed.
+commands:
+  - cd backend && mvn test
+  - cd backend && mvn test jacoco:report
+execution_status: PASSED
+obligation_status: OWNER_ACCEPTED
+obligation_review:
+  reviewer: QCov validation review (agent-assisted)
+  reviewed_at: 2026-09-11
+  result: All ten obligations were accepted by the project owner on 2026-09-11 after two QA review rounds.
+verification:
+  environment: User-authorized source checkout with local MySQL test database
+  command: cd backend && mvn -q -DskipTests=false org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.12:report
+  result: PASSED; 23 tests, 0 failures, 0 errors, 0 skipped under JDK 19 at fixed source commit c7d19b48433e9794c58b2c498201bd1181d4c99a. JaCoCo XML generated without instrumentation warnings.
+release_gate_status: NOT_MET
+release_gate_gaps:
+  - Coverage and JaCoCo remain inventory-only; business evidence is supplied by explicit JUnit mappings.
+  - Gap-to-added-verification cohort: JAVA-003, JAVA-004, JAVA-006, JAVA-010; 4/4 passed (100%). False-gap rate remains UNASSESSED.

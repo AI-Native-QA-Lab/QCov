@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-002, title: {en: Agent loop observes before evidence, zh-CN: Agent 循环必须先观察再形成证据}}
+source: {type: specification, ref: docs/v1.0-engineering/AGENT_LOOP.md}
+risk: {domain: agent_governance, severity: high}
+invariants: [{id: INV-CASE-PY-002, expression: each evidence event references an observation event recorded earlier in the same LoopTrace}]
+requiredEvidence: {behavior: [pytest], integration: [pytest]}

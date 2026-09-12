@@ -7,10 +7,12 @@ from pathlib import Path
 from typing import Any
 
 from qcov.adapters.base import InventoryRecord, ScanDiagnostic, ScanResult
+from qcov.adapters.sdk import ADAPTER_PROTOCOL_VERSION
 
 
 class PlaywrightAdapter:
     name = "playwright"
+    protocol_version = ADAPTER_PROTOCOL_VERSION
 
     def scan(self, path: Path) -> ScanResult:
         try:
@@ -39,6 +41,8 @@ class PlaywrightAdapter:
                     continue
                 project = str(test.get("projectName", ""))
                 status = str(test.get("status", "skipped"))
+                if status == "expected":
+                    status = "passed"
                 identity = " > ".join((*current, spec_title))
                 if project:
                     identity += f" [{project}]"

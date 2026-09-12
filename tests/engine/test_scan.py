@@ -19,6 +19,7 @@ def test_scan_project_collects_configured_junit_and_coverage_inventory(tmp_path:
 
     assert [(item.adapter, item.record_count) for item in report.adapters] == [
         ("coverage.py", 1),
+        ("jacoco", 0),
         ("junit", 1),
         ("lcov", 0),
         ("playwright", 0),
@@ -59,7 +60,7 @@ def test_scan_project_uses_deterministic_cross_language_adapter_order(tmp_path: 
     report = scan_project(tmp_path, config)
 
     assert [item.adapter for item in report.adapters] == [
-        "coverage.py", "junit", "lcov", "playwright", "production-observation", "pytest-marker"
+        "coverage.py", "jacoco", "junit", "lcov", "playwright", "production-observation", "pytest-marker"
     ]
 
 
@@ -86,3 +87,20 @@ observations:
     production = next(item for item in report.adapters if item.adapter == "production-observation")
     assert production.record_count == 1
     assert report.records[-1].identity == "checkout-release::availability"
+
+
+def test_scan_project_collects_configured_jacoco_inventory(tmp_path: Path) -> None:
+    (tmp_path / "jacoco.xml").write_text(
+        '<report><package name="app"><class name="app/Refund">'
+        '<method name="refund" desc="()V"/></class></package></report>'
+    )
+    config = tmp_path / "qcov.yaml"
+    config.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\nscan:\n  jacoco: [jacoco.xml]\n"
+    )
+
+    report = scan_project(tmp_path, config)
+
+    jacoco = next(item for item in report.adapters if item.adapter == "jacoco")
+    assert jacoco.record_count == 1
+    assert report.records[0].identity == "app.Refund::refund()V"

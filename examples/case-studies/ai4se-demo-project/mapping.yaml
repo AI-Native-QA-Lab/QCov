@@ -1,0 +1,17 @@
+apiVersion: qcov.dev/v1alpha1
+kind: EvidenceMapping
+metadata: {id: case-java-explicit-junit}
+defaultTimestamp: "2026-09-11T22:06:00+08:00"
+mappings:
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_create_and_list"}, to: {obligationRef: QO-CASE-JAVA-002, dimension: behavior, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_conflict"}, to: {obligationRef: QO-CASE-JAVA-001, dimension: behavior, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_appointment_for_disabled_consultant"}, to: {obligationRef: QO-CASE-JAVA-003, dimension: behavior, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_allow_tomorrow_and_seventh_day_but_reject_eighth_day"}, to: {obligationRef: QO-CASE-JAVA-004, dimension: boundary, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_cancellation_by_other_user"}, to: {obligationRef: QO-CASE-JAVA-006, dimension: security, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_deleting_appointment"}, to: {obligationRef: QO-CASE-JAVA-010, dimension: boundary, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_conflict"}, to: {obligationRef: QO-CASE-JAVA-001, dimension: boundary, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_conflict"}, to: {obligationRef: QO-CASE-JAVA-001, dimension: integration, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_appointment_for_disabled_consultant"}, to: {obligationRef: QO-CASE-JAVA-003, dimension: boundary, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_allow_tomorrow_and_seventh_day_but_reject_eighth_day"}, to: {obligationRef: QO-CASE-JAVA-004, dimension: behavior, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_cancellation_by_other_user"}, to: {obligationRef: QO-CASE-JAVA-006, dimension: integration, type: junit}}
+  - {from: {producer: junit, identity: "com.consultation.adapter.rest.AppointmentControllerTest::should_reject_deleting_appointment"}, to: {obligationRef: QO-CASE-JAVA-010, dimension: behavior, type: junit}}

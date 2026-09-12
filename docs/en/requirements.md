@@ -33,14 +33,34 @@ authority. See [agent playbook](agent.md). Iteration 8 adds local
 `production-observation`; observations require explicit mapping and retain their
 own execution timestamp. See [production evidence](production-evidence.md).
 
+## QCov 1.0 entry gate
+
+Iteration 9 begins QCov 1.0 with real-project validation, deterministic Change
+→ Obligation Impact, Adapter SDK v1, protocol stability, and documentation /
+onboarding readiness. The release gate is at least three real projects across
+Python/pytest/coverage, Java/JUnit/JaCoCo, and TypeScript/Playwright (the fixed
+required cases are `ai-native-qa-agents`, `ai4se-demo-project`, and
+`naodeng.com.cn`; `ai-test-auditor` is an extra TypeScript/Node case); at least
+30 real obligations; and time to first value of 10 minutes or less. The paired
+README must provide verified installation, quick-start, usage, configuration,
+and troubleshooting paths. See [roadmap](roadmap.md).
+
+The 1.0 impact contract accepts either repeated repository-relative
+`--changed-file` values or local `--base` / `--head` snapshots. Direct mode
+reports affected obligations and leaves gap delta unassessed; snapshot mode
+computes `newGaps` and `resolvedGaps`. Path globs are explicit and deterministic;
+package/module/service/API mappings must be expanded to paths by the caller.
+The core protocol remains `qcov.dev/v1alpha1`; `qcov.impact/v1` and
+`qcov.adapter/v1` are additive contracts.
+
 ## Still excluded without a new approved design
 
-Web UI, database persistence, remote Git operations, external plugin loading,
-inventory-to-obligation inference, policy DSL, dimension thresholds,
-wildcard or path-based waivers, and coverage/LCOV promotion to covering passed
-evidence remain out of scope until separately approved. Post-8 topics (QA for
-AI, Quality BOM, Adapter SDK, Continuous Quality Control Plane packaging) also
-require new designs.
+Web UI, database persistence, remote Git operations, automatic
+inventory-to-obligation inference, policy DSL, dimension thresholds, wildcard
+or path-based waivers, and coverage/LCOV promotion to covering passed evidence
+remain out of scope until separately approved. Adapter SDK v1 is planned for
+QCov 1.0; broader ecosystem/plugin loading, QA for AI, Quality BOM, and
+Continuous Quality Control Plane packaging require later designs.
 
 ## Pending requirement: broader mapping
 

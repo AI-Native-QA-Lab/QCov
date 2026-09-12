@@ -1,0 +1,9 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QualityImpactConfig
+mappings:
+  - id: conflict-service
+    paths: [backend/src/main/java/com/consultation/domain/service/AppointmentConflictService.java]
+    obligations: [QO-CASE-JAVA-001]
+  - id: appointment-spec
+    paths: [docs/features/appointment.md]
+    obligations: [QO-CASE-JAVA-002, QO-CASE-JAVA-003, QO-CASE-JAVA-004, QO-CASE-JAVA-005, QO-CASE-JAVA-006, QO-CASE-JAVA-007, QO-CASE-JAVA-008, QO-CASE-JAVA-009, QO-CASE-JAVA-010]

@@ -15,6 +15,7 @@ class ScanConfig(ProtocolModel):
     """Optional report paths grouped by supported local producer."""
 
     junit: list[str] = Field(default_factory=list)
+    jacoco: list[str] = Field(default_factory=list)
     coverage: list[str] = Field(default_factory=list)
     playwright: list[str] = Field(default_factory=list)
     lcov: list[str] = Field(default_factory=list)
@@ -47,6 +48,7 @@ class ResolvedPaths:
     evidence: tuple[Path, ...]
     mapping: tuple[Path, ...]
     junit: tuple[Path, ...]
+    jacoco: tuple[Path, ...]
     coverage: tuple[Path, ...]
     playwright: tuple[Path, ...]
     lcov: tuple[Path, ...]
@@ -79,6 +81,7 @@ def resolve_paths(config: ProjectConfig, config_path: Path) -> ResolvedPaths:
         evidence=resolve_patterns(config.evidence, base),
         mapping=resolve_patterns(config.mapping, base),
         junit=resolve_patterns(config.scan.junit, base),
+        jacoco=resolve_patterns(config.scan.jacoco, base),
         coverage=resolve_patterns(config.scan.coverage, base),
         playwright=resolve_patterns(config.scan.playwright, base),
         lcov=resolve_patterns(config.scan.lcov, base),

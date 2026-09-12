@@ -5,9 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from qcov.adapters.base import InventoryRecord, InventoryScanner, ScanDiagnostic
+from qcov.adapters.base import InventoryRecord, ScanDiagnostic
 from qcov.adapters.pytest import PytestAdapter
 from qcov.adapters.registry import inventory_adapters
+from qcov.adapters.sdk import InventoryAdapter
 from qcov.models.config import resolve_patterns
 from qcov.models.io import load_config
 
@@ -32,7 +33,7 @@ class ScanReport:
 
 
 def scan_adapter_files(
-    adapter: InventoryScanner, paths: tuple[Path, ...]
+    adapter: InventoryAdapter, paths: tuple[Path, ...]
 ) -> tuple[AdapterScanSummary, tuple[InventoryRecord, ...], tuple[ScanDiagnostic, ...]]:
     """Scan configured files and retain inventory records alongside the summary."""
     records: list[InventoryRecord] = []
@@ -63,6 +64,7 @@ def scan_project(project_path: Path, config_path: Path) -> ScanReport:
     )
     configured = {
         "junit": config.scan.junit,
+        "jacoco": config.scan.jacoco,
         "coverage.py": config.scan.coverage,
         "lcov": config.scan.lcov,
         "playwright": config.scan.playwright,

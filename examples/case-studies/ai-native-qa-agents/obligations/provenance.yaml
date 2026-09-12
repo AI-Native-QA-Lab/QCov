@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-007, title: {en: Evidence retains auditable provenance, zh-CN: 证据必须保留可审计的溯源}}
+source: {type: specification, ref: docs/v1.0-engineering/EVIDENCE_AND_GATES.md}
+risk: {domain: auditability, severity: high}
+invariants: [{id: INV-CASE-PY-007, expression: evidence retains source subject location timestamp and loop provenance}]
+requiredEvidence: {behavior: [pytest], data: [pytest]}

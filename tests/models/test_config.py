@@ -74,6 +74,20 @@ def test_config_resolves_production_scan_paths(tmp_path: Path) -> None:
     assert paths.production == ((tmp_path / "reports/production.yaml").resolve(),)
 
 
+def test_config_resolves_jacoco_scan_paths(tmp_path: Path) -> None:
+    config_path = tmp_path / "qcov.yaml"
+    config_path.write_text(
+        "apiVersion: qcov.dev/v1alpha1\nkind: QCovConfig\n"
+        "scan:\n  jacoco: [reports/jacoco.xml]\n"
+    )
+    (tmp_path / "reports").mkdir()
+    (tmp_path / "reports/jacoco.xml").write_text("<report/>")
+
+    paths = resolve_paths(load_config(config_path), config_path)
+
+    assert paths.jacoco == ((tmp_path / "reports/jacoco.xml").resolve(),)
+
+
 def test_config_resolves_mapping_paths(tmp_path: Path) -> None:
     mapping = tmp_path / "mappings"
     mapping.mkdir()

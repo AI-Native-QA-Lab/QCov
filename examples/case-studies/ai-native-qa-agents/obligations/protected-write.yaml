@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-PY-009, title: {en: Protected write actions fail closed, zh-CN: 受保护写操作必须以失败关闭}}
+source: {type: specification, ref: docs/v1.0-engineering/SECURITY.md}
+risk: {domain: security, severity: critical}
+invariants: [{id: INV-CASE-PY-009, expression: unsupported protected action fails closed}]
+requiredEvidence: {security: [pytest], behavior: [pytest]}

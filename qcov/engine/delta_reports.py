@@ -19,12 +19,13 @@ def _item(delta: ObligationDelta) -> dict[str, object]:
     }
 
 
-def render_delta_json(report: DeltaReport) -> str:
+def render_delta_json(report: DeltaReport, changed_files: tuple[str, ...] = ()) -> str:
     """Render stable, language-neutral delta JSON."""
     return json.dumps(
         {
             "baseCommit": report.base_commit,
             "headCommit": report.head_commit,
+            "changedFiles": list(changed_files),
             "obligations": [_item(item) for item in report.obligations],
         },
         indent=2,

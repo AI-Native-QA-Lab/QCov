@@ -1,0 +1,7 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata: {id: QO-CASE-JAVA-004, title: {en: Booking date is within seven days, zh-CN: 预约日期必须在未来七天内}}
+source: {type: specification, ref: docs/features/appointment.md}
+risk: {domain: scheduling, severity: medium}
+invariants: [{id: INV-CASE-JAVA-004, expression: booking date is from tomorrow through the seventh future calendar day inclusive}]
+requiredEvidence: {boundary: [junit], behavior: [junit]}
