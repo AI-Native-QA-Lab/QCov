@@ -1,5 +1,25 @@
 # 更新日志
 
+## 1.0.0 - 2026-09-12
+
+### 新功能
+
+- 新增确定性的 Change-to-Obligation 影响分析，提供稳定的
+  `qcov.impact/v1` 报告及 `qcov impact` / `qcov affected` 命令。
+- 新增公开的 `qcov.adapter/v1` Adapter SDK 与 JaCoCo inventory adapter。
+- 新增经过审阅的真实项目案例：pytest、JUnit/JaCoCo 与 Playwright，包含显式
+  evidence mapping 和可复现 fixture。
+
+### 文档
+
+- 新增中英文安装与快速上手指南、协议更新和案例文档；保留简明的中文维护上下文，
+  供发布后参考。
+
+### 边界
+
+- 测试报告、coverage、JaCoCo、LCOV 和静态分析仍只是 inventory；只有显式
+  mapping 产生的有效 obligation-scoped evidence 才能影响 Gap 结论。
+
 ## 0.9.0 - 2026-09-11
 
 ### 新功能

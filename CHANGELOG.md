@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.0 - 2026-09-12
+
+### Features
+
+- Add deterministic Change-to-Obligation impact analysis with stable
+  `qcov.impact/v1` reports and the `qcov impact` / `qcov affected` commands.
+- Add the public `qcov.adapter/v1` Adapter SDK and a JaCoCo inventory adapter.
+- Add reviewed real-project case studies for pytest, JUnit/JaCoCo, and
+  Playwright, with explicit evidence mappings and reproducible fixtures.
+
+### Documentation
+
+- Add bilingual installation and getting-started guides, protocol updates, and
+  case-study documentation; retain a concise Chinese maintenance context for
+  post-release reference.
+
+### Boundaries
+
+- Keep test reports, coverage, JaCoCo, LCOV, and static analysis as inventory
+  unless an explicit mapping creates valid obligation-scoped evidence.
+
 ## 0.9.0 - 2026-09-11
 
 ### Features
