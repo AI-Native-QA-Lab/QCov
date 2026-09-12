@@ -1,0 +1,16 @@
+case_id: ai-native-qa-agents
+stack: Python pytest coverage
+source:
+  repository: ai-native-qa-agents
+  commit: e3472a82dd3c090bd1b0cbd17a2e1efef6098566
+  reference_files:
+    - packages/qa_agent/requirements.py
+  redaction: Source, tests, reports, paths, and environment values are not redistributed.
+commands:
+  - PYTHONPATH=packages python3 -m pytest
+  - PYTHONPATH=packages python3 -m pytest --cov=qa_agent
+execution_status: NOT_RUN
+release_gate_status: NOT_MET
+release_gate_gaps:
+  - Fewer than ten reviewed obligations are recorded for this project.
+  - No source-project execution or report import has been recorded.

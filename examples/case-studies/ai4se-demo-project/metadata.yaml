@@ -1,0 +1,17 @@
+case_id: ai4se-demo-project
+stack: Java JUnit JaCoCo
+source:
+  repository: ai4se-demo-project
+  commit: e02408b92a0fb085f8ac0bb72f0d010c4bbbe809
+  reference_files:
+    - backend/src/main/java/com/consultation/domain/service/AppointmentConflictService.java
+  redaction: Source, database configuration, tests, reports, paths, and environment values are not redistributed.
+commands:
+  - cd backend && mvn test
+  - cd backend && mvn test jacoco:report
+execution_status: NOT_RUN
+release_gate_status: NOT_MET
+release_gate_gaps:
+  - Fewer than ten reviewed obligations are recorded for this project.
+  - JaCoCo is not configured in the pinned pom.xml.
+  - No source-project execution or report import has been recorded.

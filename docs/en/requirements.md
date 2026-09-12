@@ -30,20 +30,26 @@ adds Agentic Quality Loop helpers: required `qcov explain` and `qcov agent next`
 (load check only). Proposals and agent helpers never become evidence or gate
 authority. See [agent playbook](agent.md).
 
-## Planned Iteration 8
+## Planned Iteration 8 and QCov 1.0 entry gate
 
-Iteration 8 adds production evidence producers under the same protocol rules.
-AI/plan/agent helpers never become evidence or gate authority. See
-[roadmap](roadmap.md).
+Iteration 8 adds an offline production-observation inventory producer under the
+same protocol rules. An observation can become evidence only through explicit
+mapping; AI/plan/agent helpers never become evidence or gate authority.
+
+Iteration 9 begins QCov 1.0 with real-project validation, deterministic Change
+→ Obligation Impact, Adapter SDK v1, and protocol-stability work. The 1.0 release
+gate is at least three real projects across Python/pytest/coverage,
+Java/JUnit/JaCoCo, and TypeScript/Playwright; at least 30 real obligations; and
+time to first value of 10 minutes or less. See [roadmap](roadmap.md).
 
 ## Still excluded without a new approved design
 
-Web UI, database persistence, remote Git operations, external plugin loading,
-inventory-to-obligation inference, policy DSL, dimension thresholds,
-wildcard or path-based waivers, and coverage/LCOV promotion to covering passed
-evidence remain out of scope until separately approved. Post-8 topics (QA for
-AI, Quality BOM, Adapter SDK, Continuous Quality Control Plane packaging) also
-require new designs.
+Web UI, database persistence, remote Git operations, automatic
+inventory-to-obligation inference, policy DSL, dimension thresholds, wildcard
+or path-based waivers, and coverage/LCOV promotion to covering passed evidence
+remain out of scope until separately approved. Adapter SDK v1 is planned for
+QCov 1.0; broader ecosystem/plugin loading, QA for AI, Quality BOM, and
+Continuous Quality Control Plane packaging require later designs.
 
 ## Pending requirement: broader mapping
 

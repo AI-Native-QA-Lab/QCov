@@ -1,0 +1,5 @@
+apiVersion: qcov.dev/v1alpha1
+kind: QCovConfig
+obligations:
+  - obligations/*.yaml
+evidence: []

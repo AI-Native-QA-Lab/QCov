@@ -1,0 +1,19 @@
+apiVersion: qcov.dev/v1alpha1
+kind: TestingObligation
+metadata:
+  id: QO-CASE-PY-001
+  title:
+    en: Requirement analysis must preserve an explicit traceable requirement identity
+    zh-CN: 需求分析必须保留可追溯的显式需求标识
+source:
+  type: source_file
+  ref: packages/qa_agent/requirements.py
+risk:
+  domain: requirement_intelligence
+  severity: high
+invariants:
+  - id: INV-CASE-PY-001
+    expression: every analyzed requirement has an explicit identity
+requiredEvidence:
+  behavior: [pytest]
+  boundary: [pytest]

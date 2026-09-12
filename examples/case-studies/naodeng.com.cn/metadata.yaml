@@ -1,0 +1,15 @@
+case_id: naodeng.com.cn
+stack: TypeScript Playwright
+source:
+  repository: naodeng.com.cn
+  commit: 31250a6a4bfc5620aee671224e698a655b58eda7
+  reference_files:
+    - tests/e2e/specs/navigation.spec.ts
+  redaction: Site content, analytics settings, reports, paths, and environment values are not redistributed.
+commands:
+  - cd tests && npm run test:e2e
+execution_status: NOT_RUN
+release_gate_status: NOT_MET
+release_gate_gaps:
+  - Fewer than ten reviewed obligations are recorded for this project.
+  - No source-project execution or report import has been recorded.

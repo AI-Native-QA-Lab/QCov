@@ -11,9 +11,11 @@ default offline provider. Iteration 6 adds the deterministic Quality Planner
 (`qcov plan` → draft `quality_plan` proposal). Iteration 7 adds Agentic Quality
 Loop helpers (`qcov explain`, `qcov agent next`, optional
 `qcov agent validate-evidence`) under `qcov.agent/v1`; they never run tests or
-become evidence/gate authority. Planned Iteration 8 covers production evidence;
-Iteration 8 completes that core roadmap arc, not the whole product (see Post-8
-backlog in the roadmap).
+become evidence/gate authority. Planned Iteration 8 is an offline production-
+observation foundation. Iteration 9 begins QCov 1.0: real-project validation,
+deterministic Change → Obligation Impact, Adapter SDK design, and protocol
+stability. QCov 1.5 and 2.0 require separately approved designs; see the
+roadmap.
 
 Do not add remote LLM providers beyond the approved Iteration 5 provider
 abstraction, a web UI, persistence, remote Git host APIs, external plugins,

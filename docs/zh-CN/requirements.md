@@ -17,13 +17,15 @@ AI（`obligation suggest`、`risk analyze`）。Iteration 6 增加确定性 `qco
 `qcov explain` 与 `qcov agent next`（`contractVersion: qcov.agent/v1`），以及可选
 `qcov agent validate-evidence`（仅加载检查）。提案与 Agent 助手永不成为证据或门禁权威。见 [Agent 使用说明](agent.md)。
 
-## Planned Iteration 8
+## 计划中的 Iteration 8 与 QCov 1.0 入口门槛
 
-Iteration 8 在同一协议规则下接入生产证据生产者。AI/plan/Agent 助手永不成为证据或门禁权威。见 [路线图](roadmap.md)。
+Iteration 8 在同一协议规则下接入离线 production-observation inventory producer。观察只有经显式 mapping 才能成为证据；AI/plan/Agent 助手永不成为证据或门禁权威。
+
+Iteration 9 开启 QCov 1.0：真实项目验证、确定性的 Change → Obligation Impact、Adapter SDK v1 与协议稳定性。1.0 Release Gate 为至少 3 个真实项目（Python/pytest/coverage、Java/JUnit/JaCoCo、TypeScript/Playwright）、至少 30 条真实 obligation，并使首次价值时间不超过 10 分钟。见 [路线图](roadmap.md)。
 
 ## Still excluded without a new approved design
 
-在无新的已批准设计前，Web UI、数据库持久化、远程 Git、外部插件加载、inventory 到义务的自动推断、策略 DSL、维度阈值、通配符或路径豁免，以及 coverage/LCOV 提升为可满足的 passed 证据仍不在范围内。Post-8 主题（QA for AI、Quality BOM、Adapter SDK、Continuous Quality Control Plane 打包）同样需要新设计。
+在无新的已批准设计前，Web UI、数据库持久化、远程 Git、inventory 到义务的自动推断、策略 DSL、维度阈值、通配符或路径豁免，以及 coverage/LCOV 提升为可满足的 passed 证据仍不在范围内。Adapter SDK v1 已列为 QCov 1.0 计划；更广生态/插件加载、QA for AI、Quality BOM 与 Continuous Quality Control Plane 打包仍需后续设计。
 
 ## Pending requirement: broader mapping
 
